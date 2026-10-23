@@ -258,15 +258,11 @@ export function DashboardClient({ userName }: { userName: string }) {
             <div key={activeModule}>
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
 
-              {activeModule !== "overview" && activeModule !== "reports" && (
+              {activeModule !== "overview" && (
                 <ModulePlaceholder
                   title={activeModule}
-                  tone={TONES[activeModule]}
+                  tone={TONES[activeModule as Exclude<ModuleKey, "overview">]}
                 />
-              )}
-
-              {activeModule === "reports" && (
-                <ModulePlaceholder title="reports" tone={TONES.reports} />
               )}
             </div>
           </div>
@@ -282,6 +278,7 @@ function DashboardSidebar({
   activeModule,
   onNavigate,
   userName,
+  
 }: {
   activeModule: ModuleKey;
   onNavigate: (m: ModuleKey) => void;
@@ -506,10 +503,10 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
           Wire up your data
         </h3>
         <p className="mx-auto mt-2 max-w-md text-xs leading-6 text-deep-500 dark:text-cream-500">
-          Overview stats, charts, and activity lists go here. Add your server
-          actions in <code className="rounded bg-cream-200 px-1 py-0.5 dark:bg-deep-800">app/admin/actions/</code> and
-          fetch them inside an effect, or convert this to a server component and
-          pass data as props.
+          Overview stats, charts and activity lists go here. Add server actions
+          under <code className="rounded bg-cream-200 px-1 py-0.5 dark:bg-deep-800">app/admin/actions/</code> and
+          pass the results in as props from the server component, or fetch them
+          client-side inside an effect.
         </p>
       </div>
     </div>

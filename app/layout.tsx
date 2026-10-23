@@ -5,6 +5,7 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/footer";
 import { Navbar } from "./components/navbar";
+import { SessionProvider } from "next-auth/react";
 
 
 const spaceGrotesk = Space_Grotesk({
@@ -41,7 +42,8 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
-      <body className="flex min-h-screen flex-col font-sans antialiased">
+      <body  suppressHydrationWarning className="flex min-h-screen flex-col font-sans antialiased">
+        <SessionProvider> 
         <Suspense
           fallback={
             <div className="h-16 border-b border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-950" />
@@ -52,6 +54,7 @@ export default function RootLayout({
 
         <div className="flex-1">{children}</div>
         <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
