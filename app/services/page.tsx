@@ -97,7 +97,7 @@ export default function ServicesPage() {
           <>
             Different capabilities.
             <br />
-            <span className="text-[var(--accent)]">
+            <span className="text-accent">
               One connected practice.
             </span>
           </>
@@ -106,10 +106,10 @@ export default function ServicesPage() {
       />
 
       {/* Introduction */}
-      <section className="border-b border-[var(--border)]">
+      <section className="border-b border-border">
         <div className="mx-auto grid max-w-7xl gap-6 px-5 py-12 sm:px-8 md:grid-cols-[0.6fr_1fr] md:gap-16 md:py-16">
           <p className="section-kicker">Our capabilities</p>
-          <p className="max-w-3xl text-xl leading-relaxed tracking-tight text-[var(--text-secondary)] sm:text-2xl">
+          <p className="max-w-3xl text-xl leading-relaxed tracking-tight text-text-secondary sm:text-2xl">
             We start with what your project needs, bring the right disciplines
             together, and keep the intended outcome at the centre of the work.
           </p>
@@ -122,14 +122,14 @@ export default function ServicesPage() {
           {SERVICES.map((service) => (
             <article
               key={service.index}
-              className="grid gap-8 border-b border-[var(--border)] py-12 first:pt-14 last:border-b-0 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:py-20"
+              className="grid gap-8 border-b border-border py-12 first:pt-14 last:border-b-0 sm:py-16 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20 lg:py-20"
             >
               <div>
                 <div className="flex items-center justify-between gap-4">
-                  <span className="font-mono text-xs tracking-widest text-[var(--accent)]">
+                  <span className="font-mono text-xs tracking-widest text-accent">
                     {service.index}
                   </span>
-                  <span className="border border-[var(--border)] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                  <span className="border border-border px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-text-muted">
                     {service.category}
                   </span>
                 </div>
@@ -138,13 +138,13 @@ export default function ServicesPage() {
                   {service.title}
                 </h2>
 
-                <p className="mt-5 max-w-xl text-sm leading-7 text-[var(--text-secondary)] sm:text-base">
+                <p className="mt-5 max-w-xl text-sm leading-7 text-text-secondary sm:text-base">
                   {service.description}
                 </p>
 
                 <Link
                   href={service.work}
-                  className="mt-7 inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[var(--accent)]"
+                  className="mt-7 inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent"
                 >
                   {service.index === "03"
                     ? "Discuss brand design"
@@ -153,8 +153,8 @@ export default function ServicesPage() {
                 </Link>
               </div>
 
-              <div className="bg-[var(--surface)] p-6 sm:p-8">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)]">
+              <div className="bg-surface p-6 sm:p-8">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
                   What this can include
                 </p>
 
@@ -162,12 +162,12 @@ export default function ServicesPage() {
                   {service.included.map((item) => (
                     <li
                       key={item}
-                      className="flex items-start gap-3 text-sm text-[var(--text-secondary)]"
+                      className="flex items-start gap-3 text-sm text-text-secondary"
                     >
                       <Check
                         size={16}
                         strokeWidth={1.5}
-                        className="mt-0.5 shrink-0 text-[var(--accent)]"
+                        className="mt-0.5 shrink-0 text-accent"
                         aria-hidden="true"
                       />
                       <span>{item}</span>
@@ -181,7 +181,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Integrated engagement */}
-      <section className="border-t border-[var(--border)] bg-[var(--surface)]">
+      <section className="border-t border-border bg-surface">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:gap-20 lg:py-24">
           <div>
             <p className="section-kicker">Working together</p>
@@ -191,7 +191,7 @@ export default function ServicesPage() {
           </div>
 
           <div>
-            <p className="text-sm leading-7 text-[var(--text-secondary)] sm:text-base">
+            <p className="text-sm leading-7 text-text-secondary sm:text-base">
               Some projects need a specialist team for a defined task. Others
               benefit from coordinated creative, technical and delivery
               capabilities. We shape the engagement around the brief, scope,
@@ -200,7 +200,7 @@ export default function ServicesPage() {
 
             <Link
               href="/contact"
-              className="mt-8 inline-flex items-center gap-3 bg-[var(--accent)] px-6 py-4 text-sm font-medium text-white transition hover:opacity-90"
+              className="mt-8 inline-flex items-center gap-3 bg-accent px-6 py-4 text-sm font-medium text-white transition hover:opacity-90"
             >
               Tell us what you need
               <ArrowDownRight size={18} aria-hidden="true" />
