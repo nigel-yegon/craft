@@ -1,150 +1,380 @@
-/* app/globals.css */
+
 @import "tailwindcss";
 
+/* =========================================================
+   CRAFT STUDIOS
+   Spaces. Systems. Experiences.
+   Ideas, Integrated.
+   ========================================================= */
+
+/* Tailwind CSS v4 dark mode variant */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/*
-  Palette source
-  ─────────────────────────────────────────────────────────────
-  Aquamarine    #85ffc7  → mint / accent
-  Pine Blue     #297373  → primary brand
-  Coral Glow    #ff8552  → warm accent
-  Alabaster Grey#e6e6e6  → light surface
-  Graphite      #39393a  → dark base
-*/
+/* =========================================================
+   BRAND TOKENS
+   ========================================================= */
 
 :root {
-  /* ─── Base page ─── */
-  --background: #e6e6e6;
-  --foreground: #39393a;
+  color-scheme: light;
 
-  /* ─── Brand (Pine Blue ramp) ─── */
-  --brand-50:  #eaf5f5;
-  --brand-100: #c8e6e6;
-  --brand-200: #a3d6d6;
-  --brand-300: #6fbfbf;
-  --brand-400: #4a9e9e;
-  --brand-500: #297373;
-  --brand-600: #226060;
-  --brand-700: #1a4c4c;
-  --brand-800: #123838;
-  --brand-900: #0b2424;
-  --brand-950: #061414;
+  /* Core brand palette */
+  --olive: #78865a;
+  --olive-dark: #596744;
+  --olive-light: #b6c58d;
 
-  /* ─── Deep (Graphite ramp) ─── */
-  --deep-50:  #f4f4f4;
-  --deep-100: #e2e2e2;
-  --deep-200: #c4c4c4;
-  --deep-300: #a3a3a4;
-  --deep-400: #7c7c7d;
-  --deep-500: #5e5e5f;
-  --deep-600: #4c4c4d;
-  --deep-700: #434344;
-  --deep-800: #39393a;
-  --deep-900: #262627;
-  --deep-950: #141415;
+  --ivory: #f4f0e7;
+  --ivory-muted: #eae7de;
 
-  /* ─── Cream (Alabaster ramp) ─── */
-  --cream-50:  #fafafa;
-  --cream-100: #f2f2f2;
-  --cream-200: #e6e6e6;
-  --cream-300: #d6d6d6;
-  --cream-400: #bdbdbd;
-  --cream-500: #a0a0a0;
-  --cream-600: #7e7e7e;
-  --cream-700: #5e5e5e;
-  --cream-800: #424242;
-  --cream-900: #2d2d2d;
-  --cream-950: #1a1a1a;
+  --charcoal: #242620;
+  --charcoal-deep: #191a17;
 
-  /* ─── Accents ─── */
-  --accent-mint:  #85ffc7;
-  --accent-coral: #ff8552;
+  /* Light theme */
+  --background: #f4f0e7;
+  --foreground: #242620;
 
-  /* ─── Fonts (set by next/font on <html>) ─── */
-  --font-sans: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
-  --font-mono: var(--font-mono, ui-monospace, monospace);
+  --surface: #fbf9f4;
+  --surface-muted: #eae7de;
+
+  --border: #dedbd1;
+  --border-strong: #c8c5b9;
+
+  --text-primary: #242620;
+  --text-secondary: #66675e;
+  --text-muted: #858579;
+
+  --accent: #78865a;
+  --accent-hover: #596744;
+  --accent-foreground: #ffffff;
+
+  --selection-background: #78865a;
+  --selection-foreground: #ffffff;
+
+  --font-sans: var(--font-space-grotesk, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-jetbrains-mono, ui-monospace, monospace);
+
+  /* Layout */
+  --container-width: 1440px;
+  --page-gutter: clamp(1.25rem, 5vw, 5rem);
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+  --transition-fast: 180ms ease;
+  --transition-base: 300ms var(--ease-brand);
 }
+
+/* =========================================================
+   DARK THEME
+   Activated by .dark on html or an ancestor.
+   ========================================================= */
 
 .dark {
-  --background: #141415;
-  --foreground: #e6e6e6;
+  color-scheme: dark;
+
+  --background: #191a17;
+  --foreground: #f4f0e7;
+
+  --surface: #242620;
+  --surface-muted: #2e3029;
+
+  --border: #3b3d34;
+  --border-strong: #505346;
+
+  --text-primary: #f4f0e7;
+  --text-secondary: #c1c0b5;
+  --text-muted: #96988b;
+
+  --accent: #b6c58d;
+  --accent-hover: #d0dcb0;
+  --accent-foreground: #191a17;
+
+  --selection-background: #b6c58d;
+  --selection-foreground: #191a17;
 }
 
+/* =========================================================
+   TAILWIND CSS THEME MAPPING
+   Makes tokens available as Tailwind utility classes.
+   ========================================================= */
+
 @theme inline {
+  /* Semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand */
-  --color-brand-50:  var(--brand-50);
-  --color-brand-100: var(--brand-100);
-  --color-brand-200: var(--brand-200);
-  --color-brand-300: var(--brand-300);
-  --color-brand-400: var(--brand-400);
-  --color-brand-500: var(--brand-500);
-  --color-brand-600: var(--brand-600);
-  --color-brand-700: var(--brand-700);
-  --color-brand-800: var(--brand-800);
-  --color-brand-900: var(--brand-900);
-  --color-brand-950: var(--brand-950);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
 
-  /* Deep */
-  --color-deep-50:  var(--deep-50);
-  --color-deep-100: var(--deep-100);
-  --color-deep-200: var(--deep-200);
-  --color-deep-300: var(--deep-300);
-  --color-deep-400: var(--deep-400);
-  --color-deep-500: var(--deep-500);
-  --color-deep-600: var(--deep-600);
-  --color-deep-700: var(--deep-700);
-  --color-deep-800: var(--deep-800);
-  --color-deep-900: var(--deep-900);
-  --color-deep-950: var(--deep-950);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
 
-  /* Cream */
-  --color-cream-50:  var(--cream-50);
-  --color-cream-100: var(--cream-100);
-  --color-cream-200: var(--cream-200);
-  --color-cream-300: var(--cream-300);
-  --color-cream-400: var(--cream-400);
-  --color-cream-500: var(--cream-500);
-  --color-cream-600: var(--cream-600);
-  --color-cream-700: var(--cream-700);
-  --color-cream-800: var(--cream-800);
-  --color-cream-900: var(--cream-900);
-  --color-cream-950: var(--cream-950);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 
-  /* Accents */
-  --color-accent-mint:  var(--accent-mint);
-  --color-accent-coral: var(--accent-coral);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
 
-  /* Fonts */
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  /* Brand palette */
+  --color-olive: var(--olive);
+  --color-olive-dark: var(--olive-dark);
+  --color-olive-light: var(--olive-light);
+
+  --color-ivory: var(--ivory);
+  --color-ivory-muted: var(--ivory-muted);
+
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-deep: var(--charcoal-deep);
+
+  /* Typography */
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Existing project-compatible aliases */
+  --color-brand: var(--olive);
+  --color-brand-dark: var(--olive-dark);
+  --color-brand-light: var(--olive-light);
+
+  --color-cream: var(--ivory);
+  --color-cream-muted: var(--ivory-muted);
+
+  --color-deep: var(--charcoal);
+  --color-deep-dark: var(--charcoal-deep);
 }
 
-/* Smooth theme transitions — only colors, not layout.
-   Disabled by next-themes' `disableTransitionOnChange` during the swap. */
+/* =========================================================
+   BASE STYLES
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  background: var(--background);
+}
+
 body {
+  min-height: 100vh;
+  margin: 0;
+
   background: var(--background);
   color: var(--foreground);
+
   font-family: var(--font-sans);
-  transition: background-color 200ms ease, color 200ms ease;
+  font-size: 16px;
+  line-height: 1.6;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
-/* Focus ring */
-:focus-visible {
-  outline: 2px solid var(--brand-400);
-  outline-offset: 2px;
+/* Avoid unwanted margins in common content elements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote {
+  margin-top: 0;
 }
 
-/* Selection */
+/* Consistent heading rhythm */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: inherit;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Form controls inherit the site's typography */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Images behave predictably */
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+/* =========================================================
+   TEXT SELECTION
+   ========================================================= */
+
 ::selection {
-  background-color: var(--brand-200);
-  color: var(--deep-800);
+  background: var(--selection-background);
+  color: var(--selection-foreground);
 }
 
-.dark ::selection {
-  background-color: var(--brand-800);
-  color: var(--brand-50);
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* Keep keyboard focus visible on interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* =========================================================
+   REUSABLE LAYOUT UTILITIES
+   ========================================================= */
+
+.container-brand {
+  width: min(
+    calc(100% - (var(--page-gutter) * 2)),
+    var(--container-width)
+  );
+  margin-inline: auto;
+}
+
+.section-padding {
+  padding-block: clamp(4rem, 9vw, 9rem);
+}
+
+.section-padding-sm {
+  padding-block: clamp(3rem, 6vw, 6rem);
+}
+
+/* =========================================================
+   SECTION LABELS
+   ========================================================= */
+
+.section-kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  color: var(--text-secondary);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.section-kicker::before {
+  width: 1.75rem;
+  height: 1px;
+  flex-shrink: 0;
+
+  background: var(--accent);
+  content: "";
+}
+
+/* =========================================================
+   BRAND INTERACTIONS
+   ========================================================= */
+
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.2rem;
+  left: 0;
+
+  height: 1px;
+
+  background: currentColor;
+  content: "";
+
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--transition-base);
+}
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) var(--background);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid var(--background);
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* =========================================================
+   REDUCED MOTION
+   Respect the visitor's operating-system preference.
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

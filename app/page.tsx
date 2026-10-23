@@ -1,379 +1,497 @@
-// app/page.tsx
+
 import Link from "next/link";
-import type { Metadata } from "next";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  Box,
+  Check,
+  Layers3,
+  Lightbulb,
+  MoveUpRight,
+  PanelsTopLeft,
+  Shapes,
+  Workflow,
+} from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Craft Studios — Ideas, Integrated.",
-  description:
-    "A fully integrated creative, design and technology studio. Spaces. Systems. Experiences. From concept to delivery.",
-};
+const services = [
+  {
+    number: "01",
+    title: "Spaces & Architecture",
+    description:
+      "Architectural concepts, spatial planning and considered interiors shaped around the way people live, work and connect.",
+    tags: ["Architecture", "Interiors", "Space planning"],
+    href: "/work/architecture",
+    icon: PanelsTopLeft,
+  },
+  {
+    number: "02",
+    title: "Visuals & Art",
+    description:
+      "Visual identities, artwork, creative direction and compelling visual impressions that give ideas their own character.",
+    tags: ["Art direction", "Visual design", "Artwork"],
+    href: "/services",
+    icon: Shapes,
+  },
+  {
+    number: "03",
+    title: "Software & Systems",
+    description:
+      "Bespoke software, digital products and practical business systems designed around real people and real workflows.",
+    tags: ["Software", "Digital products", "Automation"],
+    href: "/work/software",
+    icon: Workflow,
+  },
+  {
+    number: "04",
+    title: "Solutions & Delivery",
+    description:
+      "From solution architecture and technical planning to project coordination, implementation and delivery.",
+    tags: ["Consulting", "Project management", "Implementation"],
+    href: "/work/delivery",
+    icon: Layers3,
+  },
+];
 
-const DISCIPLINES = [
+const projects = [
   {
-    index: "01",
-    title: "Architecture",
-    body: "Buildings, interiors and spatial systems drawn with precision — from concept sketches to construction sets.",
+    number: "01",
+    category: "SPATIAL DESIGN",
+    title: "Spaces that make sense.",
+    description:
+      "Thoughtful environments, material choices and spatial experiences.",
+    image:
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=85",
+    alt: "Warm contemporary interior with considered furniture and natural materials",
+    className: "md:col-span-7",
   },
   {
-    index: "02",
-    title: "Design",
-    body: "Identity, print and digital design that reads as clearly on a facade as it does on a screen.",
+    number: "02",
+    category: "DIGITAL SYSTEMS",
+    title: "Complexity, made clear.",
+    description:
+      "Digital tools and bespoke systems designed for the way businesses work.",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=85",
+    alt: "Digital business analytics displayed on a computer screen",
+    className: "md:col-span-5 md:mt-24",
   },
   {
-    index: "03",
-    title: "Software",
-    body: "Web, product and platform engineering — the systems that make the studio's work live and work.",
+    number: "03",
+    category: "ARCHITECTURE",
+    title: "Ideas with a footprint.",
+    description:
+      "Architectural thinking that connects function, form and context.",
+    image:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=85",
+    alt: "Contemporary architecture with expansive glass and carefully composed forms",
+    className: "md:col-span-5",
   },
   {
-    index: "04",
-    title: "Delivery",
-    body: "Project management and implementation: the studio stays on the ground until the work is built, shipped and running.",
+    number: "04",
+    category: "CREATIVE DIRECTION",
+    title: "Identity with intention.",
+    description:
+      "Visual decisions that create a coherent, recognisable experience.",
+    image:
+      "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1200&q=85",
+    alt: "Creative workspace with notebooks and design materials",
+    className: "md:col-span-7 md:mt-24",
   },
-] as const;
+];
 
-const WORK = [
+const process = [
   {
-    tag: "Architecture",
-    title: "Riverside Civic Hall",
-    location: "Nairobi, 2024",
-    detail: "Public building",
+    number: "01",
+    title: "Discover",
+    text: "Understand the people, the problem and the opportunity.",
   },
   {
-    tag: "Software",
-    title: "Formwork OS",
-    location: "Platform, 2024",
-    detail: "Design system + app",
+    number: "02",
+    title: "Conceptualise",
+    text: "Explore ideas, test possibilities and define the direction.",
   },
   {
-    tag: "Interiors",
-    title: "The Cut",
-    location: "Mombasa, 2023",
-    detail: "Barbershop & gallery",
+    number: "03",
+    title: "Design & engineer",
+    text: "Bring creative thinking and technical rigour together.",
   },
   {
-    tag: "Delivery",
-    title: "Karura Trail",
-    location: "Nairobi, 2023",
-    detail: "Public realm",
+    number: "04",
+    title: "Deliver",
+    text: "Coordinate implementation and bring the solution into the real world.",
   },
-] as const;
+];
 
-const PROCESS = [
-  {
-    step: "01",
-    label: "Frame",
-    body: "We start with the problem, not the brief. What is this for, who is it for, and how will we know it worked?",
-  },
-  {
-    step: "02",
-    label: "Design",
-    body: "Drawing, modelling, prototyping. Ideas get tested at the scale they will actually live at.",
-  },
-  {
-    step: "03",
-    label: "Engineer",
-    body: "Details, systems, specs. The part where a sketch becomes something a contractor or a developer can build.",
-  },
-  {
-    step: "04",
-    label: "Deliver",
-    body: "On the ground and on the screen. The studio stays through handover, launch and the first six months.",
-  },
-] as const;
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <>
-      {/* ─── HERO ─────────────────────────────────────────── */}
-      <section className="border-b border-deep-200 dark:border-deep-800">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-20 lg:grid-cols-[1.15fr_1fr] lg:gap-16 lg:px-8 lg:pb-28 lg:pt-32">
-          {/* Left: title block */}
-          <div>
-            <div className="flex items-center gap-3">
-              <span
-                aria-hidden
-                className="h-1.5 w-1.5 rounded-full bg-accent-mint"
-              />
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-deep-500 dark:text-cream-400">
-                Creative · Design · Technology
-              </p>
-            </div>
+    <main className="overflow-hidden bg-background text-foreground">
+      {/* HERO */}
+      <section className="relative isolate min-h-170 overflow-hidden bg-[#20221e] text-[#f4f0e7] lg:min-h-190">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=2400&q=90')",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-linear-to-r from-[#171915]/95 via-[#171915]/75 to-[#171915]/20"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-linear-to-t from-[#171915]/70 via-transparent to-[#171915]/10"
+        />
 
-            <h1 className="mt-8 text-[clamp(2.75rem,7vw,6rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-deep-900 dark:text-cream-100">
-              Ideas,
+        <div className="mx-auto flex min-h-170 max-w-7xl flex-col justify-between px-5 pb-8 pt-20 sm:px-8 lg:min-h-190 lg:px-12 lg:pb-10 lg:pt-28">
+          <div className="max-w-4xl">
+            <p className="mb-7 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[#c2cf9c] sm:text-xs">
+              <span className="h-px w-8 bg-[#a9b77d]" />
+              An integrated creative & technology studio
+            </p>
+
+            <h1 className="max-w-4xl text-5xl font-light leading-[0.98] tracking-[-0.065em] sm:text-7xl lg:text-[100px]">
+              Spaces.
               <br />
-              <span className="text-brand-700 dark:text-brand-300">
-                integrated.
+              Systems.
+              <br />
+              <span className="font-normal text-[#b6c58d]">
+                Experiences.
               </span>
             </h1>
 
-            <p className="mt-8 max-w-xl text-base leading-7 text-deep-600 dark:text-cream-400">
-              Craft Studios is a single practice bringing architecture, design,
-              software and delivery under one roof. One studio. Multiple
-              disciplines. Seamlessly integrated.
-            </p>
-
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 rounded-md bg-deep-800 px-5 py-3 text-sm font-medium text-cream-100 transition hover:bg-brand-700 dark:bg-brand-500 dark:text-deep-900 dark:hover:bg-accent-mint"
-              >
-                Start a project
-                <span aria-hidden>→</span>
-              </Link>
-              <Link
-                href="/work"
-                className="inline-flex items-center gap-2 rounded-md border border-deep-300 px-5 py-3 text-sm font-medium text-deep-700 transition hover:border-deep-800 dark:border-deep-700 dark:text-cream-300 dark:hover:border-cream-100"
-              >
-                See the work
-              </Link>
-            </div>
-
-            {/* Discipline strip */}
-            <dl className="mt-14 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-deep-200 pt-8 sm:grid-cols-4 dark:border-deep-800">
-              {DISCIPLINES.map((d) => (
-                <div key={d.title}>
-                  <dt className="text-[10px] font-mono uppercase tracking-[0.22em] text-deep-400 dark:text-cream-600">
-                    {d.index}
-                  </dt>
-                  <dd className="mt-1 text-sm font-medium text-deep-800 dark:text-cream-200">
-                    {d.title}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          {/* Right: three plain word panels — architectural diagram feel */}
-          <div className="relative">
-            <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-deep-200 bg-deep-200 dark:border-deep-800 dark:bg-deep-800">
-              <div className="col-span-2 flex aspect-4/3 flex-col justify-between bg-cream-50 p-6 dark:bg-deep-900">
-                <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-deep-400 dark:text-cream-600">
-                  Craft — Diagram 01
-                </p>
-                <p className="text-3xl font-semibold leading-[1.05] tracking-[-0.02em] text-deep-800 dark:text-cream-100">
-                  Spaces.
-                  <br />
-                  Systems.
-                  <br />
-                  Experiences.
-                </p>
-                <p className="text-[11px] uppercase tracking-[0.18em] text-deep-500 dark:text-cream-500">
-                  From concept to delivery
-                </p>
-              </div>
-              <div className="flex aspect-square flex-col justify-between bg-brand-500 p-5 text-cream-50 dark:bg-brand-600">
-                <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-cream-100/70">
-                  Integrated
-                </p>
-                <p className="text-sm font-medium leading-5">
-                  One studio, four disciplines, no hand-offs.
-                </p>
-              </div>
-              <div className="flex aspect-square flex-col justify-between bg-deep-800 p-5 text-cream-100 dark:bg-deep-950">
-                <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-cream-100/60">
-                  Est.
-                </p>
-                <p className="text-4xl font-semibold tabular-nums tracking-[-0.02em]">
-                  2024
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── DISCIPLINES ─────────────────────────────────── */}
-      <section className="border-b border-deep-200 dark:border-deep-800">
-        <div className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
-          <div className="grid gap-12 lg:grid-cols-[0.5fr_1fr] lg:gap-20">
-            <header>
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-deep-500 dark:text-cream-400">
-                What we do
+            <div className="mt-8 grid max-w-2xl gap-7 sm:grid-cols-[1fr_auto] sm:items-end">
+              <p className="max-w-md text-sm leading-7 text-white/75 sm:text-base">
+                We bring creative thinking, spatial design and intelligent
+                technology together to turn ambitious ideas into meaningful,
+                real-world solutions.
               </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-deep-900 dark:text-cream-100 sm:text-4xl">
-                Four disciplines.
-                <br />
-                One practice.
-              </h2>
-              <p className="mt-5 max-w-md text-base leading-7 text-deep-600 dark:text-cream-400">
-                Most studios pick a lane. We deliberately don't. Architecture,
-                design, software and delivery sit in the same room so decisions
-                travel in one direction: forward.
-              </p>
-            </header>
 
-            <ul className="divide-y divide-deep-200 dark:divide-deep-800">
-              {DISCIPLINES.map((d) => (
-                <li
-                  key={d.title}
-                  className="grid grid-cols-[auto_1fr] gap-6 py-7 first:pt-0 last:pb-0"
+              <div className="flex flex-wrap gap-3 sm:flex-col">
+                <Link
+                  href="/contact"
+                  className="inline-flex min-h-12 items-center justify-center gap-3 bg-[#b6c58d] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#20221e] transition hover:bg-[#d0dbb3] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b6c58d]"
                 >
-                  <span className="pt-1 text-[11px] font-mono uppercase tracking-[0.22em] text-deep-400 dark:text-cream-600">
-                    {d.index}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-semibold text-deep-900 dark:text-cream-100">
-                      {d.title}
-                    </h3>
-                    <p className="mt-1.5 max-w-xl text-sm leading-6 text-deep-600 dark:text-cream-400">
-                      {d.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── PROCESS ─────────────────────────────────────── */}
-      <section className="border-b border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
-        <div className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-deep-500 dark:text-cream-400">
-              How we work
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-deep-900 dark:text-cream-100 sm:text-4xl">
-              A method, not a mood.
-            </h2>
-          </div>
-
-          <ol className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-deep-200 bg-deep-200 sm:grid-cols-2 lg:grid-cols-4 dark:border-deep-800 dark:bg-deep-800">
-            {PROCESS.map((p) => (
-              <li
-                key={p.step}
-                className="flex flex-col gap-4 bg-cream-50 p-6 dark:bg-deep-950"
-              >
-                <span className="text-[11px] font-mono uppercase tracking-[0.22em] text-brand-700 dark:text-brand-300">
-                  {p.step}
-                </span>
-                <h3 className="text-lg font-semibold text-deep-900 dark:text-cream-100">
-                  {p.label}
-                </h3>
-                <p className="text-sm leading-6 text-deep-600 dark:text-cream-400">
-                  {p.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* ─── SELECTED WORK ───────────────────────────────── */}
-      <section className="border-b border-deep-200 dark:border-deep-800">
-        <div className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-deep-500 dark:text-cream-400">
-                Selected work
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-deep-900 dark:text-cream-100 sm:text-4xl">
-                Built, shipped, standing.
-              </h2>
-            </div>
-            <Link
-              href="/work"
-              className="text-sm font-medium text-deep-700 underline decoration-deep-300 decoration-1 underline-offset-4 transition hover:decoration-deep-800 dark:text-cream-300 dark:decoration-deep-600 dark:hover:decoration-cream-100"
-            >
-              All work →
-            </Link>
-          </div>
-
-          <ul className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-deep-200 bg-deep-200 sm:grid-cols-2 dark:border-deep-800 dark:bg-deep-800">
-            {WORK.map((w) => (
-              <li key={w.title} className="bg-cream-50 dark:bg-deep-950">
+                  Start a project
+                  <ArrowUpRight size={16} />
+                </Link>
                 <Link
                   href="/work"
-                  className="group flex h-full flex-col justify-between gap-12 p-8 transition hover:bg-cream-100 dark:hover:bg-deep-900"
+                  className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/30 px-5 text-xs font-medium uppercase tracking-[0.12em] text-white transition hover:border-white hover:bg-white/10"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-deep-400 dark:text-cream-600">
-                      {w.tag}
+                  Explore our work
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16 flex flex-wrap items-end justify-between gap-6 border-t border-white/20 pt-5">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
+              Independent thinking. Integrated delivery.
+            </p>
+            <a
+              href="#studio"
+              className="inline-flex items-center gap-2 text-xs text-white/80 transition hover:text-[#c2cf9c]"
+            >
+              Discover the studio
+              <ArrowDownRight size={15} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* STUDIO INTRODUCTION */}
+      <section
+        id="studio"
+        className="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-12 lg:gap-16 lg:px-12"
+      >
+        <div className="lg:col-span-5">
+          <p className="section-kicker">01 / The studio</p>
+          <h2 className="mt-6 max-w-lg text-4xl font-light leading-[1.08] tracking-tighter sm:text-5xl lg:text-6xl">
+            Different disciplines.
+            <br />
+            <span className="text-olive">One clear vision.</span>
+          </h2>
+        </div>
+
+        <div className="flex flex-col justify-between gap-8 lg:col-span-6 lg:col-start-7">
+          <p className="max-w-2xl text-base leading-8 text-foreground/75 sm:text-lg sm:leading-9">
+            Craft Studios is a fully integrated creative studio working across
+            spaces, visual expression and technology. We connect the dots
+            between an initial idea, a considered design, an engineered
+            solution and its implementation.
+          </p>
+          <p className="max-w-2xl text-sm leading-7 text-foreground/65">
+            Rather than treating every discipline as a separate destination,
+            we bring them together around what the project actually needs.
+            One connected process. A more coherent result.
+          </p>
+          <Link
+            href="/studio"
+            className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm font-medium transition hover:gap-5"
+          >
+            Get to know Craft Studios
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </section>
+
+      {/* SERVICES */}
+      <section className="bg-[#eae7de] py-20 text-[#292a25] sm:py-28">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p className="section-kicker">02 / What we do</p>
+              <h2 className="mt-5 max-w-2xl text-4xl font-light leading-tight tracking-tighter sm:text-5xl lg:text-6xl">
+                Made to work
+                <br />
+                <span className="text-olive">better together.</span>
+              </h2>
+            </div>
+            <p className="max-w-sm text-sm leading-7 text-[#292a25]/70">
+              Four connected disciplines. One adaptable team, from the first
+              sketch to the final handover.
+            </p>
+          </div>
+
+          <div className="grid border-l border-t border-[#292a25]/15 sm:grid-cols-2">
+            {services.map((service) => {
+              const Icon = service.icon;
+
+              return (
+                <Link
+                  key={service.number}
+                  href={service.href}
+                  className="group flex min-h-75 flex-col border-b border-r border-[#292a25]/15 p-6 transition-colors hover:bg-[#f4f0e7] sm:p-8 lg:min-h-82.5 lg:p-10"
+                >
+                  <div className="flex items-start justify-between">
+                    <span className="font-mono text-xs text-[#292a25]/50">
+                      {service.number}
                     </span>
-                    <span
-                      aria-hidden
-                      className="text-deep-300 transition group-hover:translate-x-1 group-hover:text-deep-800 dark:text-deep-600 dark:group-hover:text-cream-100"
-                    >
-                      →
-                    </span>
+                    <Icon
+                      size={23}
+                      strokeWidth={1.4}
+                      className="text-olive transition-transform duration-300 group-hover:scale-110"
+                    />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold tracking-[-0.01em] text-deep-900 dark:text-cream-100">
-                      {w.title}
-                    </h3>
-                    <p className="mt-1 text-sm text-deep-500 dark:text-cream-500">
-                      {w.detail} · {w.location}
-                    </p>
+
+                  <h3 className="mt-12 text-2xl font-medium tracking-tight sm:text-3xl">
+                    {service.title}
+                  </h3>
+                  <p className="mt-4 max-w-md text-sm leading-7 text-[#292a25]/70">
+                    {service.description}
+                  </p>
+
+                  <div className="mt-auto flex flex-wrap gap-2 pt-7">
+                    {service.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="border border-[#292a25]/15 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.08em] text-[#292a25]/70"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                    <span className="ml-auto flex items-center text-olive transition-transform group-hover:translate-x-1">
+                      <ArrowUpRight size={19} />
+                    </span>
                   </div>
                 </Link>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      {/* ─── STATEMENT / QUOTE ───────────────────────────── */}
-      <section className="border-b border-deep-200 dark:border-deep-800">
-        <div className="mx-auto max-w-7xl px-4 py-20 lg:px-8 lg:py-28">
-          <figure className="grid gap-12 lg:grid-cols-[0.4fr_1fr] lg:gap-20">
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-deep-500 dark:text-cream-400">
-              Principle
-            </p>
-            <blockquote>
-              <p className="text-[clamp(1.5rem,3.2vw,2.5rem)] font-medium leading-[1.15] tracking-[-0.015em] text-deep-900 dark:text-cream-100">
-                “The work is one thing. Architecture, design, software and
-                delivery are not stages of a process — they are the same
-                practice seen from four angles.”
-              </p>
-              <figcaption className="mt-8 flex items-center gap-3">
-                <span
-                  aria-hidden
-                  className="h-1.5 w-1.5 rounded-full bg-accent-coral"
-                />
-                <span className="text-sm font-medium text-deep-700 dark:text-cream-300">
-                  Craft Studios
-                </span>
-                <span className="text-sm text-deep-400 dark:text-cream-600">
-                  — studio note, 2024
-                </span>
-              </figcaption>
-            </blockquote>
-          </figure>
-        </div>
-      </section>
-
-      {/* ─── CTA ─────────────────────────────────────────── */}
-      <section className="bg-deep-800 dark:bg-deep-950">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 lg:grid-cols-[1fr_auto] lg:items-end lg:px-8 lg:py-28">
+      {/* PORTFOLIO */}
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+        <div className="mb-14 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-cream-400">
-              Next
-            </p>
-            <h2 className="mt-4 text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-cream-100">
-              Have a project in mind?
-              <br />
-              <span className="text-accent-mint">
-                Let's draw the first line.
-              </span>
+            <p className="section-kicker">03 / Selected perspectives</p>
+            <h2 className="mt-5 text-4xl font-light tracking-tighter sm:text-5xl lg:text-6xl">
+              Ideas, made tangible.
             </h2>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <Link
+            href="/work"
+            className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm transition hover:gap-5"
+          >
+            View all work
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-12 md:gap-y-20">
+          {projects.map((project) => (
+            <article key={project.number} className={project.className}>
+              <Link
+                href="/work"
+                className="group block"
+                aria-label={`Explore work: ${project.title}`}
+              >
+                <div className="relative aspect-5/4 overflow-hidden bg-cream-200">
+                  {/* Remote images are used here so no image-host configuration is needed. */}
+                  <img
+                    src={project.image}
+                    alt={project.alt}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                  />
+                  <span className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#f4f0e7] text-[#292a25] transition group-hover:bg-olive group-hover:text-white">
+                    <MoveUpRight size={18} />
+                  </span>
+                </div>
+
+                <div className="mt-5 flex items-start justify-between gap-5">
+                  <div>
+                    <p className="font-mono text-[10px] tracking-[0.15em] text-olive">
+                      {project.category}
+                    </p>
+                    <h3 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
+                      {project.title}
+                    </h3>
+                    <p className="mt-2 max-w-md text-sm leading-6 text-foreground/65">
+                      {project.description}
+                    </p>
+                  </div>
+                  <span className="pt-1 font-mono text-xs text-foreground/40">
+                    {project.number}
+                  </span>
+                </div>
+              </Link>
+            </article>
+          ))}
+        </div>
+
+        <p className="mt-12 max-w-xl text-xs leading-6 text-foreground/50">
+          The imagery above is illustrative. Replace it with verified studio
+          projects as your portfolio is ready to publish.
+        </p>
+      </section>
+
+      {/* PROCESS */}
+      <section className="bg-[#242620] py-20 text-[#f4f0e7] sm:py-28">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#b6c58d]">
+                04 / How we work
+              </p>
+              <h2 className="mt-6 text-4xl font-light leading-[1.08] tracking-tighter sm:text-5xl lg:text-6xl">
+                From first thought
+                <br />
+                to final form.
+              </h2>
+              <p className="mt-6 max-w-md text-sm leading-7 text-white/60">
+                Good work needs more than a good idea. We connect discovery,
+                design, engineering and delivery into one thoughtful process.
+              </p>
+              <Link
+                href="/studio/process"
+                className="mt-8 inline-flex items-center gap-3 border-b border-[#b6c58d] pb-2 text-sm text-[#f4f0e7] transition hover:gap-5"
+              >
+                Explore our process
+                <ArrowUpRight size={16} />
+              </Link>
+            </div>
+
+            <div className="lg:col-span-6 lg:col-start-7">
+              {process.map((step, index) => (
+                <div
+                  key={step.number}
+                  className="grid grid-cols-[48px_1fr] gap-4 border-t border-white/15 py-6 sm:grid-cols-[60px_1fr] sm:py-8"
+                >
+                  <span className="font-mono text-xs text-[#b6c58d]">
+                    {step.number}
+                  </span>
+                  <div>
+                    <h3 className="text-xl font-medium sm:text-2xl">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 max-w-md text-sm leading-7 text-white/60">
+                      {step.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              <div className="mt-4 flex items-center gap-2 text-xs text-[#b6c58d]">
+                <Check size={15} />
+                <span>One connected process, shaped around your project.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BRAND PRINCIPLE */}
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+        <div className="grid gap-8 border-b border-foreground/15 pb-12 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div>
+            <p className="section-kicker">05 / Our guiding principle</p>
+            <h2 className="mt-6 max-w-4xl text-5xl font-light leading-[1.02] tracking-[-0.06em] sm:text-7xl lg:text-8xl">
+              Ideas,
+              <br />
+              <span className="text-olive">Integrated.</span>
+            </h2>
+          </div>
+          <div className="max-w-xs">
+            <p className="text-sm leading-7 text-foreground/70">
+              Creative vision meets practical thinking. Every detail has a
+              purpose, every discipline has a place, and every solution is
+              designed to work in the real world.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* PROJECT ENQUIRY */}
+      <section className="px-5 pb-20 sm:px-8 sm:pb-28 lg:px-12">
+        <div className="relative mx-auto max-w-7xl overflow-hidden bg-[#dfe4d1] px-6 py-12 text-[#252720] sm:px-12 sm:py-16 lg:px-16 lg:py-20">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-24 h-72 w-72 rounded-full border border-[#65734b]/20 sm:h-96 sm:w-96"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -right-4 -top-12 h-56 w-56 rounded-full border border-[#65734b]/20 sm:h-72 sm:w-72"
+          />
+
+          <div className="relative max-w-3xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#65734b]">
+              Have something in mind?
+            </p>
+            <h2 className="mt-6 text-4xl font-light leading-[1.05] tracking-tighter sm:text-6xl lg:text-7xl">
+              Let&apos;s make
+              <br />
+              something meaningful.
+            </h2>
+            <p className="mt-6 max-w-xl text-sm leading-7 text-[#252720]/70 sm:text-base">
+              Tell us what you are imagining, building or trying to solve.
+              We&apos;ll help connect the ideas to a way forward.
+            </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-md bg-cream-100 px-5 py-3 text-sm font-medium text-deep-900 transition hover:bg-accent-mint"
+              className="mt-8 inline-flex min-h-12 items-center gap-4 bg-[#252720] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f0e7] transition hover:bg-[#424638] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#252720]"
             >
-              Start a project →
-            </Link>
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 rounded-md border border-cream-100/25 px-5 py-3 text-sm font-medium text-cream-100 transition hover:border-accent-mint hover:text-accent-mint"
-            >
-              View services
+              Start a conversation
+              <ArrowUpRight size={17} />
             </Link>
           </div>
         </div>
       </section>
-    </>
+
+      {/* FOOTER BRAND STRIP */}
+      <div className="border-t border-foreground/10 px-5 py-5 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between">
+          <span>Craft Studios</span>
+          <span>Spaces. Systems. Experiences.</span>
+          <Link href="/contact" className="inline-flex items-center gap-2 hover:text-foreground">
+            Have a project? <ArrowUpRight size={12} />
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }
