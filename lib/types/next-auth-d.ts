@@ -8,6 +8,12 @@ declare module "next-auth" {
       role: string;
     } & DefaultSession["user"];
   }
+
+  interface User {
+    id: string;
+    role: string;
+  }
 }
 
+// Required so this file is treated as a module (enables augmentation).
 export {};

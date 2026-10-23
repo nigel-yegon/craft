@@ -482,17 +482,7 @@ export function Navbar({
                     My dashboard
                   </Link>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpen(false);
-                      signOut({ callbackUrl: "/" });
-                    }}
-                    className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm font-medium text-deep-700 hover:bg-cream-200 dark:text-cream-300 dark:hover:bg-deep-900"
-                  >
-                    <LogOut size={16} aria-hidden="true" />
-                    Sign out
-                  </button>
+                  <MobileSignOutButton onClose={() => setOpen(false)} />
                 </>
               ) : (
                 <>
@@ -557,6 +547,13 @@ function UserMenuPanel({
   session: NonNullable<SiteChromeSession>;
   onClose: () => void;
 }) {
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    await signOut({ callbackUrl: "/" });
+  }
+
   return (
     <div
       role="menu"
@@ -590,13 +587,37 @@ function UserMenuPanel({
       <button
         type="button"
         role="menuitem"
-        onClick={() => signOut({ callbackUrl: "/" })}
-        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-deep-700 transition hover:bg-cream-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 dark:text-cream-200 dark:hover:bg-deep-900"
+        onClick={handleSignOut}
+        disabled={signingOut}
+        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-deep-700 transition hover:bg-cream-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-60 dark:text-cream-200 dark:hover:bg-deep-900"
       >
         <LogOut size={15} aria-hidden="true" />
-        Sign out
+        {signingOut ? "Signing out…" : "Sign out"}
       </button>
     </div>
+  );
+}
+
+// ─── Mobile sign-out button ─────────────────────────────────
+function MobileSignOutButton({ onClose }: { onClose: () => void }) {
+  const [signingOut, setSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    onClose();
+    await signOut({ callbackUrl: "/" });
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleSignOut}
+      disabled={signingOut}
+      className="flex w-full items-center gap-2 rounded-md px-3 py-2.5 text-left text-sm font-medium text-deep-700 hover:bg-cream-200 disabled:opacity-60 dark:text-cream-300 dark:hover:bg-deep-900"
+    >
+      <LogOut size={16} aria-hidden="true" />
+      {signingOut ? "Signing out…" : "Sign out"}
+    </button>
   );
 }
 

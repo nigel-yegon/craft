@@ -1,12 +1,13 @@
-// app/admin/page.tsx — scaffold version, no auth gate
+// app/admin/page.tsx
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { DashboardClient } from "./dashboard-client";
 
-export const metadata = { title: "Admin — Craft" };
+export const metadata = { title: "Admin" };
 
-export default function AdminPage() {
-  return (
-    <main className="min-h-screen bg-cream-200 dark:bg-deep-950">
-      <DashboardClient userName="Admin" />
-    </main>
-  );
+export default async function AdminPage() {
+  const session = await getServerSession(authOptions);
+  const userName = session?.user?.name ?? session?.user?.email ?? "Admin";
+
+  return <DashboardClient userName={userName} />;
 }
