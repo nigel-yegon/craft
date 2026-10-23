@@ -1,5 +1,6 @@
 // app/work/[discipline]/page.tsx
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { PageHeader } from "../../components/page-header";
 
@@ -12,6 +13,7 @@ const TITLES: Record<string, string> = {
   delivery: "Delivery",
 };
 
+// Keep generateMetadata — it's allowed to read params
 export async function generateMetadata({
   params,
 }: {
@@ -21,7 +23,31 @@ export async function generateMetadata({
   return { title: TITLES[discipline] ?? "Work" };
 }
 
-export default async function DisciplinePage({
+// Main page — does NOT await params
+export default function DisciplinePage({
+  params,
+}: {
+  params: Promise<{ discipline: string }>;
+}) {
+  return (
+    <>
+      {/* Static header — renders immediately */}
+      <PageHeader
+        eyebrow="Work"
+        title="Discipline"
+        lede="Case studies are being collected. Individual project pages will live one level deeper."
+      />
+
+      {/* Dynamic content — streams in with the discipline name */}
+      <Suspense fallback={<DisciplineSkeleton />}>
+        <DisciplineContent params={params} />
+      </Suspense>
+    </>
+  );
+}
+
+// Child component — awaits params inside its own boundary
+async function DisciplineContent({
   params,
 }: {
   params: Promise<{ discipline: string }>;
@@ -30,10 +56,24 @@ export default async function DisciplinePage({
   if (!VALID.has(discipline)) notFound();
 
   return (
-    <PageHeader
-      eyebrow="Work"
-      title={TITLES[discipline]}
-      lede="Case studies are being collected. In the meantime, this section lists the practice area — individual project pages will live one level deeper at /work/[discipline]/[project]."
-    />
+    <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+      <h2 className="text-3xl font-semibold text-deep-900 dark:text-cream-100">
+        {TITLES[discipline]}
+      </h2>
+      <p className="mt-4 max-w-2xl text-base leading-7 text-deep-600 dark:text-cream-400">
+        This section lists the practice area — individual project pages will live
+        one level deeper at /work/{discipline}/[project].
+      </p>
+    </div>
+  );
+}
+
+function DisciplineSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8">
+      <div className="h-8 w-48 animate-pulse rounded bg-cream-200 dark:bg-deep-800" />
+      <div className="mt-4 h-4 w-full max-w-xl animate-pulse rounded bg-cream-200 dark:bg-deep-800" />
+      <div className="mt-2 h-4 w-3/4 max-w-md animate-pulse rounded bg-cream-200 dark:bg-deep-800" />
+    </div>
   );
 }
