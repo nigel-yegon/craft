@@ -1,10 +1,20 @@
 // app/components/footer.tsx
 import Link from "next/link";
 
+// ─── Cached year ────────────────────────────────────────────
+// Next.js 16 enables Cache Components by default. `new Date()` is an
+// "unstable" value during prerender, so we isolate it behind a
+// `"use cache"` boundary. The year is computed once per build/revalidation
+// instead of on every request, which satisfies the prerender check.
+async function getCurrentYear(): Promise<number> {
+  "use cache";
+  return new Date().getFullYear();
+}
+
 // ─── Brand icons (inline SVG) ───────────────────────────────
-// Lucide v1 removed all trademarked brand icons, so these are
-// hand-rolled from the official brand marks. Each accepts a
-// `className` so the parent can size them uniformly.
+// Lucide v1 removed trademarked brand icons, so these are hand-rolled
+// from the official brand marks. Each accepts a `className` so the
+// parent can size them uniformly.
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -83,12 +93,14 @@ const SOCIALS = [
 ] as const;
 
 // ─── Footer ─────────────────────────────────────────────────
-export function Footer() {
+export async function Footer() {
+  const year = await getCurrentYear();
+
   return (
     <footer className="border-t border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-950">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row lg:px-8">
         <p className="text-xs text-deep-500 dark:text-cream-500">
-          © {new Date().getFullYear()} Craft Studios. Ideas, integrated.
+          © {year} Craft Studios. Ideas, integrated.
         </p>
 
         <ul className="flex items-center gap-1">
