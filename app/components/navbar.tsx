@@ -1,7 +1,6 @@
 // app/components/navbar.tsx
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -48,6 +47,11 @@ const ROLE_LABEL: Record<string, string> = {
   TEAM: "Studio team",
 };
 
+// ─── Helpers ────────────────────────────────────────────────
+function displayName(session: SiteChromeSession | null): string {
+  return session?.name?.trim() || session?.email?.split("@")[0] || "Account";
+}
+
 // ─── Scroll direction hook ──────────────────────────────────
 function useScrollDirection(threshold = 8) {
   const [direction, setDirection] = useState<"up" | "down">("up");
@@ -91,9 +95,7 @@ export function Navbar({
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isDashboard =
-    isStatic ||
-    isAdminRoute ||
-    pathname.startsWith("/dashboard");
+    isStatic || isAdminRoute || pathname.startsWith("/dashboard");
 
   useEffect(() => {
     setOpen(false);
@@ -287,7 +289,7 @@ export function Navbar({
                               </span>
                             </Link>
                           );
-                        }
+                        },
                       )}
                     </div>
                   )}
@@ -311,9 +313,9 @@ export function Navbar({
                   aria-haspopup="menu"
                   className="flex items-center gap-2 rounded-full border border-deep-300 bg-cream-100 py-1 pl-1 pr-2.5 text-sm text-deep-800 transition hover:border-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 dark:border-deep-700 dark:bg-deep-900 dark:text-cream-100 dark:hover:border-brand-500"
                 >
-                  <Avatar name={session.name} />
+                  <Avatar name={session.name} email={session.email} />
                   <span className="hidden max-w-40 truncate sm:inline">
-                    {session.name}
+                    {displayName(session)}
                   </span>
                 </button>
               ) : (
@@ -342,8 +344,6 @@ export function Navbar({
                 <AnonMenuPanel onClose={() => setMenuOpen(null)} />
               )}
             </div>
-
-            
 
             <button
               onClick={() => setOpen(true)}
@@ -396,7 +396,7 @@ export function Navbar({
                 const dropdownActive =
                   hasDropdown &&
                   l.dropdown.some((sub: { href: string }) =>
-                    isActive(sub.href)
+                    isActive(sub.href),
                   );
                 const active = isActive(l.href) || dropdownActive;
 
@@ -450,7 +450,7 @@ export function Navbar({
                               </Link>
                             </li>
                           );
-                        }
+                        },
                       )}
                     </ul>
                   </li>
@@ -462,10 +462,10 @@ export function Navbar({
               {session ? (
                 <>
                   <div className="mb-3 flex items-center gap-3 rounded-md bg-cream-200/60 px-3 py-2.5 dark:bg-deep-900/60">
-                    <Avatar name={session.name} />
+                    <Avatar name={session.name} email={session.email} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-deep-800 dark:text-cream-100">
-                        {session.name}
+                        {displayName(session)}
                       </p>
                       <p className="truncate text-xs text-deep-500 dark:text-cream-400">
                         {session.email}
@@ -514,8 +514,6 @@ export function Navbar({
                   </Link>
                 </>
               )}
-
-              
             </div>
           </div>
         </div>
@@ -524,8 +522,16 @@ export function Navbar({
   );
 }
 
-function Avatar({ name }: { name: string }) {
-  const initials = name
+// ─── Avatar ─────────────────────────────────────────────────
+function Avatar({
+  name,
+  email,
+}: {
+  name?: string | null;
+  email?: string | null;
+}) {
+  const source = name?.trim() || email?.split("@")[0] || "";
+  const initials = source
     .split(/\s+/)
     .map((p) => p[0])
     .filter(Boolean)
@@ -543,6 +549,7 @@ function Avatar({ name }: { name: string }) {
   );
 }
 
+// ─── User menu panel ────────────────────────────────────────
 function UserMenuPanel({
   session,
   onClose,
@@ -558,7 +565,7 @@ function UserMenuPanel({
     >
       <div className="px-3 py-2.5">
         <p className="truncate text-sm font-medium text-deep-800 dark:text-cream-100">
-          {session.name}
+          {displayName(session)}
         </p>
         <p className="truncate text-xs text-deep-500 dark:text-cream-400">
           {session.email}
@@ -593,6 +600,7 @@ function UserMenuPanel({
   );
 }
 
+// ─── Anon menu panel ────────────────────────────────────────
 function AnonMenuPanel({ onClose }: { onClose: () => void }) {
   return (
     <div

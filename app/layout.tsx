@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/footer";
+import { Navbar } from "./components/navbar";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
+        <Navbar static session={{} as React.ComponentProps<typeof Navbar>["session"]} />
         <div className="flex-1">{children}</div>
         <Footer />
       </body>
