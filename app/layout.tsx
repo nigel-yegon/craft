@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Footer } from "./components/footer";
@@ -40,7 +41,14 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
-        <Navbar static session={{} as React.ComponentProps<typeof Navbar>["session"]} />
+        <Suspense
+          fallback={
+            <div className="h-16 border-b border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-950" />
+          }
+        >
+          <Navbar session={null} />
+        </Suspense>
+
         <div className="flex-1">{children}</div>
         <Footer />
       </body>
