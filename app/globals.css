@@ -1,26 +1,137 @@
+/* app/globals.css */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Palette source
+  ─────────────────────────────────────────────────────────────
+  Aquamarine    #85ffc7  → mint / accent
+  Pine Blue     #297373  → primary brand
+  Coral Glow    #ff8552  → warm accent
+  Alabaster Grey#e6e6e6  → light surface
+  Graphite      #39393a  → dark base
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ─── Base page ─── */
+  --background: #e6e6e6;        /* Alabaster Grey */
+  --foreground: #39393a;        /* Graphite */
+
+  /* ─── Brand (Pine Blue → Coral Glow ramp) ─── */
+  --brand-50:  #eaf5f5;
+  --brand-100: #c8e6e6;
+  --brand-200: #a3d6d6;
+  --brand-300: #6fbfbf;
+  --brand-400: #4a9e9e;
+  --brand-500: #297373;   /* Pine Blue — primary */
+  --brand-600: #226060;
+  --brand-700: #1a4c4c;
+  --brand-800: #123838;
+  --brand-900: #0b2424;
+  --brand-950: #061414;
+
+  /* ─── Deep (Graphite → near-black ramp) ─── */
+  --deep-50:  #f4f4f4;
+  --deep-100: #e2e2e2;
+  --deep-200: #c4c4c4;
+  --deep-300: #a3a3a4;
+  --deep-400: #7c7c7d;
+  --deep-500: #5e5e5f;
+  --deep-600: #4c4c4d;
+  --deep-700: #434344;
+  --deep-800: #39393a;   /* Graphite — base dark */
+  --deep-900: #262627;
+  --deep-950: #141415;
+
+  /* ─── Cream (Alabaster → light surface ramp) ─── */
+  --cream-50:  #fafafa;
+  --cream-100: #f2f2f2;
+  --cream-200: #e6e6e6;  /* Alabaster Grey — base light */
+  --cream-300: #d6d6d6;
+  --cream-400: #bdbdbd;
+  --cream-500: #a0a0a0;
+  --cream-600: #7e7e7e;
+  --cream-700: #5e5e5e;
+  --cream-800: #424242;
+  --cream-900: #2d2d2d;
+  --cream-950: #1a1a1a;
+
+  /* ─── Accents (exposed for direct use) ─── */
+  --accent-mint:  #85ffc7;  /* Aquamarine */
+  --accent-coral: #ff8552;  /* Coral Glow */
+}
+
+.dark {
+  --background: #141415;        /* deep-950 */
+  --foreground: #e6e6e6;        /* Alabaster Grey */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Brand scale */
+  --color-brand-50:  var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+
+  /* Deep scale */
+  --color-deep-50:  var(--deep-50);
+  --color-deep-100: var(--deep-100);
+  --color-deep-200: var(--deep-200);
+  --color-deep-300: var(--deep-300);
+  --color-deep-400: var(--deep-400);
+  --color-deep-500: var(--deep-500);
+  --color-deep-600: var(--deep-600);
+  --color-deep-700: var(--deep-700);
+  --color-deep-800: var(--deep-800);
+  --color-deep-900: var(--deep-900);
+  --color-deep-950: var(--deep-950);
+
+  /* Cream scale */
+  --color-cream-50:  var(--cream-50);
+  --color-cream-100: var(--cream-100);
+  --color-cream-200: var(--cream-200);
+  --color-cream-300: var(--cream-300);
+  --color-cream-400: var(--cream-400);
+  --color-cream-500: var(--cream-500);
+  --color-cream-600: var(--cream-600);
+  --color-cream-700: var(--cream-700);
+  --color-cream-800: var(--cream-800);
+  --color-cream-900: var(--cream-900);
+  --color-cream-950: var(--cream-950);
+
+  /* Accent passthroughs (optional, for direct use) */
+  --color-accent-mint:  var(--accent-mint);
+  --color-accent-coral: var(--accent-coral);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Focus ring — use the Coral Glow accent for visibility on both themes */
+:focus-visible {
+  outline: 2px solid var(--brand-400);
+  outline-offset: 2px;
+}
+
+::selection {
+  background-color: var(--brand-200);
+  color: var(--deep-800);
+}
+
+.dark ::selection {
+  background-color: var(--brand-800);
+  color: var(--brand-50);
 }
