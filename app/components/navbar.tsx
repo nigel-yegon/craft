@@ -92,8 +92,6 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
 
   const { direction, scrolled } = useScrollDirection(8);
 
-  // Build a plain session object from the next-auth session.
-  // Falls back to null only when truly unauthenticated.
   const session: NavSession | null =
     status === "authenticated" && rawSession?.user
       ? {
@@ -311,8 +309,6 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
 
           {/* Right cluster */}
           <div className="flex shrink-0 items-center gap-2">
-            <ThemeToggle />
-
             <div className="relative" data-user-menu>
               {status === "loading" ? (
                 <div
@@ -360,6 +356,8 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
                 <AnonMenuPanel onClose={() => setMenuOpen(null)} />
               )}
             </div>
+
+            <ThemeToggle />
 
             <button
               onClick={() => setOpen(true)}
