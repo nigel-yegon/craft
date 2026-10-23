@@ -14,9 +14,8 @@ import {
   User as UserIcon,
   ChevronDown,
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { ThemeToggle } from "./theme-toggle";
-import type { SiteChromeSession } from "./site-chrome";
 
 // ─── Navigation structure ───────────────────────────────────
 const workSub = [
@@ -47,8 +46,13 @@ const ROLE_LABEL: Record<string, string> = {
   TEAM: "Studio team",
 };
 
-// ─── Helpers ────────────────────────────────────────────────
-function displayName(session: SiteChromeSession | null): string {
+type NavSession = {
+  name?: string | null;
+  email?: string | null;
+  role?: string | null;
+};
+
+function displayName(session: NavSession | null): string {
   return session?.name?.trim() || session?.email?.split("@")[0] || "Account";
 }
 
@@ -79,19 +83,26 @@ function useScrollDirection(threshold = 8) {
 }
 
 // ─── Navbar ─────────────────────────────────────────────────
-export function Navbar({
-  static: isStatic = false,
-  session,
-}: {
-  static?: boolean;
-  session: SiteChromeSession;
-}) {
+export function Navbar({ static: isStatic = false }: { static?: boolean }) {
   const pathname = usePathname();
+  const { data: rawSession, status } = useSession();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState<null | "user" | "anon">(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   const { direction, scrolled } = useScrollDirection(8);
+
+  // Build a plain session object from the next-auth session.
+  // Falls back to null only when truly unauthenticated.
+  const session: NavSession | null =
+    status === "authenticated" && rawSession?.user
+      ? {
+          name: rawSession.user.name ?? null,
+          email: rawSession.user.email ?? null,
+          role:
+            (rawSession.user as { role?: string | null }).role ?? "CLIENT",
+        }
+      : null;
 
   const isAdminRoute = pathname.startsWith("/admin");
   const isDashboard =
@@ -163,7 +174,7 @@ export function Navbar({
         className={[
           "border-b",
           isAdminRoute
-            ? "border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900"
+            ? "relative z-40 border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900"
             : [
                 "sticky top-0 z-50",
                 "transition-[transform,background-color,border-color] duration-200",
@@ -303,7 +314,12 @@ export function Navbar({
             <ThemeToggle />
 
             <div className="relative" data-user-menu>
-              {session ? (
+              {status === "loading" ? (
+                <div
+                  className="h-9 w-9 animate-pulse rounded-full border border-deep-300 bg-cream-100 dark:border-deep-700 dark:bg-deep-900"
+                  aria-hidden
+                />
+              ) : session ? (
                 <button
                   type="button"
                   onClick={() =>
@@ -544,7 +560,7 @@ function UserMenuPanel({
   session,
   onClose,
 }: {
-  session: NonNullable<SiteChromeSession>;
+  session: NavSession;
   onClose: () => void;
 }) {
   const [signingOut, setSigningOut] = useState(false);
@@ -567,22 +583,26 @@ function UserMenuPanel({
         <p className="truncate text-xs text-deep-500 dark:text-cream-400">
           {session.email}
         </p>
-        <p className="mt-1 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-950/40 dark:text-brand-300">
-          {ROLE_LABEL[session.role] ?? session.role}
-        </p>
+        {session.role && (
+          <p className="mt-1 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-800 dark:bg-brand-950/40 dark:text-brand-300">
+            {ROLE_LABEL[session.role] ?? session.role}
+          </p>
+        )}
       </div>
 
       <div className="my-1 h-px bg-deep-200 dark:bg-deep-800" />
 
-      <Link
-        href="/dashboard"
-        role="menuitem"
-        onClick={onClose}
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-deep-700 transition hover:bg-cream-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 dark:text-cream-200 dark:hover:bg-deep-900"
-      >
-        <LayoutDashboard size={15} aria-hidden="true" />
-        Go to my dashboard
-      </Link>
+      {session.role === "ADMIN" && (
+        <Link
+          href="/admin"
+          role="menuitem"
+          onClick={onClose}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-deep-700 transition hover:bg-cream-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 dark:text-cream-200 dark:hover:bg-deep-900"
+        >
+          <LayoutDashboard size={15} aria-hidden="true" />
+          Admin dashboard
+        </Link>
+      )}
 
       <button
         type="button"

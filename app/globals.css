@@ -15,23 +15,23 @@
 
 :root {
   /* ─── Base page ─── */
-  --background: #e6e6e6;        /* Alabaster Grey */
-  --foreground: #39393a;        /* Graphite */
+  --background: #e6e6e6;
+  --foreground: #39393a;
 
-  /* ─── Brand (Pine Blue → Coral Glow ramp) ─── */
+  /* ─── Brand (Pine Blue ramp) ─── */
   --brand-50:  #eaf5f5;
   --brand-100: #c8e6e6;
   --brand-200: #a3d6d6;
   --brand-300: #6fbfbf;
   --brand-400: #4a9e9e;
-  --brand-500: #297373;   /* Pine Blue — primary */
+  --brand-500: #297373;
   --brand-600: #226060;
   --brand-700: #1a4c4c;
   --brand-800: #123838;
   --brand-900: #0b2424;
   --brand-950: #061414;
 
-  /* ─── Deep (Graphite → near-black ramp) ─── */
+  /* ─── Deep (Graphite ramp) ─── */
   --deep-50:  #f4f4f4;
   --deep-100: #e2e2e2;
   --deep-200: #c4c4c4;
@@ -40,14 +40,14 @@
   --deep-500: #5e5e5f;
   --deep-600: #4c4c4d;
   --deep-700: #434344;
-  --deep-800: #39393a;   /* Graphite — base dark */
+  --deep-800: #39393a;
   --deep-900: #262627;
   --deep-950: #141415;
 
-  /* ─── Cream (Alabaster → light surface ramp) ─── */
+  /* ─── Cream (Alabaster ramp) ─── */
   --cream-50:  #fafafa;
   --cream-100: #f2f2f2;
-  --cream-200: #e6e6e6;  /* Alabaster Grey — base light */
+  --cream-200: #e6e6e6;
   --cream-300: #d6d6d6;
   --cream-400: #bdbdbd;
   --cream-500: #a0a0a0;
@@ -57,21 +57,25 @@
   --cream-900: #2d2d2d;
   --cream-950: #1a1a1a;
 
-  /* ─── Accents (exposed for direct use) ─── */
-  --accent-mint:  #85ffc7;  /* Aquamarine */
-  --accent-coral: #ff8552;  /* Coral Glow */
+  /* ─── Accents ─── */
+  --accent-mint:  #85ffc7;
+  --accent-coral: #ff8552;
+
+  /* ─── Fonts (set by next/font on <html>) ─── */
+  --font-sans: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-mono, ui-monospace, monospace);
 }
 
 .dark {
-  --background: #141415;        /* deep-950 */
-  --foreground: #e6e6e6;        /* Alabaster Grey */
+  --background: #141415;
+  --foreground: #e6e6e6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand scale */
+  /* Brand */
   --color-brand-50:  var(--brand-50);
   --color-brand-100: var(--brand-100);
   --color-brand-200: var(--brand-200);
@@ -84,7 +88,7 @@
   --color-brand-900: var(--brand-900);
   --color-brand-950: var(--brand-950);
 
-  /* Deep scale */
+  /* Deep */
   --color-deep-50:  var(--deep-50);
   --color-deep-100: var(--deep-100);
   --color-deep-200: var(--deep-200);
@@ -97,7 +101,7 @@
   --color-deep-900: var(--deep-900);
   --color-deep-950: var(--deep-950);
 
-  /* Cream scale */
+  /* Cream */
   --color-cream-50:  var(--cream-50);
   --color-cream-100: var(--cream-100);
   --color-cream-200: var(--cream-200);
@@ -110,22 +114,31 @@
   --color-cream-900: var(--cream-900);
   --color-cream-950: var(--cream-950);
 
-  /* Accent passthroughs (optional, for direct use) */
+  /* Accents */
   --color-accent-mint:  var(--accent-mint);
   --color-accent-coral: var(--accent-coral);
+
+  /* Fonts */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
+/* Smooth theme transitions — only colors, not layout.
+   Disabled by next-themes' `disableTransitionOnChange` during the swap. */
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
-/* Focus ring — use the Coral Glow accent for visibility on both themes */
+/* Focus ring */
 :focus-visible {
   outline: 2px solid var(--brand-400);
   outline-offset: 2px;
 }
 
+/* Selection */
 ::selection {
   background-color: var(--brand-200);
   color: var(--deep-800);

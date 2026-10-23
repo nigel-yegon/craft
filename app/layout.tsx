@@ -6,7 +6,7 @@ import "./globals.css";
 import { Footer } from "./components/footer";
 import { Navbar } from "./components/navbar";
 import { AppSessionProvider } from "./components/session-provider";
-import { Analytics } from "@vercel/analytics/next"
+import { ThemeProvider } from "./components/theme-provider";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -43,18 +43,24 @@ export default function RootLayout({
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <body className="flex min-h-screen flex-col font-sans antialiased">
-        <AppSessionProvider>
-          <Suspense
-            fallback={
-              <div className="h-16 border-b border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-950" />
-            }
-          >
-            <Navbar {...({} as React.ComponentProps<typeof Navbar>)} />
-          </Suspense>
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </AppSessionProvider>
-        <Analytics />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AppSessionProvider>
+            <Suspense
+              fallback={
+                <div className="h-16 border-b border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-950" />
+              }
+            >
+              <Navbar />
+            </Suspense>
+            <div className="flex-1">{children}</div>
+            <Footer />
+          </AppSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
