@@ -64,7 +64,7 @@ export default function AboutPage() {
           <>
             Different disciplines.
             <br />
-            <span className="text-[var(--accent)]">
+            <span className="text-accent">
               One connected vision.
             </span>
           </>
@@ -73,7 +73,7 @@ export default function AboutPage() {
       />
 
       {/* Studio introduction */}
-      <section className="border-b border-[var(--border)]">
+      <section className="border-b border-border">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[0.65fr_1fr] lg:gap-24 lg:py-28">
           <div>
             <p className="section-kicker">Our point of view</p>
@@ -82,7 +82,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="space-y-6 text-base leading-8 text-[var(--text-secondary)]">
+          <div className="space-y-6 text-base leading-8 text-text-secondary">
             <p>
               A building is more than its drawings. A digital product is more
               than its interface. A brand is more than a mark. Each exists
@@ -106,27 +106,27 @@ export default function AboutPage() {
       </section>
 
       {/* The three connected disciplines */}
-      <section className="bg-[var(--surface)]">
+      <section className="bg-surface">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
           <div className="max-w-2xl">
             <p className="section-kicker">What connects our work</p>
             <h2 className="mt-6 text-3xl font-medium tracking-tight sm:text-5xl">
               Spaces. Systems. Experiences.
             </h2>
-            <p className="mt-6 max-w-xl leading-7 text-[var(--text-secondary)]">
+            <p className="mt-6 max-w-xl leading-7 text-text-secondary">
               Three perspectives, brought together around the same brief.
               Each can stand on its own. Together, they open up a more
               integrated way to solve problems.
             </p>
           </div>
 
-          <div className="mt-14 grid gap-px overflow-hidden border border-[var(--border)] bg-[var(--border)] md:grid-cols-3">
+          <div className="mt-14 grid gap-px overflow-hidden border border-border bg-border md:grid-cols-3">
             {DISCIPLINES.map((discipline) => (
               <article
                 key={discipline.number}
-                className="flex min-h-64 flex-col bg-[var(--surface)] p-7 sm:p-9"
+                className="flex min-h-64 flex-col bg-surface p-7 sm:p-9"
               >
-                <span className="font-mono text-xs tracking-widest text-[var(--text-muted)]">
+                <span className="font-mono text-xs tracking-widest text-text-muted">
                   {discipline.number}
                 </span>
 
@@ -134,7 +134,7 @@ export default function AboutPage() {
                   {discipline.title}
                 </h3>
 
-                <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+                <p className="mt-4 text-sm leading-7 text-text-secondary">
                   {discipline.description}
                 </p>
               </article>
@@ -144,7 +144,7 @@ export default function AboutPage() {
       </section>
 
       {/* Principles */}
-      <section className="border-y border-[var(--border)]">
+      <section className="border-y border-border">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
           <div className="grid gap-12 lg:grid-cols-[0.7fr_1fr] lg:gap-24">
             <div>
@@ -154,14 +154,14 @@ export default function AboutPage() {
               </h2>
               <Link
                 href="/studio/process"
-                className="mt-8 inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[var(--accent)]"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-accent"
               >
                 Explore our process
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
 
-            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <div className="divide-y divide-border border-y border-border">
               {PRINCIPLES.map((principle) => {
                 const Icon = principle.icon;
 
@@ -170,7 +170,7 @@ export default function AboutPage() {
                     key={principle.number}
                     className="grid gap-4 py-8 sm:grid-cols-[3rem_1fr] sm:gap-6"
                   >
-                    <span className="font-mono text-xs text-[var(--text-muted)]">
+                    <span className="font-mono text-xs text-text-muted">
                       {principle.number}
                     </span>
 
@@ -179,7 +179,7 @@ export default function AboutPage() {
                         <Icon
                           size={19}
                           strokeWidth={1.5}
-                          className="text-[var(--accent)]"
+                          className="text-accent"
                           aria-hidden="true"
                         />
                         <h3 className="text-lg font-medium">
@@ -187,7 +187,7 @@ export default function AboutPage() {
                         </h3>
                       </div>
 
-                      <p className="mt-4 max-w-xl text-sm leading-7 text-[var(--text-secondary)]">
+                      <p className="mt-4 max-w-xl text-sm leading-7 text-text-secondary">
                         {principle.description}
                       </p>
                     </div>
@@ -200,7 +200,7 @@ export default function AboutPage() {
       </section>
 
       {/* Closing CTA */}
-      <section className="bg-[var(--charcoal-deep)] text-[var(--ivory)]">
+      <section className="bg-(--charcoal-deep) text-(--ivory)">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-5 py-20 sm:px-8 lg:flex-row lg:items-end lg:py-24">
           <div className="max-w-3xl">
             <p className="section-kicker">A good place to begin</p>
@@ -215,7 +215,7 @@ export default function AboutPage() {
 
           <Link
             href="/contact"
-            className="inline-flex shrink-0 items-center gap-3 bg-[var(--olive-light)] px-6 py-4 text-sm font-medium text-[var(--charcoal-deep)] transition hover:bg-[var(--ivory)]"
+            className="inline-flex shrink-0 items-center gap-3 bg-(--olive-light) px-6 py-4 text-sm font-medium text-(--charcoal-deep) transition hover:bg-(--ivory)"
           >
             Start a conversation
             <ArrowDownRight size={18} aria-hidden="true" />

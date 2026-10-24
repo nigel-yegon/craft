@@ -82,7 +82,7 @@ export default function ProcessPage() {
           <>
             From first question
             <br />
-            <span className="text-[var(--accent)]">
+            <span className="text-accent">
               to finished work.
             </span>
           </>
@@ -90,7 +90,7 @@ export default function ProcessPage() {
         lede="Every project is different, but good delivery needs a clear direction, open communication and thoughtful coordination. Our process provides structure without forcing every brief into the same shape."
       />
 
-      <section className="border-b border-[var(--border)]">
+      <section className="border-b border-border">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-[0.6fr_1fr] lg:gap-20 lg:py-20">
           <p className="section-kicker">The working principle</p>
           <div>
@@ -98,7 +98,7 @@ export default function ProcessPage() {
               The earlier we connect the moving parts, the fewer surprises
               we leave for the end.
             </p>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-[var(--text-secondary)]">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-text-secondary">
               We bring the right people into the conversation at the right
               time, make decisions visible, and keep design intent connected
               to the realities of delivery.
@@ -119,23 +119,23 @@ export default function ProcessPage() {
             <ArrowDown
               size={24}
               strokeWidth={1.3}
-              className="hidden text-[var(--accent)] sm:block"
+              className="hidden text-accent sm:block"
               aria-hidden="true"
             />
           </div>
 
-          <div className="border-t border-[var(--border)]">
+          <div className="border-t border-border">
             {PHASES.map((phase) => (
               <article
                 key={phase.number}
-                className="grid gap-6 border-b border-[var(--border)] py-10 md:grid-cols-[5rem_0.8fr_1.2fr] md:gap-10 md:py-14"
+                className="grid gap-6 border-b border-border py-10 md:grid-cols-[5rem_0.8fr_1.2fr] md:gap-10 md:py-14"
               >
-                <span className="font-mono text-sm text-[var(--accent)]">
+                <span className="font-mono text-sm text-accent">
                   {phase.number}
                 </span>
 
                 <div>
-                  <p className="text-xs uppercase tracking-[0.16em] text-[var(--text-muted)]">
+                  <p className="text-xs uppercase tracking-[0.16em] text-text-muted">
                     {phase.label}
                   </p>
                   <h3 className="mt-3 text-2xl font-medium tracking-tight sm:text-3xl">
@@ -144,7 +144,7 @@ export default function ProcessPage() {
                 </div>
 
                 <div>
-                  <p className="max-w-2xl text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="max-w-2xl text-sm leading-7 text-text-secondary">
                     {phase.description}
                   </p>
 
@@ -152,7 +152,7 @@ export default function ProcessPage() {
                     {phase.outputs.map((output) => (
                       <li
                         key={output}
-                        className="border border-[var(--border)] px-3 py-2 text-xs text-[var(--text-secondary)]"
+                        className="border border-border px-3 py-2 text-xs text-text-secondary"
                       >
                         {output}
                       </li>
@@ -165,7 +165,7 @@ export default function ProcessPage() {
         </div>
       </section>
 
-      <section className="bg-[var(--surface)]">
+      <section className="bg-surface">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 md:grid-cols-2 lg:py-20">
           <div>
             <p className="section-kicker">Built around the brief</p>
@@ -173,7 +173,7 @@ export default function ProcessPage() {
               Structure where it helps. Flexibility where it matters.
             </h2>
           </div>
-          <div className="space-y-4 text-sm leading-7 text-[var(--text-secondary)]">
+          <div className="space-y-4 text-sm leading-7 text-text-secondary">
             <p>
               A software engagement may move through prototypes and testing.
               A spatial project may require approvals, procurement and site
@@ -189,7 +189,7 @@ export default function ProcessPage() {
         </div>
       </section>
 
-      <section className="bg-[var(--charcoal-deep)] text-[var(--ivory)]">
+      <section className="bg-(--charcoal-deep) text-(--ivory)">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
           <p className="section-kicker">Your project starts here</p>
           <div className="mt-6 flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -198,7 +198,7 @@ export default function ProcessPage() {
             </h2>
             <Link
               href="/contact"
-              className="inline-flex shrink-0 items-center gap-3 bg-[var(--olive-light)] px-6 py-4 text-sm font-medium text-[var(--charcoal-deep)] transition hover:bg-[var(--ivory)]"
+              className="inline-flex shrink-0 items-center gap-3 bg-(--olive-light) px-6 py-4 text-sm font-medium text-(--charcoal-deep) transition hover:bg-(--ivory)"
             >
               Discuss a project
               <ArrowRight size={17} aria-hidden="true" />

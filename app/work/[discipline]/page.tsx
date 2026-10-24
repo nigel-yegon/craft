@@ -180,7 +180,7 @@ export default async function DisciplinePage({
           <>
             {section.title}
             <br />
-            <span className="text-[var(--accent)]">In practice.</span>
+            <span className="text-accent">In practice.</span>
           </>
         }
         lede={section.description}
@@ -190,35 +190,35 @@ export default async function DisciplinePage({
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:py-20">
           <Link
             href="/work"
-            className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] transition hover:text-[var(--accent)]"
+            className="inline-flex items-center gap-2 text-sm text-text-secondary transition hover:text-accent"
           >
             <ArrowLeft size={16} aria-hidden="true" />
             All work
           </Link>
 
-          <div className="mt-10 grid gap-px border border-[var(--border)] bg-[var(--border)] md:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-10 grid gap-px border border-border bg-border md:grid-cols-2 xl:grid-cols-3">
             {section.projects.map((project, index) => (
               <article
                 key={project.title}
-                className="flex min-h-72 flex-col bg-[var(--surface)] p-6 sm:p-8"
+                className="flex min-h-72 flex-col bg-surface p-6 sm:p-8"
               >
                 <div className="flex items-center justify-between gap-4">
-                  <span className="font-mono text-xs text-[var(--accent)]">
+                  <span className="font-mono text-xs text-accent">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-xs text-[var(--text-muted)]">
+                  <span className="text-xs text-text-muted">
                     {project.year}
                   </span>
                 </div>
 
                 <div className="mt-12">
-                  <p className="text-xs uppercase tracking-[0.14em] text-[var(--text-muted)]">
+                  <p className="text-xs uppercase tracking-[0.14em] text-text-muted">
                     {project.type} · {project.location}
                   </p>
                   <h2 className="mt-3 text-2xl font-medium tracking-tight">
                     {project.title}
                   </h2>
-                  <p className="mt-4 text-sm leading-7 text-[var(--text-secondary)]">
+                  <p className="mt-4 text-sm leading-7 text-text-secondary">
                     {project.description}
                   </p>
                 </div>
@@ -227,7 +227,7 @@ export default async function DisciplinePage({
                   <ArrowUpRight
                     size={18}
                     strokeWidth={1.5}
-                    className="text-[var(--accent)]"
+                    className="text-accent"
                     aria-hidden="true"
                   />
                 </div>
@@ -235,7 +235,7 @@ export default async function DisciplinePage({
             ))}
           </div>
 
-          <p className="mt-6 text-xs leading-6 text-[var(--text-muted)]">
+          <p className="mt-6 text-xs leading-6 text-text-muted">
             Portfolio entries are currently illustrative placeholders. Replace
             them with verified projects, approved descriptions and project
             imagery before publishing.
@@ -243,7 +243,7 @@ export default async function DisciplinePage({
         </div>
       </section>
 
-      <section className="bg-[var(--charcoal-deep)] text-[var(--ivory)]">
+      <section className="bg-(--charcoal-deep) text-(--ivory)">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-16 sm:px-8 md:flex-row md:items-end md:justify-between lg:py-20">
           <div>
             <p className="section-kicker">Have a project in mind?</p>
@@ -254,7 +254,7 @@ export default async function DisciplinePage({
 
           <Link
             href="/contact"
-            className="inline-flex shrink-0 items-center gap-2 bg-[var(--olive-light)] px-5 py-3 text-sm font-medium text-[var(--charcoal-deep)] transition hover:bg-[var(--ivory)]"
+            className="inline-flex shrink-0 items-center gap-2 bg-(--olive-light) px-5 py-3 text-sm font-medium text-(--charcoal-deep) transition hover:bg-(--ivory)"
           >
             Start a conversation
             <ArrowUpRight size={17} aria-hidden="true" />

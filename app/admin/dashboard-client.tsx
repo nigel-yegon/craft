@@ -56,6 +56,13 @@ type ModuleGroup = {
   modules: ModuleDef[];
 };
 
+// ─── Shared header height ─────────────────────────────────────────
+// Locks the sidebar greeting and the dashboard header to the same
+// computed height on desktop so they align pixel-for-pixel regardless
+// of which module is active (some have a search input, some don't).
+
+const HEADER_HEIGHT = "lg:min-h-24";
+
 // ─── Tones ────────────────────────────────────────────────────────
 
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
@@ -378,32 +385,38 @@ function DashboardSidebar({
   return (
     /*
       Sticky sidebar:
-      - `sticky top-0 h-screen` makes the whole aside pin to the viewport.
+      - `sticky top-0 h-screen` pins the whole aside to the viewport.
       - Parent flex div has no min-h-screen, and `main` carries
         `lg:min-h-screen`, so the parent is always ≥ viewport height and
         the sticky has scroll range to work against.
     */
-    <aside className=" hidden h-screen w-72 shrink-0 lg:block">
+    <aside className="hidden h-screen w-72 shrink-0 lg:block">
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
         {/*
-          Greeting header — mirrors DashboardHeader's height.
-          Same px-6 py-5 + two-line stack (text-xs kicker + text-2xl primary)
-          so both columns resolve to identical computed heights.
+          Greeting header — locked to the same height as DashboardHeader
+          on desktop via HEADER_HEIGHT (`lg:min-h-24`). This guarantees the
+          sidebar greeting and the dashboard title row line up regardless of
+          whether the active module shows a search input.
         */}
-        <div className="sticky top-0 z-20 border-b border-deep-200 px-6 py-5 bg-cream-100 dark:bg-deep-900 dark:border-deep-800">
-          <Link href="/" className="group block">
-            <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
-              Welcome back
-            </div>
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="truncate text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
+        <div
+          className={[
+            "sticky top-0 z-20 flex items-center border-b bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
+            HEADER_HEIGHT,
+          ].join(" ")}
+        >
+          <Link href="/" className="group flex w-full items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
+                Welcome back
+              </div>
+              <h2 className="truncate text-2xl  font-bold tracking-tight text-deep-800 dark:text-cream-100">
                 Hello, {userName}.
               </h2>
-              {/* <span className="flex shrink-0 items-center gap-1.5 text-xs text-deep-500 dark:text-cream-500">
-                <House size={14} strokeWidth={1.75} aria-hidden className="shrink-0" />
-                <span className="hidden xl:inline">Home</span>
-              </span> */}
             </div>
+            {/* <span className="flex shrink-0 items-center gap-1.5 text-xs text-deep-500 dark:text-cream-500">
+              <House size={14} strokeWidth={1.75} aria-hidden className="shrink-0" />
+              <span className="hidden xl:inline">Home</span>
+            </span> */}
           </Link>
         </div>
 
@@ -556,7 +569,18 @@ function DashboardHeader({
           : "border-deep-200 bg-cream-100/90 backdrop-blur-sm dark:border-deep-800 dark:bg-deep-900/90",
       ].join(" ")}
     >
-      <div className="flex flex-col gap-5 px-6 py-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      {/*
+        Inner wrapper is locked to HEADER_HEIGHT (`lg:min-h-24`) so it matches
+        the sidebar greeting height on desktop, whether or not the module
+        shows a search input. On mobile it stacks naturally — no height lock.
+      */}
+      <div
+        className={[
+          "flex flex-col gap-5 px-6 py-5",
+          "lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0",
+          HEADER_HEIGHT,
+        ].join(" ")}
+      >
         <FadeIn key={`title-${activeModule}`} duration={400}>
           <div>
             <div className={`text-xs font-medium uppercase tracking-[0.16em] ${tone?.text ?? "text-brand-600 dark:text-brand-400"}`}>
