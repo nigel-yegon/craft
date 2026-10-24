@@ -2,9 +2,11 @@
 //
 // Populates the database with sample data for local development.
 //
-// Usage:
-//   npx tsx prisma/seed.ts
-//   npm run db:seed
+// Usage (Prisma-native):
+//   npx prisma db seed
+//
+// Also triggered automatically by:
+//   npx prisma migrate reset
 //
 // Idempotent: re-running will not duplicate rows.
 
@@ -12,6 +14,7 @@ import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./prisma/generated/prisma/client";
+import { seedOfferings } from "./seed-offerings";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -272,11 +275,7 @@ async function seedPayments() {
       data: {
         ...invoiceData,
         transactions: {
-          create: transactions.map((t) => ({
-            ...t,
-            // rawCallback intentionally left undefined — Prisma treats
-            // undefined on Json? as "not set".
-          })),
+          create: transactions.map((t) => ({ ...t })),
         },
       },
     });
@@ -286,11 +285,7 @@ async function seedPayments() {
   console.log(`   created ${created}, skipped ${skipped} existing`);
 }
 
-// ─── Auth (Account + Session) ─────────────────────────────────────
-//
-// These are only needed if you're testing the NextAuth flows end-to-end.
-// For day-to-day admin work you can ignore them; NextAuth will create
-// them on first real sign-in.
+// ─── Auth artifacts ───────────────────────────────────────────────
 
 async function seedAuthArtifacts() {
   console.log("🔐 Seeding auth artifacts (session + account for admin)…");
@@ -303,8 +298,6 @@ async function seedAuthArtifacts() {
     return;
   }
 
-  // A credentials-only account row so the NextAuth adapter has something
-  // to attach. Real OAuth sign-ins would replace this.
   const existingAccount = await prisma.account.findFirst({
     where: { userId: admin.id, provider: "credentials" },
   });
@@ -319,7 +312,6 @@ async function seedAuthArtifacts() {
     });
   }
 
-  // A long-lived test session for admin.
   const existingSession = await prisma.session.findFirst({
     where: { userId: admin.id },
   });
@@ -344,6 +336,7 @@ async function main() {
   await seedUsers();
   await seedAuthArtifacts();
   await seedPayments();
+  await seedOfferings(prisma);
 
   console.log("\n✅ All done.\n");
   console.log("Sample logins:");

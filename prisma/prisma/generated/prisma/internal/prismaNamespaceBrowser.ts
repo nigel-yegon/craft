@@ -56,7 +56,10 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   Invoice: 'Invoice',
-  MpesaTransaction: 'MpesaTransaction'
+  MpesaTransaction: 'MpesaTransaction',
+  Offering: 'Offering',
+  QuoteRequest: 'QuoteRequest',
+  QuoteRequestItem: 'QuoteRequestItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -160,6 +163,55 @@ export const MpesaTransactionScalarFieldEnum = {
 } as const
 
 export type MpesaTransactionScalarFieldEnum = (typeof MpesaTransactionScalarFieldEnum)[keyof typeof MpesaTransactionScalarFieldEnum]
+
+
+export const OfferingScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  kind: 'kind',
+  category: 'category',
+  pricingMode: 'pricingMode',
+  fixedPrice: 'fixedPrice',
+  recurringInterval: 'recurringInterval',
+  imageUrl: 'imageUrl',
+  active: 'active',
+  featured: 'featured',
+  createdAt: 'createdAt'
+} as const
+
+export type OfferingScalarFieldEnum = (typeof OfferingScalarFieldEnum)[keyof typeof OfferingScalarFieldEnum]
+
+
+export const QuoteRequestScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  customerName: 'customerName',
+  customerEmail: 'customerEmail',
+  customerPhone: 'customerPhone',
+  company: 'company',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuoteRequestScalarFieldEnum = (typeof QuoteRequestScalarFieldEnum)[keyof typeof QuoteRequestScalarFieldEnum]
+
+
+export const QuoteRequestItemScalarFieldEnum = {
+  id: 'id',
+  quoteRequestId: 'quoteRequestId',
+  offeringId: 'offeringId',
+  offeringName: 'offeringName',
+  offeringKind: 'offeringKind',
+  pricingMode: 'pricingMode',
+  quantity: 'quantity',
+  notes: 'notes'
+} as const
+
+export type QuoteRequestItemScalarFieldEnum = (typeof QuoteRequestItemScalarFieldEnum)[keyof typeof QuoteRequestItemScalarFieldEnum]
 
 
 export const SortOrder = {

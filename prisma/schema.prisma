@@ -1,3 +1,5 @@
+// prisma/schema.prisma
+
 generator client {
   provider = "prisma-client"
   output   = "./prisma/generated/prisma"
@@ -7,6 +9,7 @@ datasource db {
   provider = "postgresql"
 }
 
+// ─── Auth ─────────────────────────────────────────────────────────
 
 model User {
   id            String    @id @default(cuid())
@@ -98,4 +101,72 @@ model MpesaTransaction {
   @@index([invoiceId])
   @@index([status])
   @@index([checkoutRequestId])
+}
+
+// ─── Catalogue & quote requests (Milestone 1) ────────────────────
+
+model Offering {
+  id                Int      @id @default(autoincrement())
+  slug              String   @unique
+  name              String
+  description       String
+  kind              String   // "SUBSCRIPTION" | "PRODUCT" | "SERVICE"
+  category          String
+
+  pricingMode       String   // "FIXED" | "QUOTE" | "RECURRING"
+  fixedPrice        Int?     // present when pricingMode = FIXED | RECURRING
+  recurringInterval String?  // "MONTHLY" | "QUARTERLY" | "ANNUAL"
+
+  imageUrl          String?
+  active            Boolean  @default(true)
+  featured          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  quoteRequestItems QuoteRequestItem[]
+
+  @@index([kind])
+  @@index([category])
+  @@index([active])
+}
+
+model QuoteRequest {
+  id            Int      @id @default(autoincrement())
+  reference     String   @unique   // "QR-2026-0001"
+
+  customerName  String
+  customerEmail String
+  customerPhone String
+  company       String?
+  notes         String?
+
+  status        String   @default("NEW")
+  // NEW → REVIEWING → QUOTED → INVOICED → PAID → CANCELLED
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items         QuoteRequestItem[]
+  // quote      Quote?   ← deferred to Milestone 2
+
+  @@index([status])
+  @@index([customerEmail])
+}
+
+model QuoteRequestItem {
+  id             Int          @id @default(autoincrement())
+  quoteRequestId Int
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+
+  offeringId     Int?
+  offering       Offering?    @relation(fields: [offeringId], references: [id], onDelete: SetNull)
+
+  // Snapshot at time of request — protects history if the offering changes
+  offeringName   String
+  offeringKind   String
+  pricingMode    String
+
+  quantity       Int          @default(1)
+  notes          String?
+
+  @@index([quoteRequestId])
 }

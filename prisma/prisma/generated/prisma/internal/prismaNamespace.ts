@@ -402,7 +402,10 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   Invoice: 'Invoice',
-  MpesaTransaction: 'MpesaTransaction'
+  MpesaTransaction: 'MpesaTransaction',
+  Offering: 'Offering',
+  QuoteRequest: 'QuoteRequest',
+  QuoteRequestItem: 'QuoteRequestItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -418,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction" | "offering" | "quoteRequest" | "quoteRequestItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -866,6 +869,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Offering: {
+      payload: Prisma.$OfferingPayload<ExtArgs>
+      fields: Prisma.OfferingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.OfferingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.OfferingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        findFirst: {
+          args: Prisma.OfferingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.OfferingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        findMany: {
+          args: Prisma.OfferingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>[]
+        }
+        create: {
+          args: Prisma.OfferingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        createMany: {
+          args: Prisma.OfferingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.OfferingCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>[]
+        }
+        delete: {
+          args: Prisma.OfferingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        update: {
+          args: Prisma.OfferingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        deleteMany: {
+          args: Prisma.OfferingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.OfferingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.OfferingUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>[]
+        }
+        upsert: {
+          args: Prisma.OfferingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$OfferingPayload>
+        }
+        aggregate: {
+          args: Prisma.OfferingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateOffering>
+        }
+        groupBy: {
+          args: Prisma.OfferingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OfferingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.OfferingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.OfferingCountAggregateOutputType> | number
+        }
+      }
+    }
+    QuoteRequest: {
+      payload: Prisma.$QuoteRequestPayload<ExtArgs>
+      fields: Prisma.QuoteRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuoteRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuoteRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.QuoteRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuoteRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        findMany: {
+          args: Prisma.QuoteRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>[]
+        }
+        create: {
+          args: Prisma.QuoteRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        createMany: {
+          args: Prisma.QuoteRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuoteRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.QuoteRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        update: {
+          args: Prisma.QuoteRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuoteRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuoteRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuoteRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuoteRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.QuoteRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuoteRequest>
+        }
+        groupBy: {
+          args: Prisma.QuoteRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuoteRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    QuoteRequestItem: {
+      payload: Prisma.$QuoteRequestItemPayload<ExtArgs>
+      fields: Prisma.QuoteRequestItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuoteRequestItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuoteRequestItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        findFirst: {
+          args: Prisma.QuoteRequestItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuoteRequestItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        findMany: {
+          args: Prisma.QuoteRequestItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>[]
+        }
+        create: {
+          args: Prisma.QuoteRequestItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        createMany: {
+          args: Prisma.QuoteRequestItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuoteRequestItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>[]
+        }
+        delete: {
+          args: Prisma.QuoteRequestItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        update: {
+          args: Prisma.QuoteRequestItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuoteRequestItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuoteRequestItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuoteRequestItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuoteRequestItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuoteRequestItemPayload>
+        }
+        aggregate: {
+          args: Prisma.QuoteRequestItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuoteRequestItem>
+        }
+        groupBy: {
+          args: Prisma.QuoteRequestItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteRequestItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuoteRequestItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuoteRequestItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -992,6 +1217,55 @@ export const MpesaTransactionScalarFieldEnum = {
 export type MpesaTransactionScalarFieldEnum = (typeof MpesaTransactionScalarFieldEnum)[keyof typeof MpesaTransactionScalarFieldEnum]
 
 
+export const OfferingScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  kind: 'kind',
+  category: 'category',
+  pricingMode: 'pricingMode',
+  fixedPrice: 'fixedPrice',
+  recurringInterval: 'recurringInterval',
+  imageUrl: 'imageUrl',
+  active: 'active',
+  featured: 'featured',
+  createdAt: 'createdAt'
+} as const
+
+export type OfferingScalarFieldEnum = (typeof OfferingScalarFieldEnum)[keyof typeof OfferingScalarFieldEnum]
+
+
+export const QuoteRequestScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  customerName: 'customerName',
+  customerEmail: 'customerEmail',
+  customerPhone: 'customerPhone',
+  company: 'company',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuoteRequestScalarFieldEnum = (typeof QuoteRequestScalarFieldEnum)[keyof typeof QuoteRequestScalarFieldEnum]
+
+
+export const QuoteRequestItemScalarFieldEnum = {
+  id: 'id',
+  quoteRequestId: 'quoteRequestId',
+  offeringId: 'offeringId',
+  offeringName: 'offeringName',
+  offeringKind: 'offeringKind',
+  pricingMode: 'pricingMode',
+  quantity: 'quantity',
+  notes: 'notes'
+} as const
+
+export type QuoteRequestItemScalarFieldEnum = (typeof QuoteRequestItemScalarFieldEnum)[keyof typeof QuoteRequestItemScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1092,6 +1366,13 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -1265,6 +1546,9 @@ export type GlobalOmitConfig = {
   verificationToken?: Prisma.VerificationTokenOmit
   invoice?: Prisma.InvoiceOmit
   mpesaTransaction?: Prisma.MpesaTransactionOmit
+  offering?: Prisma.OfferingOmit
+  quoteRequest?: Prisma.QuoteRequestOmit
+  quoteRequestItem?: Prisma.QuoteRequestItemOmit
 }
 
 /* Types for Logging */

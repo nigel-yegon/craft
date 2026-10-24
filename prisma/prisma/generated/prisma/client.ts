@@ -71,3 +71,18 @@ export type Invoice = Prisma.InvoiceModel
  * 
  */
 export type MpesaTransaction = Prisma.MpesaTransactionModel
+/**
+ * Model Offering
+ * 
+ */
+export type Offering = Prisma.OfferingModel
+/**
+ * Model QuoteRequest
+ * 
+ */
+export type QuoteRequest = Prisma.QuoteRequestModel
+/**
+ * Model QuoteRequestItem
+ * 
+ */
+export type QuoteRequestItem = Prisma.QuoteRequestItemModel
