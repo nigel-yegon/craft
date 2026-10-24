@@ -400,7 +400,7 @@ function DashboardSidebar({
         */}
         <div
           className={[
-            "sticky top-0 z-20 flex items-center border-b bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
+            "sticky top-0 z-20 flex items-center bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
             HEADER_HEIGHT,
           ].join(" ")}
         >

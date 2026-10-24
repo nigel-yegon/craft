@@ -157,7 +157,7 @@ export default function HomePage() {
               <br />
               Systems.
               <br />
-              <span className="font-normal text-[#b6c58d]">
+              <span className="font-normal text-brand-300">
                 Experiences.
               </span>
             </h1>
@@ -172,7 +172,7 @@ export default function HomePage() {
               <div className="flex flex-wrap gap-3 sm:flex-col">
                 <Link
                   href="/contact"
-                  className="inline-flex min-h-12 items-center justify-center gap-3 bg-[#b6c58d] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#20221e] transition hover:bg-[#d0dbb3] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#b6c58d]"
+                  className="inline-flex min-h-12 items-center justify-center gap-3 bg-brand-300 px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#20221e] transition hover:bg-[#d0dbb3] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-300"
                 >
                   Start a project
                   <ArrowUpRight size={16} />
@@ -240,7 +240,7 @@ export default function HomePage() {
       </section>
 
       {/* SERVICES */}
-      <section className="bg-[#eae7de] py-20 text-[#292a25] sm:py-28">
+      <section className="bg-cream-200 py-20 text-[#292a25] sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
@@ -376,7 +376,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5">
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#b6c58d]">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-300">
                 04 / How we work
               </p>
               <h2 className="mt-6 text-4xl font-light leading-[1.08] tracking-tighter sm:text-5xl lg:text-6xl">
@@ -390,7 +390,7 @@ export default function HomePage() {
               </p>
               <Link
                 href="/studio/process"
-                className="mt-8 inline-flex items-center gap-3 border-b border-[#b6c58d] pb-2 text-sm text-[#f4f0e7] transition hover:gap-5"
+                className="mt-8 inline-flex items-center gap-3 border-b border-brand-300 pb-2 text-sm text-[#f4f0e7] transition hover:gap-5"
               >
                 Explore our process
                 <ArrowUpRight size={16} />
@@ -403,7 +403,7 @@ export default function HomePage() {
                   key={step.number}
                   className="grid grid-cols-[48px_1fr] gap-4 border-t border-white/15 py-6 sm:grid-cols-[60px_1fr] sm:py-8"
                 >
-                  <span className="font-mono text-xs text-[#b6c58d]">
+                  <span className="font-mono text-xs text-brand-300">
                     {step.number}
                   </span>
                   <div>
@@ -416,7 +416,7 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
-              <div className="mt-4 flex items-center gap-2 text-xs text-[#b6c58d]">
+              <div className="mt-4 flex items-center gap-2 text-xs text-brand-300">
                 <Check size={15} />
                 <span>One connected process, shaped around your project.</span>
               </div>
