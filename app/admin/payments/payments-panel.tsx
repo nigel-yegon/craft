@@ -1,7 +1,7 @@
 // app/admin/payments/payments-panel.tsx
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { WalletIcon } from "lucide-react";
 
 import {
@@ -15,7 +15,7 @@ import {
 const inputClass =
   "w-full rounded-xl border border-deep-200 bg-cream-100 px-3.5 py-3 text-sm text-deep-800 outline-none transition placeholder:text-deep-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 dark:border-deep-800 dark:bg-deep-950 dark:text-cream-100 dark:placeholder:text-cream-500";
 
-export function PaymentsPanel() {
+export function PaymentsPanel({ search = "" }: { search?: string }) {
   const [invoices, setInvoices] = useState<InvoiceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [pending, startTransition] = useTransition();
@@ -36,6 +36,18 @@ export function PaymentsPanel() {
   useEffect(() => {
     refresh();
   }, []);
+
+  // Filter by the header search box
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return invoices;
+    return invoices.filter((inv) =>
+      [inv.invoiceNumber, inv.customerName, inv.customerPhone]
+        .join(" ")
+        .toLowerCase()
+        .includes(q),
+    );
+  }, [invoices, search]);
 
   function handleCreate() {
     startTransition(async () => {
@@ -137,8 +149,16 @@ export function PaymentsPanel() {
         <div className="h-24 animate-pulse rounded-2xl bg-cream-50 dark:bg-deep-900" />
       )}
 
+      {!loading && filtered.length === 0 && (
+        <div className="rounded-2xl border-2 border-dashed border-deep-200 p-10 text-center text-sm text-deep-500 dark:border-deep-800 dark:text-cream-500">
+          {invoices.length === 0
+            ? "No invoices yet. Create one above."
+            : "No invoices match your search."}
+        </div>
+      )}
+
       <div className="space-y-3">
-        {invoices.map((inv) => (
+        {filtered.map((inv) => (
           <div
             key={inv.id}
             className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900"
