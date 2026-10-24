@@ -1,4 +1,3 @@
-
 @import "tailwindcss";
 
 /* =========================================================
@@ -140,6 +139,54 @@
 
   --color-deep: var(--charcoal);
   --color-deep-dark: var(--charcoal-deep);
+
+  /* ─────────────────────────────────────────────────────────
+     Extended color scales
+     These generate the numbered utility classes used by
+     the admin dashboard and other deep UI:
+       cream-50 … cream-950
+       deep-50  … deep-950
+       brand-50 … brand-950
+     ───────────────────────────────────────────────────────── */
+
+  /* cream scale — ivory family */
+  --color-cream-50: #fbf9f4;
+  --color-cream-100: #f4f0e7;
+  --color-cream-200: #eae7de;
+  --color-cream-300: #dedbd1;
+  --color-cream-400: #c8c5b9;
+  --color-cream-500: #858579;
+  --color-cream-600: #66675e;
+  --color-cream-700: #505346;
+  --color-cream-800: #3b3d34;
+  --color-cream-900: #242620;
+  --color-cream-950: #191a17;
+
+  /* deep scale — charcoal family */
+  --color-deep-50: #f4f0e7;
+  --color-deep-100: #dedbd1;
+  --color-deep-200: #c8c5b9;
+  --color-deep-300: #96988b;
+  --color-deep-400: #66675e;
+  --color-deep-500: #505346;
+  --color-deep-600: #3b3d34;
+  --color-deep-700: #2e3029;
+  --color-deep-800: #242620;
+  --color-deep-900: #191a17;
+  --color-deep-950: #12130f;
+
+  /* brand scale — olive family */
+  --color-brand-50: #f4f5ee;
+  --color-brand-100: #e6e9d9;
+  --color-brand-200: #d0dcb0;
+  --color-brand-300: #b6c58d;
+  --color-brand-400: #96a870;
+  --color-brand-500: #78865a;
+  --color-brand-600: #596744;
+  --color-brand-700: #455035;
+  --color-brand-800: #333c27;
+  --color-brand-900: #242a1c;
+  --color-brand-950: #14170f;
 }
 
 /* =========================================================

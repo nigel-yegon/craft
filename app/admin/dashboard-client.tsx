@@ -2,8 +2,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { House, Users as UsersIcon, FileText } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronDown, House, Users as UsersIcon, FileText } from "lucide-react";
 
 import FadeIn from "../components/fade-in";
 import { Stagger } from "../components/stagger";
@@ -40,6 +40,20 @@ type ModuleTone = {
   pillBg: string;
   pillText: string;
   icon: React.ReactNode;
+};
+
+type ModuleDef = {
+  key: ModuleKey;
+  label: string;
+  description: string;
+  tone?: ModuleTone;
+  icon: React.ReactNode;
+};
+
+type ModuleGroup = {
+  key: string;
+  label: string;
+  modules: ModuleDef[];
 };
 
 // ─── Tones ────────────────────────────────────────────────────────
@@ -229,6 +243,55 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   },
 };
 
+// ─── Module groups ────────────────────────────────────────────────
+
+const MODULE_GROUPS: ModuleGroup[] = [
+  {
+    key: "dashboard",
+    label: "Dashboard",
+    modules: [
+      { key: "overview", label: "Overview", description: "Dashboard summary", icon: <GridIcon /> },
+    ],
+  },
+  {
+    key: "directory",
+    label: "Directory",
+    modules: [
+      { key: "businesses", label: "Businesses", description: "Manage businesses", icon: TONES.businesses.icon, tone: TONES.businesses },
+      { key: "operators", label: "Tour Operators", description: "Verify TRA licenses", icon: TONES.operators.icon, tone: TONES.operators },
+      { key: "destinations", label: "Destinations", description: "Manage destinations", icon: TONES.destinations.icon, tone: TONES.destinations },
+    ],
+  },
+  {
+    key: "offering",
+    label: "Offering",
+    modules: [
+      { key: "experiences", label: "Experiences", description: "Manage experiences", icon: TONES.experiences.icon, tone: TONES.experiences },
+      { key: "packages", label: "Packages", description: "Manage packages", icon: TONES.packages.icon, tone: TONES.packages },
+      { key: "stay", label: "Stay", description: "Manage accommodation", icon: TONES.stay.icon, tone: TONES.stay },
+      { key: "events", label: "Events", description: "Manage events", icon: TONES.events.icon, tone: TONES.events },
+    ],
+  },
+  {
+    key: "operations",
+    label: "Operations",
+    modules: [
+      { key: "incidents", label: "Incidents", description: "Manage incidents", icon: TONES.incidents.icon, tone: TONES.incidents },
+      { key: "inquiries", label: "Inquiries", description: "Investor inquiries", icon: TONES.inquiries.icon, tone: TONES.inquiries },
+      { key: "resources", label: "Resources", description: "Documents & downloads", icon: TONES.resources.icon, tone: TONES.resources },
+      { key: "blog", label: "Blog", description: "Manage blog posts", icon: TONES.blog.icon, tone: TONES.blog },
+    ],
+  },
+  {
+    key: "admin",
+    label: "Administration",
+    modules: [
+      { key: "reports", label: "Reports", description: "Review & generate reports", icon: TONES.reports.icon, tone: TONES.reports },
+      { key: "users", label: "Users & Groups", description: "Manage roles and access", icon: TONES.users.icon, tone: TONES.users },
+    ],
+  },
+];
+
 // ─── Root ─────────────────────────────────────────────────────────
 
 export function DashboardClient({ userName }: { userName: string }) {
@@ -238,14 +301,21 @@ export function DashboardClient({ userName }: { userName: string }) {
 
   return (
     <div className="min-h-screen bg-cream-200 dark:bg-deep-950">
-      <div className="flex min-h-screen">
+      {/*
+        Layout notes for sticky sidebar:
+        - The flex parent must NOT have `min-h-screen` — it must grow with
+          `main` so the sticky `aside` has scroll range.
+        - `main` carries `lg:min-h-screen` so even short module pages make
+          the flex parent ≥ viewport height (sticky needs *some* range).
+      */}
+      <div className="flex">
         <DashboardSidebar
           activeModule={activeModule}
           onNavigate={setActiveModule}
           userName={userName}
         />
 
-        <main className="min-w-0 flex-1">
+        <main className="min-w-0 flex-1 lg:min-h-screen">
           <DashboardHeader
             activeModule={activeModule}
             search={search}
@@ -278,114 +348,164 @@ function DashboardSidebar({
   activeModule,
   onNavigate,
   userName,
-  
 }: {
   activeModule: ModuleKey;
   onNavigate: (m: ModuleKey) => void;
   userName: string;
 }) {
-  const modules: {
-    key: ModuleKey;
-    label: string;
-    description: string;
-    tone?: ModuleTone;
-    icon: React.ReactNode;
-  }[] = [
-    { key: "overview", label: "Overview", description: "Dashboard summary", icon: <GridIcon /> },
-    { key: "businesses", label: "Businesses", description: "Manage businesses", icon: TONES.businesses.icon, tone: TONES.businesses },
-    { key: "operators", label: "Tour Operators", description: "Verify TRA licenses", icon: TONES.operators.icon, tone: TONES.operators },
-    { key: "incidents", label: "Incidents", description: "Manage incidents", icon: TONES.incidents.icon, tone: TONES.incidents },
-    { key: "resources", label: "Resources", description: "Documents & downloads", icon: TONES.resources.icon, tone: TONES.resources },
-    { key: "inquiries", label: "Inquiries", description: "Investor inquiries", icon: TONES.inquiries.icon, tone: TONES.inquiries },
-    { key: "destinations", label: "Destinations", description: "Manage destinations", icon: TONES.destinations.icon, tone: TONES.destinations },
-    { key: "experiences", label: "Experiences", description: "Manage experiences", icon: TONES.experiences.icon, tone: TONES.experiences },
-    { key: "packages", label: "Packages", description: "Manage packages", icon: TONES.packages.icon, tone: TONES.packages },
-    { key: "stay", label: "Stay", description: "Manage accommodation", icon: TONES.stay.icon, tone: TONES.stay },
-    { key: "events", label: "Events", description: "Manage events", icon: TONES.events.icon, tone: TONES.events },
-    { key: "blog", label: "Blog", description: "Manage blog posts", icon: TONES.blog.icon, tone: TONES.blog },
-    { key: "reports", label: "Reports", description: "Review & generate reports", icon: TONES.reports.icon, tone: TONES.reports },
-    { key: "users", label: "Users & Groups", description: "Manage roles and access", icon: TONES.users.icon, tone: TONES.users },
-  ];
+  const activeGroupKey = useMemo(
+    () => MODULE_GROUPS.find((g) => g.modules.some((m) => m.key === activeModule))?.key,
+    [activeModule],
+  );
+
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (const g of MODULE_GROUPS) initial[g.key] = g.key === activeGroupKey;
+    return initial;
+  });
+
+  const [lastActiveGroup, setLastActiveGroup] = useState(activeGroupKey);
+  if (activeGroupKey && activeGroupKey !== lastActiveGroup) {
+    setLastActiveGroup(activeGroupKey);
+    if (!openGroups[activeGroupKey]) {
+      setOpenGroups((prev) => ({ ...prev, [activeGroupKey]: true }));
+    }
+  }
+
+  const toggleGroup = (key: string) =>
+    setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
-    <aside className="hidden w-72 shrink-0 lg:block">
-      <div className="sticky top-0 h-screen">
-        <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
-          <div className="border-b border-deep-200 px-6 py-5 dark:border-deep-800">
-            <Link href="/" className="group flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex items-center gap-2 text-base font-bold tracking-tight text-deep-800 dark:text-cream-100">
-                  <span className="text-lg leading-none">✦</span>
-                  <span className="truncate">Hello, {userName}.</span>
-                </div>
-                <div className="mt-1 flex items-center gap-1.5 px-2 py-0.5 text-xs text-deep-500 dark:text-cream-500">
-                  <House size={14} strokeWidth={1.75} aria-hidden className="shrink-0" />
-                  <span>Go To Home</span>
-                </div>
-              </div>
-            </Link>
-          </div>
+    /*
+      Sticky sidebar:
+      - `sticky top-0 h-screen` makes the whole aside pin to the viewport.
+      - Parent flex div has no min-h-screen, and `main` carries
+        `lg:min-h-screen`, so the parent is always ≥ viewport height and
+        the sticky has scroll range to work against.
+    */
+    <aside className=" hidden h-screen w-72 shrink-0 lg:block">
+      <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
+        {/*
+          Greeting header — mirrors DashboardHeader's height.
+          Same px-6 py-5 + two-line stack (text-xs kicker + text-2xl primary)
+          so both columns resolve to identical computed heights.
+        */}
+        <div className="sticky top-0 z-20 border-b border-deep-200 px-6 py-5 bg-cream-100 dark:bg-deep-900 dark:border-deep-800">
+          <Link href="/" className="group block">
+            <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
+              Welcome back
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="truncate text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
+                Hello, {userName}.
+              </h2>
+              {/* <span className="flex shrink-0 items-center gap-1.5 text-xs text-deep-500 dark:text-cream-500">
+                <House size={14} strokeWidth={1.75} aria-hidden className="shrink-0" />
+                <span className="hidden xl:inline">Home</span>
+              </span> */}
+            </div>
+          </Link>
+        </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
-            <Stagger delayStart={0.05} delayStep={0.04} maxDelay={0.4}>
-              {modules.map((m) => {
-                const active = activeModule === m.key;
-                const tone = m.tone;
-                return (
+        {/* Scrollable module groups */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
+          <Stagger delayStart={0.05} delayStep={0.04} maxDelay={0.4}>
+            {MODULE_GROUPS.map((group) => {
+              const isOpen = !!openGroups[group.key];
+              const hasActive = group.modules.some((m) => m.key === activeModule);
+
+              return (
+                <div key={group.key} className="mb-2">
                   <button
-                    key={m.key}
                     type="button"
-                    onClick={() => onNavigate(m.key)}
+                    onClick={() => toggleGroup(group.key)}
+                    aria-expanded={isOpen}
                     className={[
-                      "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition",
-                      active && tone
-                        ? `${tone.bgActive} ${tone.text}`
-                        : active
-                          ? "bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
-                          : "text-deep-600 hover:bg-cream-200 hover:text-deep-900 dark:text-cream-400 dark:hover:bg-deep-800 dark:hover:text-cream-100",
+                      "group flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left transition",
+                      hasActive
+                        ? "text-deep-900 dark:text-cream-100"
+                        : "text-deep-500 hover:text-deep-800 dark:text-cream-500 dark:hover:text-cream-200",
                     ].join(" ")}
                   >
-                    {active && tone && (
-                      <span aria-hidden className={`absolute inset-y-1 left-0 w-1 rounded-full ${tone.bar}`} />
-                    )}
-                    <span
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.14em]">
+                      {group.label}
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      strokeWidth={2}
+                      aria-hidden
                       className={[
-                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition",
-                        active && tone
-                          ? tone.bgSoft
-                          : "bg-cream-200 text-deep-500 group-hover:bg-cream-300 dark:bg-deep-800 dark:text-cream-500 dark:group-hover:bg-deep-700",
+                        "shrink-0 transition-transform duration-200",
+                        isOpen ? "rotate-0" : "-rotate-90",
                       ].join(" ")}
-                    >
-                      <span className={active && tone ? tone.text : "text-deep-500 dark:text-cream-500"}>
-                        {m.icon}
-                      </span>
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">{m.label}</span>
-                      <span
-                        className={[
-                          "block truncate text-xs",
-                          active ? "text-current opacity-70" : "text-deep-500 dark:text-cream-500",
-                        ].join(" ")}
-                      >
-                        {m.description}
-                      </span>
-                    </span>
+                    />
                   </button>
-                );
-              })}
-            </Stagger>
-          </div>
 
-          <div className="border-t border-deep-200 p-4 dark:border-deep-800">
-            <Link
-              href="/"
-              className="flex items-center gap-2 rounded-xl bg-cream-200 px-4 py-3 text-xs text-deep-600 transition hover:bg-cream-300 dark:bg-deep-800 dark:text-cream-400 dark:hover:bg-deep-700"
-            >
-              <ArrowLeftIcon />
-              <span>View public site</span>
-            </Link>
-          </div>
+                  {isOpen && (
+                    <div className="mt-1 space-y-1">
+                      {group.modules.map((m) => {
+                        const active = activeModule === m.key;
+                        const tone = m.tone;
+                        return (
+                          <button
+                            key={m.key}
+                            type="button"
+                            onClick={() => onNavigate(m.key)}
+                            className={[
+                              "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition",
+                              active && tone
+                                ? `${tone.bgActive} ${tone.text}`
+                                : active
+                                  ? "bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
+                                  : "text-deep-600 hover:bg-cream-200 hover:text-deep-900 dark:text-cream-400 dark:hover:bg-deep-800 dark:hover:text-cream-100",
+                            ].join(" ")}
+                          >
+                            {active && tone && (
+                              <span aria-hidden className={`absolute inset-y-1 left-0 w-1 rounded-full ${tone.bar}`} />
+                            )}
+                            <span
+                              className={[
+                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition",
+                                active && tone
+                                  ? tone.bgSoft
+                                  : "bg-cream-200 text-deep-500 group-hover:bg-cream-300 dark:bg-deep-800 dark:text-cream-500 dark:group-hover:bg-deep-700",
+                              ].join(" ")}
+                            >
+                              <span className={active && tone ? tone.text : "text-deep-500 dark:text-cream-500"}>
+                                {m.icon}
+                              </span>
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-semibold">{m.label}</span>
+                              <span
+                                className={[
+                                  "block truncate text-xs",
+                                  active ? "text-current opacity-70" : "text-deep-500 dark:text-cream-500",
+                                ].join(" ")}
+                              >
+                                {m.description}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </Stagger>
+        </div>
+
+        {/* Footer — pinned at bottom of the sticky sidebar */}
+        <div className="border-t border-deep-200 p-4 dark:border-deep-800">
+          <Link
+            href="/"
+            className="flex items-center gap-2 rounded-xl bg-cream-200 px-4 py-3 text-xs text-deep-600 transition hover:bg-cream-300 dark:bg-deep-800 dark:text-cream-400 dark:hover:bg-deep-700"
+          >
+            <ArrowLeftIcon />
+            <span>View public site</span>
+          </Link>
         </div>
       </div>
     </aside>
