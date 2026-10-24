@@ -174,7 +174,7 @@ function DashboardSidebar({
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
         <div
           className={[
-            "flex items-center border-b border-deep-200 px-6 dark:border-deep-800",
+            "sticky top-0 z-20 flex items-center border-b bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
             HEADER_HEIGHT,
           ].join(" ")}
         >
