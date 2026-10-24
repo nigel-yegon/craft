@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "./generated/prisma"
+  output   = "./prisma/generated/prisma"
 }
 
 datasource db {
@@ -56,4 +56,46 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+// ─── Payments: Invoices & M-Pesa Transactions ─────────────────────
+
+model Invoice {
+  id            Int       @id @default(autoincrement())
+  invoiceNumber String    @unique
+  customerName  String
+  customerPhone String
+  description   String?
+  amount        Int
+  status        String    @default("PENDING")
+  dueDate       DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  transactions  MpesaTransaction[]
+
+  @@index([status])
+  @@index([customerPhone])
+}
+
+model MpesaTransaction {
+  id                 Int       @id @default(autoincrement())
+  invoiceId          Int?
+  invoice            Invoice?  @relation(fields: [invoiceId], references: [id])
+  merchantRequestId  String?
+  checkoutRequestId  String?   @unique
+  mpesaReceiptNumber String?   @unique
+  phoneNumber        String
+  amount             Int
+  status             String    @default("PENDING")
+  resultCode         String?
+  resultDesc         String?
+  rawCallback        Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([invoiceId])
+  @@index([status])
+  @@index([checkoutRequestId])
 }

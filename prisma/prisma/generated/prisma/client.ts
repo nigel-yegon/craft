@@ -61,3 +61,13 @@ export type Session = Prisma.SessionModel
  * 
  */
 export type VerificationToken = Prisma.VerificationTokenModel
+/**
+ * Model Invoice
+ * 
+ */
+export type Invoice = Prisma.InvoiceModel
+/**
+ * Model MpesaTransaction
+ * 
+ */
+export type MpesaTransaction = Prisma.MpesaTransactionModel
