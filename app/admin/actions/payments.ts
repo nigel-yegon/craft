@@ -15,6 +15,7 @@ export type InvoiceRow = {
   status: string;
   paidAt: string | null;
   createdAt: string;
+  quoteId: number | null;
 };
 
 export type TransactionRow = {
@@ -62,11 +63,6 @@ async function getToken(): Promise<string> {
   return data.access_token;
 }
 
-/**
- * Generate the next invoice number for the current year.
- * Reads the highest existing number rather than a row count, so it is
- * safe against deletions and gaps.
- */
 async function nextInvoiceNumber(): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `INV-${year}-`;
@@ -115,7 +111,6 @@ export async function sendPaymentPrompt(invoiceId: number) {
     );
   }
 
-  // Daraja expects EAT (UTC+3), 14 digits, no separators
   const timestamp = new Date(Date.now() + 3 * 60 * 60 * 1000)
     .toISOString()
     .replace(/[-:TZ.]/g, "")
@@ -131,7 +126,6 @@ export async function sendPaymentPrompt(invoiceId: number) {
       ? "https://api.safaricom.co.ke"
       : "https://sandbox.safaricom.co.ke";
 
-  // PAYBILL: TransactionType MUST be CustomerPayBillOnline
   const payload = {
     BusinessShortCode: shortcode,
     Password: password,
@@ -165,7 +159,6 @@ export async function sendPaymentPrompt(invoiceId: number) {
     throw new Error(data.errorMessage || `STK failed: ${res.status}`);
   }
 
-  // Persist BEFORE responding — callback can arrive fast
   await prisma.mpesaTransaction.create({
     data: {
       invoiceId: invoice.id,
@@ -180,14 +173,8 @@ export async function sendPaymentPrompt(invoiceId: number) {
   return { checkoutRequestId: data.CheckoutRequestID as string };
 }
 
-// ─── Reconciliation (STK Push Query) ─────────────────────────────
+// ─── Reconciliation ──────────────────────────────────────────────
 
-/**
- * Query Safaricom for the status of a pending STK Push.
- * Used when the callback never arrives.
- * Daraja's stkpushquery is rate-limited (5 req/min in sandbox),
- * so call it selectively — not on every render.
- */
 export async function queryStkStatus(checkoutRequestId: string) {
   const token = await getToken();
   const shortcode = process.env.MPESA_SHORTCODE!;
@@ -220,7 +207,6 @@ export async function queryStkStatus(checkoutRequestId: string) {
   });
 
   const data = (await res.json()) as {
-    ResponseCode?: string;
     ResultCode?: string;
     ResultDesc?: string;
     errorMessage?: string;
@@ -233,7 +219,6 @@ export async function queryStkStatus(checkoutRequestId: string) {
     };
   }
 
-  // ResultCode "0" = success, "1032" = user cancelled, "1037" = timeout
   if (data.ResultCode === "0") return { status: "SUCCESS" as const };
   if (data.ResultCode === "1032" || data.ResultCode === "1037") {
     return { status: "FAILED" as const, message: data.ResultDesc };
@@ -241,10 +226,6 @@ export async function queryStkStatus(checkoutRequestId: string) {
   return { status: "PENDING" as const, message: data.ResultDesc };
 }
 
-/**
- * Reconcile stale pending transactions for an invoice.
- * Called by the "Refresh status" button in the Payments panel.
- */
 export async function reconcileInvoice(invoiceId: number) {
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
@@ -314,6 +295,7 @@ export async function listInvoices(): Promise<InvoiceRow[]> {
     status: r.status,
     paidAt: r.paidAt?.toISOString() ?? null,
     createdAt: r.createdAt.toISOString(),
+    quoteId: r.quoteId,
   }));
 }
 
@@ -341,7 +323,10 @@ export async function listTransactions(): Promise<TransactionRow[]> {
 export async function createInvoice(input: {
   customerName: string;
   customerPhone: string;
+  customerEmail?: string;
   amount: number;
+  description?: string;
+  quoteId?: number;
 }) {
   let phone = input.customerPhone.replace(/[^\d]/g, "");
   if (phone.startsWith("0")) phone = `254${phone.slice(1)}`;
@@ -360,7 +345,10 @@ export async function createInvoice(input: {
           invoiceNumber,
           customerName: input.customerName,
           customerPhone: phone,
+          customerEmail: input.customerEmail ?? null,
+          description: input.description ?? null,
           amount: Math.ceil(input.amount),
+          quoteId: input.quoteId ?? null,
         },
       });
       revalidatePath("/admin");

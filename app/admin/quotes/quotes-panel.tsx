@@ -10,6 +10,7 @@ import {
   createQuote,
   updateQuoteStatus,
   deleteQuoteRequest,
+  convertQuoteToInvoice,
   type QuoteRequestRow,
   type QuoteRow,
   type QuoteLineItem,
@@ -105,9 +106,28 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
     });
   }
 
+  function handleConvertToInvoice(quoteId: number) {
+    startTransition(async () => {
+      try {
+        const result = await convertQuoteToInvoice(quoteId);
+        if ("error" in result.prompt) {
+          alert(
+            `Invoice ${result.invoiceNumber} created, but the M-Pesa prompt failed: ${result.prompt.error}. Retry from Payments.`,
+          );
+        } else {
+          alert(
+            `Invoice ${result.invoiceNumber} created. STK Push sent to the customer's phone.`,
+          );
+        }
+        await refresh();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Conversion failed");
+      }
+    });
+  }
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -125,7 +145,6 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 border-b border-deep-200 dark:border-deep-800">
         {(["requests", "quotes"] as const).map((t) => (
           <button
@@ -156,7 +175,6 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
         <div className="h-24 animate-pulse rounded-2xl bg-cream-50 dark:bg-deep-900" />
       )}
 
-      {/* Requests tab */}
       {tab === "requests" && (
         <div className="space-y-3">
           {!loading && filteredRequests.length === 0 && (
@@ -216,6 +234,11 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
                         Awaiting response
                       </span>
                     )}
+                    {r.status === "INVOICED" && (
+                      <span className="rounded-lg border border-violet-300 px-3 py-2 text-xs font-semibold text-violet-700 dark:border-violet-800 dark:text-violet-300">
+                        Invoiced
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => handleDelete(r.id)}
@@ -232,7 +255,6 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
         </div>
       )}
 
-      {/* Quotes tab */}
       {tab === "quotes" && (
         <div className="space-y-3">
           {!loading && filteredQuotes.length === 0 && (
@@ -301,12 +323,17 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
                 {q.status === "ACCEPTED" && (
                   <button
                     type="button"
-                    disabled
-                    className="rounded-lg border border-deep-200 px-3 py-2 text-xs font-semibold text-deep-500 dark:border-deep-800 dark:text-cream-500"
-                    title="Invoice conversion lands in the next milestone"
+                    onClick={() => handleConvertToInvoice(q.id)}
+                    disabled={pending}
+                    className="rounded-lg bg-violet-700 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-800 disabled:opacity-60"
                   >
-                    Convert to invoice (soon)
+                    {pending ? "Converting…" : "Convert to invoice & send M-Pesa"}
                   </button>
+                )}
+                {q.status === "INVOICED" && (
+                  <span className="rounded-lg border border-violet-300 px-3 py-2 text-xs font-semibold text-violet-700 dark:border-violet-800 dark:text-violet-300">
+                    Invoiced — see Payments module
+                  </span>
                 )}
               </div>
             </div>
@@ -314,7 +341,6 @@ export function QuotesPanel({ search = "" }: { search?: string }) {
         </div>
       )}
 
-      {/* Price dialog */}
       {selectedRequest && (
         <PriceDialog
           request={selectedRequest}

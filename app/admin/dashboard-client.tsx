@@ -45,11 +45,6 @@ type ModuleGroup = {
   modules: ModuleDef[];
 };
 
-// ─── Shared header height ─────────────────────────────────────────
-// Locks the sidebar greeting and the dashboard header to the same
-// computed height on desktop so they align pixel-for-pixel regardless
-// of which module is active (some have a search input, some don't).
-
 const HEADER_HEIGHT = "lg:min-h-24";
 
 // ─── Tones ────────────────────────────────────────────────────────
@@ -114,20 +109,12 @@ export function DashboardClient({ userName }: { userName: string }) {
 
   return (
     <div className="min-h-screen bg-cream-200 dark:bg-deep-950">
-      {/*
-        Layout notes for sticky sidebar:
-        - The flex parent must NOT have `min-h-screen` — it must grow with
-          `main` so the sticky `aside` has scroll range.
-        - `main` carries `lg:min-h-screen` so even short module pages make
-          the flex parent ≥ viewport height (sticky needs *some* range).
-      */}
       <div className="flex">
         <DashboardSidebar
           activeModule={activeModule}
           onNavigate={setActiveModule}
           userName={userName}
         />
-
         <main className="min-w-0 flex-1 lg:min-h-screen">
           <DashboardHeader
             activeModule={activeModule}
@@ -136,13 +123,10 @@ export function DashboardClient({ userName }: { userName: string }) {
             tone={activeModule !== "overview" ? TONES[activeModule] : undefined}
             scrolled={scrolled}
           />
-
           <div className="p-6 lg:p-8">
             <div key={activeModule}>
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
-
               {activeModule === "quotes" && <QuotesPanel search={search} />}
-
               {activeModule === "payments" && <PaymentsPanel search={search} />}
             </div>
           </div>
@@ -186,21 +170,8 @@ function DashboardSidebar({
     setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
-    /*
-      Sticky sidebar:
-      - `sticky top-0 h-screen` pins the whole aside to the viewport.
-      - Parent flex div has no min-h-screen, and `main` carries
-        `lg:min-h-screen`, so the parent is always ≥ viewport height and
-        the sticky has scroll range to work against.
-    */
     <aside className="sticky top-0 z-20 hidden h-screen w-72 shrink-0 lg:block">
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
-        {/*
-          Greeting header — locked to the same height as DashboardHeader
-          on desktop via HEADER_HEIGHT (`lg:min-h-24`). This guarantees the
-          sidebar greeting and the dashboard title row line up regardless of
-          whether the active module shows a search input.
-        */}
         <div
           className={[
             "flex items-center border-b border-deep-200 px-6 dark:border-deep-800",
@@ -219,7 +190,6 @@ function DashboardSidebar({
           </Link>
         </div>
 
-        {/* Scrollable module groups */}
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
           <Stagger delayStart={0.05} delayStep={0.04} maxDelay={0.4}>
             {MODULE_GROUPS.map((group) => {
@@ -309,7 +279,6 @@ function DashboardSidebar({
           </Stagger>
         </div>
 
-        {/* Footer — pinned at bottom of the sticky sidebar */}
         <div className="border-t border-deep-200 p-4 dark:border-deep-800">
           <Link
             href="/"
@@ -357,11 +326,6 @@ function DashboardHeader({
           : "border-deep-200 bg-cream-100/90 backdrop-blur-sm dark:border-deep-800 dark:bg-deep-900/90",
       ].join(" ")}
     >
-      {/*
-        Inner wrapper is locked to HEADER_HEIGHT (`lg:min-h-24`) so it matches
-        the sidebar greeting height on desktop, whether or not the module
-        shows a search input. On mobile it stacks naturally — no height lock.
-      */}
       <div
         className={[
           "flex flex-col gap-5 px-6 py-5",
@@ -401,7 +365,7 @@ function DashboardHeader({
   );
 }
 
-// ─── Overview stub ────────────────────────────────────────────────
+// ─── Overview ────────────────────────────────────────────────────
 
 function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
   return (
@@ -433,10 +397,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
           Wire up your data
         </h3>
         <p className="mx-auto mt-2 max-w-md text-xs leading-6 text-deep-500 dark:text-cream-500">
-          Overview stats, charts and activity lists go here. Add server actions
-          under <code className="rounded bg-cream-200 px-1 py-0.5 dark:bg-deep-800">app/admin/actions/</code> and
-          pass the results in as props from the server component, or fetch them
-          client-side inside an effect.
+          Overview stats, charts and activity lists go here.
         </p>
       </div>
     </div>

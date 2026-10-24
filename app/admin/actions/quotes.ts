@@ -3,6 +3,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createInvoice, sendPaymentPrompt } from "./payments";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -131,7 +132,7 @@ export async function listQuotes(): Promise<QuoteRow[]> {
 export async function createQuote(input: {
   quoteRequestId: number;
   lineItems: QuoteLineItem[];
-  taxRate?: number;   // e.g. 0.16 for 16% VAT
+  taxRate?: number;
   validDays?: number;
   notes?: string;
 }) {
@@ -187,4 +188,72 @@ export async function updateQuoteStatus(id: number, status: string) {
 export async function deleteQuoteRequest(id: number) {
   await prisma.quoteRequest.delete({ where: { id } });
   revalidatePath("/admin");
+}
+
+// ─── Convert accepted quote → invoice + STK Push ─────────────────
+
+export async function convertQuoteToInvoice(quoteId: number) {
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    include: { quoteRequest: true, invoice: true },
+  });
+  if (!quote) throw new Error("Quote not found");
+  if (quote.status !== "ACCEPTED") {
+    throw new Error("Only accepted quotes can be converted to invoices");
+  }
+  if (quote.invoice) {
+    throw new Error("This quote has already been invoiced");
+  }
+
+  const req = quote.quoteRequest;
+  const lineItems = quote.lineItems as QuoteLineItem[];
+
+  const description =
+    lineItems.length === 1
+      ? lineItems[0].label
+      : `Quote ${quote.reference}: ${lineItems
+          .map((li) => li.label)
+          .slice(0, 3)
+          .join(", ")}${lineItems.length > 3 ? ` +${lineItems.length - 3} more` : ""}`;
+
+  const invoice = await createInvoice({
+    customerName: req.customerName,
+    customerPhone: req.customerPhone,
+    customerEmail: req.customerEmail,
+    amount: quote.total,
+    description: description.slice(0, 200),
+    quoteId: quote.id,
+  });
+
+  await prisma.$transaction([
+    prisma.quote.update({
+      where: { id: quote.id },
+      data: { status: "INVOICED" },
+    }),
+    prisma.quoteRequest.update({
+      where: { id: req.id },
+      data: { status: "INVOICED" },
+    }),
+  ]);
+
+  revalidatePath("/admin");
+
+  let prompt:
+    | { checkoutRequestId: string }
+    | { error: string };
+
+  try {
+    prompt = await sendPaymentPrompt(invoice.id);
+  } catch (err) {
+    prompt = {
+      error: err instanceof Error ? err.message : "STK Push failed",
+    };
+  }
+
+  return {
+    invoiceNumber: invoice.invoiceNumber,
+    invoiceId: invoice.id,
+    amount: invoice.amount,
+    prompt,
+  };
 }

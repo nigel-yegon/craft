@@ -61,13 +61,14 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// ─── Payments: Invoices & M-Pesa Transactions ─────────────────────
+// ─── Payments ─────────────────────────────────────────────────────
 
 model Invoice {
   id            Int       @id @default(autoincrement())
   invoiceNumber String    @unique
   customerName  String
   customerPhone String
+  customerEmail String?
   description   String?
   amount        Int
   status        String    @default("PENDING")
@@ -75,6 +76,9 @@ model Invoice {
   paidAt        DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  quoteId       Int?      @unique
+  quote         Quote?    @relation(fields: [quoteId], references: [id])
 
   transactions  MpesaTransaction[]
 
@@ -103,19 +107,19 @@ model MpesaTransaction {
   @@index([checkoutRequestId])
 }
 
-// ─── Catalogue & quote requests (Milestone 1) ────────────────────
+// ─── Catalogue ────────────────────────────────────────────────────
 
 model Offering {
   id                Int      @id @default(autoincrement())
   slug              String   @unique
   name              String
   description       String
-  kind              String   // "SUBSCRIPTION" | "PRODUCT" | "SERVICE"
+  kind              String
   category          String
 
-  pricingMode       String   // "FIXED" | "QUOTE" | "RECURRING"
-  fixedPrice        Int?     // present when pricingMode = FIXED | RECURRING
-  recurringInterval String?  // "MONTHLY" | "QUARTERLY" | "ANNUAL"
+  pricingMode       String
+  fixedPrice        Int?
+  recurringInterval String?
 
   imageUrl          String?
   active            Boolean  @default(true)
@@ -129,9 +133,11 @@ model Offering {
   @@index([active])
 }
 
+// ─── Quote requests → quotes → invoices ───────────────────────────
+
 model QuoteRequest {
   id            Int      @id @default(autoincrement())
-  reference     String   @unique   // "QR-2026-0001"
+  reference     String   @unique
 
   customerName  String
   customerEmail String
@@ -140,7 +146,6 @@ model QuoteRequest {
   notes         String?
 
   status        String   @default("NEW")
-  // NEW → REVIEWING → QUOTED → INVOICED → PAID → CANCELLED
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -160,7 +165,6 @@ model QuoteRequestItem {
   offeringId     Int?
   offering       Offering?    @relation(fields: [offeringId], references: [id], onDelete: SetNull)
 
-  // Snapshot at time of request — protects history if the offering changes
   offeringName   String
   offeringKind   String
   pricingMode    String
@@ -171,11 +175,9 @@ model QuoteRequestItem {
   @@index([quoteRequestId])
 }
 
-// ─── Quotes (Milestone 2) ────────────────────────────────────────
-
 model Quote {
   id             Int          @id @default(autoincrement())
-  reference      String       @unique   // "Q-2026-0001"
+  reference      String       @unique
   quoteRequestId Int          @unique
   quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id])
 
@@ -189,8 +191,9 @@ model Quote {
   notes          String?
 
   status         String       @default("DRAFT")
-  // DRAFT → SENT → ACCEPTED → INVOICED → CANCELLED
 
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+
+  invoice        Invoice?
 }

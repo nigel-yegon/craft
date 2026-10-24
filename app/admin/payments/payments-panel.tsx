@@ -38,7 +38,6 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
     refresh();
   }, []);
 
-  // Filter by the header search box
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return invoices;
@@ -88,9 +87,7 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
         if (result.status === "PAID") {
           alert("Payment confirmed via Safaricom query. Invoice marked PAID.");
         } else if (result.status === "FAILED") {
-          alert(
-            `Payment failed: ${result.message ?? "User cancelled or timed out"}`,
-          );
+          alert(`Payment failed: ${result.message ?? "User cancelled or timed out"}`);
         } else if (result.status === "PENDING") {
           alert("Still pending on Safaricom's side. Try again in a minute.");
         } else {
@@ -188,7 +185,7 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
           >
             <div className="flex items-start justify-between">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold text-deep-800 dark:text-cream-100">
                     {inv.invoiceNumber}
                   </span>
@@ -201,6 +198,11 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
                   >
                     {inv.status}
                   </span>
+                  {inv.quoteId && (
+                    <span className="rounded-full bg-brand-100 px-2 py-0.5 text-[10px] font-bold uppercase text-brand-700 dark:bg-brand-950 dark:text-brand-300">
+                      from quote
+                    </span>
+                  )}
                 </div>
                 <p className="mt-1 text-xs text-deep-500 dark:text-cream-500">
                   {inv.customerName} · {inv.customerPhone}

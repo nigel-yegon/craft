@@ -1261,13 +1261,15 @@ export const InvoiceScalarFieldEnum = {
   invoiceNumber: 'invoiceNumber',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
+  customerEmail: 'customerEmail',
   description: 'description',
   amount: 'amount',
   status: 'status',
   dueDate: 'dueDate',
   paidAt: 'paidAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  quoteId: 'quoteId'
 } as const
 
 export type InvoiceScalarFieldEnum = (typeof InvoiceScalarFieldEnum)[keyof typeof InvoiceScalarFieldEnum]
