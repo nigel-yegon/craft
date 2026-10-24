@@ -169,7 +169,7 @@ function DashboardSidebar({
         `lg:min-h-screen`, so the parent is always ≥ viewport height and
         the sticky has scroll range to work against.
     */
-    <aside className=" hidden h-screen w-72 shrink-0 lg:block">
+    <aside className="sticky top-0 z-20 hidden h-screen w-72 shrink-0 lg:block">
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
         {/*
           Greeting header — locked to the same height as DashboardHeader
@@ -184,7 +184,7 @@ function DashboardSidebar({
           ].join(" ")}
         >
           <Link href="/" className="group flex w-full items-center justify-between gap-3">
-            <div className="min-w-0">
+            <div className="sticky top-0 z-20 min-w-0">
               <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
                 Welcome back
               </div>
