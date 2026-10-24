@@ -545,7 +545,7 @@ function Avatar({
 
   return (
     <span
-      className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-mint text-xs font-semibold text-deep-900"
+      className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-800 ring-1 ring-brand-200/60 dark:bg-brand-950/60 dark:text-brand-200 dark:ring-brand-800/50"
       aria-hidden="true"
     >
       {initials || "?"}

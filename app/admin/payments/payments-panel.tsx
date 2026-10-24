@@ -9,6 +9,7 @@ import {
   createInvoice,
   deleteInvoice,
   sendPaymentPrompt,
+  reconcileInvoice,
   type InvoiceRow,
 } from "../actions/payments";
 
@@ -76,6 +77,28 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
         await refresh();
       } catch (err) {
         alert(err instanceof Error ? err.message : "STK failed");
+      }
+    });
+  }
+
+  function handleReconcile(id: number) {
+    startTransition(async () => {
+      try {
+        const result = await reconcileInvoice(id);
+        if (result.status === "PAID") {
+          alert("Payment confirmed via Safaricom query. Invoice marked PAID.");
+        } else if (result.status === "FAILED") {
+          alert(
+            `Payment failed: ${result.message ?? "User cancelled or timed out"}`,
+          );
+        } else if (result.status === "PENDING") {
+          alert("Still pending on Safaricom's side. Try again in a minute.");
+        } else {
+          alert("No pending transaction found for this invoice.");
+        }
+        await refresh();
+      } catch (err) {
+        alert(err instanceof Error ? err.message : "Reconcile failed");
       }
     });
   }
@@ -188,7 +211,7 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
               </p>
             </div>
             {inv.status !== "PAID" && (
-              <div className="mt-3 flex gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => handlePrompt(inv.id)}
@@ -196,6 +219,14 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
                   className="rounded-lg bg-emerald-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60"
                 >
                   Send Payment Prompt
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleReconcile(inv.id)}
+                  disabled={pending}
+                  className="rounded-lg border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:bg-amber-50 disabled:opacity-60 dark:border-amber-800 dark:text-amber-300"
+                >
+                  Refresh status
                 </button>
                 <button
                   type="button"

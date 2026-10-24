@@ -6,7 +6,7 @@ import { PageHeader } from "../components/page-header";
 export const metadata: Metadata = { title: "Studio" };
 
 const FACTS = [
-  { label: "Founded", value: "2024" },
+  { label: "Founded", value: "2015" },
   { label: "Team", value: "12" },
   { label: "Disciplines", value: "4" },
   { label: "Based", value: "Nairobi" },

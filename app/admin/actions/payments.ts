@@ -64,8 +64,8 @@ async function getToken(): Promise<string> {
 
 /**
  * Generate the next invoice number for the current year.
- * Uses the highest existing number rather than a row count — this is
- * safe against deletions and gaps, and matches the `INV-YYYY-NNNN` format.
+ * Reads the highest existing number rather than a row count, so it is
+ * safe against deletions and gaps.
  */
 async function nextInvoiceNumber(): Promise<string> {
   const year = new Date().getFullYear();
@@ -180,6 +180,125 @@ export async function sendPaymentPrompt(invoiceId: number) {
   return { checkoutRequestId: data.CheckoutRequestID as string };
 }
 
+// ─── Reconciliation (STK Push Query) ─────────────────────────────
+
+/**
+ * Query Safaricom for the status of a pending STK Push.
+ * Used when the callback never arrives.
+ * Daraja's stkpushquery is rate-limited (5 req/min in sandbox),
+ * so call it selectively — not on every render.
+ */
+export async function queryStkStatus(checkoutRequestId: string) {
+  const token = await getToken();
+  const shortcode = process.env.MPESA_SHORTCODE!;
+  const passkey = process.env.MPESA_PASSKEY!;
+  const base =
+    process.env.MPESA_ENVIRONMENT === "production"
+      ? "https://api.safaricom.co.ke"
+      : "https://sandbox.safaricom.co.ke";
+
+  const timestamp = new Date(Date.now() + 3 * 60 * 60 * 1000)
+    .toISOString()
+    .replace(/[-:TZ.]/g, "")
+    .slice(0, 14);
+  const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString(
+    "base64",
+  );
+
+  const res = await fetch(`${base}/mpesa/stkpushquery/v1/query`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      BusinessShortCode: shortcode,
+      Password: password,
+      Timestamp: timestamp,
+      CheckoutRequestID: checkoutRequestId,
+    }),
+  });
+
+  const data = (await res.json()) as {
+    ResponseCode?: string;
+    ResultCode?: string;
+    ResultDesc?: string;
+    errorMessage?: string;
+  };
+
+  if (!res.ok) {
+    return {
+      status: "UNKNOWN" as const,
+      message: data.errorMessage ?? "Query failed",
+    };
+  }
+
+  // ResultCode "0" = success, "1032" = user cancelled, "1037" = timeout
+  if (data.ResultCode === "0") return { status: "SUCCESS" as const };
+  if (data.ResultCode === "1032" || data.ResultCode === "1037") {
+    return { status: "FAILED" as const, message: data.ResultDesc };
+  }
+  return { status: "PENDING" as const, message: data.ResultDesc };
+}
+
+/**
+ * Reconcile stale pending transactions for an invoice.
+ * Called by the "Refresh status" button in the Payments panel.
+ */
+export async function reconcileInvoice(invoiceId: number) {
+  const invoice = await prisma.invoice.findUnique({
+    where: { id: invoiceId },
+    include: {
+      transactions: {
+        where: { status: "PENDING" },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+  });
+  if (!invoice) throw new Error("Invoice not found");
+  if (invoice.status === "PAID") return { status: "PAID" as const };
+
+  const tx = invoice.transactions[0];
+  if (!tx?.checkoutRequestId) {
+    return { status: "NO_PENDING" as const };
+  }
+
+  const result = await queryStkStatus(tx.checkoutRequestId);
+
+  if (result.status === "SUCCESS") {
+    await prisma.mpesaTransaction.update({
+      where: { id: tx.id },
+      data: {
+        status: "SUCCESS",
+        resultCode: "0",
+        resultDesc: result.message ?? "Reconciled via query",
+      },
+    });
+    await prisma.invoice.update({
+      where: { id: invoiceId },
+      data: { status: "PAID", paidAt: new Date() },
+    });
+    revalidatePath("/admin");
+    return { status: "PAID" as const };
+  }
+
+  if (result.status === "FAILED") {
+    await prisma.mpesaTransaction.update({
+      where: { id: tx.id },
+      data: {
+        status: "FAILED",
+        resultCode: "1032",
+        resultDesc: result.message ?? "Failed (reconciled)",
+      },
+    });
+    revalidatePath("/admin");
+    return { status: "FAILED" as const, message: result.message };
+  }
+
+  return { status: "PENDING" as const };
+}
+
 // ─── Reads ────────────────────────────────────────────────────────
 
 export async function listInvoices(): Promise<InvoiceRow[]> {
@@ -233,8 +352,6 @@ export async function createInvoice(input: {
     );
   }
 
-  // Try to create; if we collide on the unique invoice number, retry once
-  // with a freshly computed number (covers the rare concurrent-create race).
   for (let attempt = 0; attempt < 2; attempt++) {
     const invoiceNumber = await nextInvoiceNumber();
     try {
@@ -256,7 +373,6 @@ export async function createInvoice(input: {
     }
   }
 
-  // Unreachable — the loop either returns or throws
   throw new Error("Failed to allocate a unique invoice number");
 }
 
