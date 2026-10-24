@@ -10,10 +10,11 @@ import { Stagger } from "../components/stagger";
 import { useScrollDirection } from "../components/use-scroll-direction";
 
 import { PaymentsPanel } from "./payments/payments-panel";
+import { QuotesPanel } from "./quotes/quotes-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 
-type ModuleKey = "overview" | "payments";
+type ModuleKey = "overview" | "quotes" | "payments";
 
 type ModuleTone = {
   ring: string;
@@ -54,6 +55,20 @@ const HEADER_HEIGHT = "lg:min-h-24";
 // ─── Tones ────────────────────────────────────────────────────────
 
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
+  quotes: {
+    ring: "ring-brand-500/20",
+    border: "border-brand-300 dark:border-brand-800",
+    borderHover: "hover:border-brand-500",
+    bgSoft: "bg-brand-50 dark:bg-brand-950/40",
+    bgActive: "bg-brand-100 dark:bg-brand-950/70",
+    text: "text-brand-700 dark:text-brand-300",
+    button: "bg-brand-600",
+    buttonHover: "hover:bg-brand-700",
+    bar: "bg-brand-500",
+    pillBg: "bg-brand-100 dark:bg-brand-950",
+    pillText: "text-brand-800 dark:text-brand-200",
+    icon: <QuoteIcon />,
+  },
   payments: {
     ring: "ring-emerald-500/20",
     border: "border-emerald-300 dark:border-emerald-800",
@@ -78,6 +93,13 @@ const MODULE_GROUPS: ModuleGroup[] = [
     label: "Dashboard",
     modules: [
       { key: "overview", label: "Overview", description: "Dashboard summary", icon: <GridIcon /> },
+    ],
+  },
+  {
+    key: "operations",
+    label: "Operations",
+    modules: [
+      { key: "quotes", label: "Quotes", description: "Requests → quotes", icon: TONES.quotes.icon, tone: TONES.quotes },
       { key: "payments", label: "Payments", description: "Invoices & M-Pesa", icon: TONES.payments.icon, tone: TONES.payments },
     ],
   },
@@ -118,6 +140,8 @@ export function DashboardClient({ userName }: { userName: string }) {
           <div className="p-6 lg:p-8">
             <div key={activeModule}>
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
+
+              {activeModule === "quotes" && <QuotesPanel search={search} />}
 
               {activeModule === "payments" && <PaymentsPanel search={search} />}
             </div>
@@ -179,12 +203,12 @@ function DashboardSidebar({
         */}
         <div
           className={[
-            "sticky top-0 z-20 flex items-center bg-cream-100 border-deep-200 px-6 dark:bg-deep-900 dark:border-deep-800",
+            "flex items-center border-b border-deep-200 px-6 dark:border-deep-800",
             HEADER_HEIGHT,
           ].join(" ")}
         >
           <Link href="/" className="group flex w-full items-center justify-between gap-3">
-            <div className="sticky top-0 z-20 min-w-0">
+            <div className="min-w-0">
               <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
                 Welcome back
               </div>
@@ -317,6 +341,7 @@ function DashboardHeader({
 }) {
   const titles: Record<ModuleKey, string> = {
     overview: "Dashboard",
+    quotes: "Quotes",
     payments: "Payments",
   };
 
@@ -383,6 +408,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
     <div className="mx-auto max-w-7xl space-y-8">
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { key: "quotes" as const, label: "Quotes", value: 0 },
           { key: "payments" as const, label: "Payments", value: 0 },
         ].map((kpi) => (
           <button
@@ -438,6 +464,15 @@ function WalletIcon() {
       <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
       <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
       <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
+function QuoteIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M6 2h9l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
+      <path d="M14 2v4h4" />
+      <path d="M8 12h8M8 16h5" />
     </svg>
   );
 }

@@ -1,4 +1,5 @@
 // app/store/page.tsx
+import { Suspense } from "react";
 import { listOfferings } from "@/app/actions/store";
 import { StoreClient } from "./store-client";
 
@@ -8,9 +9,7 @@ export const metadata = {
     "Subscriptions, products, and services from Craft Studios. Request a quote or subscribe.",
 };
 
-export default async function StorePage() {
-  const offerings = await listOfferings();
-
+export default function StorePage() {
   return (
     <div className="min-h-screen bg-cream-200 dark:bg-deep-950">
       <section className="border-b border-deep-200 bg-cream-100 py-16 dark:border-deep-800 dark:bg-deep-900">
@@ -29,7 +28,37 @@ export default async function StorePage() {
         </div>
       </section>
 
-      <StoreClient offerings={offerings} />
+      <Suspense fallback={<StoreSkeleton />}>
+        <StoreOfferings />
+      </Suspense>
+    </div>
+  );
+}
+
+async function StoreOfferings() {
+  const offerings = await listOfferings();
+  return <StoreClient offerings={offerings} />;
+}
+
+function StoreSkeleton() {
+  return (
+    <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+      <div className="mb-8 flex gap-2">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="h-8 w-20 animate-pulse rounded-full bg-cream-100 dark:bg-deep-800"
+          />
+        ))}
+      </div>
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div
+            key={i}
+            className="h-80 animate-pulse rounded-2xl bg-cream-100 dark:bg-deep-900"
+          />
+        ))}
+      </div>
     </div>
   );
 }

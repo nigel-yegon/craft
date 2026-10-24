@@ -59,7 +59,8 @@ export const ModelName = {
   MpesaTransaction: 'MpesaTransaction',
   Offering: 'Offering',
   QuoteRequest: 'QuoteRequest',
-  QuoteRequestItem: 'QuoteRequestItem'
+  QuoteRequestItem: 'QuoteRequestItem',
+  Quote: 'Quote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -214,6 +215,25 @@ export const QuoteRequestItemScalarFieldEnum = {
 export type QuoteRequestItemScalarFieldEnum = (typeof QuoteRequestItemScalarFieldEnum)[keyof typeof QuoteRequestItemScalarFieldEnum]
 
 
+export const QuoteScalarFieldEnum = {
+  id: 'id',
+  reference: 'reference',
+  quoteRequestId: 'quoteRequestId',
+  lineItems: 'lineItems',
+  subtotal: 'subtotal',
+  taxAmount: 'taxAmount',
+  total: 'total',
+  currency: 'currency',
+  validUntil: 'validUntil',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuoteScalarFieldEnum = (typeof QuoteScalarFieldEnum)[keyof typeof QuoteScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -228,6 +248,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

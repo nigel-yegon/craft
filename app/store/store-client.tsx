@@ -138,7 +138,7 @@ export function StoreClient({ offerings }: { offerings: OfferingRow[] }) {
             className="group flex flex-col overflow-hidden rounded-2xl border border-deep-200 bg-cream-50 transition hover:border-brand-400 dark:border-deep-800 dark:bg-deep-900"
           >
             <Link href={`/store/${o.slug}`} className="block">
-              <div className="relative aspect-[4/3] overflow-hidden bg-cream-200 dark:bg-deep-800">
+              <div className="relative aspect-4/3 overflow-hidden bg-cream-200 dark:bg-deep-800">
                 {o.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img

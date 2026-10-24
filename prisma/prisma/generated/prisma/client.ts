@@ -86,3 +86,8 @@ export type QuoteRequest = Prisma.QuoteRequestModel
  * 
  */
 export type QuoteRequestItem = Prisma.QuoteRequestItemModel
+/**
+ * Model Quote
+ * 
+ */
+export type Quote = Prisma.QuoteModel

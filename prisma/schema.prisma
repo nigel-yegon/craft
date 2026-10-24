@@ -146,7 +146,7 @@ model QuoteRequest {
   updatedAt     DateTime @updatedAt
 
   items         QuoteRequestItem[]
-  // quote      Quote?   ← deferred to Milestone 2
+  quote         Quote?
 
   @@index([status])
   @@index([customerEmail])
@@ -169,4 +169,28 @@ model QuoteRequestItem {
   notes          String?
 
   @@index([quoteRequestId])
+}
+
+// ─── Quotes (Milestone 2) ────────────────────────────────────────
+
+model Quote {
+  id             Int          @id @default(autoincrement())
+  reference      String       @unique   // "Q-2026-0001"
+  quoteRequestId Int          @unique
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id])
+
+  lineItems      Json
+  subtotal       Int
+  taxAmount      Int          @default(0)
+  total          Int
+  currency       String       @default("KES")
+
+  validUntil     DateTime?
+  notes          String?
+
+  status         String       @default("DRAFT")
+  // DRAFT → SENT → ACCEPTED → INVOICED → CANCELLED
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }
