@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ChevronDown, House, Users as UsersIcon, FileText } from "lucide-react";
+import { ChevronDown, Users as UsersIcon, FileText } from "lucide-react";
 
 import FadeIn from "../components/fade-in";
 import { Stagger } from "../components/stagger";
@@ -15,7 +15,7 @@ type ModuleKey =
   | "overview"
   | "businesses"
   | "operators"
-  | "incidents"
+  | "payments"
   | "inquiries"
   | "resources"
   | "destinations"
@@ -94,19 +94,19 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillText: "text-slate-800 dark:text-slate-200",
     icon: <UsersIcon className="h-5 w-5" />,
   },
-  incidents: {
-    ring: "ring-rose-500/20",
-    border: "border-rose-300 dark:border-rose-800",
-    borderHover: "hover:border-rose-500",
-    bgSoft: "bg-rose-50 dark:bg-rose-950/40",
-    bgActive: "bg-rose-100 dark:bg-rose-950/70",
-    text: "text-rose-700 dark:text-rose-300",
-    button: "bg-rose-700",
-    buttonHover: "hover:bg-rose-800",
-    bar: "bg-rose-600",
-    pillBg: "bg-rose-100 dark:bg-rose-950",
-    pillText: "text-rose-800 dark:text-rose-200",
-    icon: <ShieldIcon />,
+  payments: {
+    ring: "ring-emerald-500/20",
+    border: "border-emerald-300 dark:border-emerald-800",
+    borderHover: "hover:border-emerald-500",
+    bgSoft: "bg-emerald-50 dark:bg-emerald-950/40",
+    bgActive: "bg-emerald-100 dark:bg-emerald-950/70",
+    text: "text-emerald-700 dark:text-emerald-300",
+    button: "bg-emerald-700",
+    buttonHover: "hover:bg-emerald-800",
+    bar: "bg-emerald-600",
+    pillBg: "bg-emerald-100 dark:bg-emerald-950",
+    pillText: "text-emerald-800 dark:text-emerald-200",
+    icon: <WalletIcon />,
   },
   inquiries: {
     ring: "ring-brand-500/20",
@@ -283,7 +283,7 @@ const MODULE_GROUPS: ModuleGroup[] = [
     key: "operations",
     label: "Operations",
     modules: [
-      { key: "incidents", label: "Incidents", description: "Manage incidents", icon: TONES.incidents.icon, tone: TONES.incidents },
+      { key: "payments", label: "Payments", description: "Invoices & M-Pesa", icon: TONES.payments.icon, tone: TONES.payments },
       { key: "inquiries", label: "Inquiries", description: "Investor inquiries", icon: TONES.inquiries.icon, tone: TONES.inquiries },
       { key: "resources", label: "Resources", description: "Documents & downloads", icon: TONES.resources.icon, tone: TONES.resources },
       { key: "blog", label: "Blog", description: "Manage blog posts", icon: TONES.blog.icon, tone: TONES.blog },
@@ -390,7 +390,7 @@ function DashboardSidebar({
         `lg:min-h-screen`, so the parent is always ≥ viewport height and
         the sticky has scroll range to work against.
     */
-    <aside className="hidden h-screen w-72 shrink-0 lg:block">
+    <aside className="sticky top-0 z-20 hidden h-screen w-72 shrink-0 lg:block">
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
         {/*
           Greeting header — locked to the same height as DashboardHeader
@@ -400,7 +400,7 @@ function DashboardSidebar({
         */}
         <div
           className={[
-            "sticky top-0 z-20 flex items-center bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
+            "flex items-center border-b border-deep-200 px-6 dark:border-deep-800",
             HEADER_HEIGHT,
           ].join(" ")}
         >
@@ -409,14 +409,10 @@ function DashboardSidebar({
               <div className="text-xs font-medium uppercase tracking-[0.16em] text-deep-500 dark:text-cream-500">
                 Welcome back
               </div>
-              <h2 className="truncate text-2xl  font-bold tracking-tight text-deep-800 dark:text-cream-100">
+              <h2 className="truncate text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
                 Hello, {userName}.
               </h2>
             </div>
-            {/* <span className="flex shrink-0 items-center gap-1.5 text-xs text-deep-500 dark:text-cream-500">
-              <House size={14} strokeWidth={1.75} aria-hidden className="shrink-0" />
-              <span className="hidden xl:inline">Home</span>
-            </span> */}
           </Link>
         </div>
 
@@ -544,7 +540,7 @@ function DashboardHeader({
     overview: "Dashboard",
     businesses: "Businesses",
     operators: "Tour Operators",
-    incidents: "Reported Incidents",
+    payments: "Payments",
     inquiries: "Investor inquiries",
     resources: "Resources",
     destinations: "Destinations",
@@ -622,7 +618,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         {[
           { key: "businesses" as const, label: "Businesses", value: 0 },
           { key: "operators" as const, label: "Tour operators", value: 0 },
-          { key: "incidents" as const, label: "Incidents", value: 0 },
+          { key: "payments" as const, label: "Payments", value: 0 },
           { key: "inquiries" as const, label: "Inquiries", value: 0 },
         ].map((kpi) => (
           <button
@@ -705,7 +701,6 @@ const iconBase = {
 
 function GridIcon() { return (<svg {...iconBase}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>); }
 function BoxIcon() { return (<svg {...iconBase}><path d="M21 8v8a2 2 0 0 1-1 1.73l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.73l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8Z" /><path d="m3.3 7 8.7 5 8.7-5M12 22V12" /></svg>); }
-function ShieldIcon() { return (<svg {...iconBase}><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z" /></svg>); }
 function MailIcon() { return (<svg {...iconBase}><path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z" /><path d="m3 8 9 6 9-6" /></svg>); }
 function FolderIcon() { return (<svg {...iconBase}><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /></svg>); }
 function CompassIcon() { return (<svg {...iconBase}><circle cx="12" cy="12" r="9" /><path d="m15.5 8.5-2 5-5 2 2-5 5-2Z" /></svg>); }
@@ -716,3 +711,12 @@ function CalendarIcon() { return (<svg {...iconBase}><rect x="3" y="5" width="18
 function PenIcon() { return (<svg {...iconBase}><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z" /></svg>); }
 function SearchIcon() { return (<svg {...iconBase} className="h-4 w-4"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>); }
 function ArrowLeftIcon() { return (<svg {...iconBase} className="h-4 w-4"><path d="M19 12H5M11 18l-6-6 6-6" /></svg>); }
+function WalletIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
