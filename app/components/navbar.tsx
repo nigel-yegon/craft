@@ -34,6 +34,7 @@ const studioSub = [
 
 const links = [
   { href: "/work", label: "Work", dropdown: workSub },
+  { href: "/portfolio", label: "Portfolio" },
   { href: "/services", label: "Services" },
   { href: "/studio", label: "Studio", dropdown: studioSub },
   { href: "/contact", label: "Contact" },
@@ -90,10 +91,15 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
   const [menuOpen, setMenuOpen] = useState<null | "user" | "anon">(null);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Hydration guard: server renders skeleton, client renders real state
+  // only after mount. Prevents "loading" on server vs "authenticated" on client.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const { direction, scrolled } = useScrollDirection(8);
 
   const session: NavSession | null =
-    status === "authenticated" && rawSession?.user
+    mounted && status === "authenticated" && rawSession?.user
       ? {
           name: rawSession.user.name ?? null,
           email: rawSession.user.email ?? null,
@@ -165,6 +171,9 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
 
   const hideHeader =
     !isAdminRoute && !isDashboard && direction === "down" && scrolled;
+
+  // Show skeleton until mounted AND session status is resolved.
+  const showLoading = !mounted || status === "loading";
 
   return (
     <>
@@ -310,7 +319,7 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
           {/* Right cluster */}
           <div className="flex shrink-0 items-center gap-2">
             <div className="relative" data-user-menu>
-              {status === "loading" ? (
+              {showLoading ? (
                 <div
                   className="h-9 w-9 animate-pulse rounded-full border border-deep-300 bg-cream-100 dark:border-deep-700 dark:bg-deep-900"
                   aria-hidden
@@ -473,7 +482,9 @@ export function Navbar({ static: isStatic = false }: { static?: boolean }) {
             </ul>
 
             <div className="border-t border-deep-200 p-3 dark:border-deep-800">
-              {session ? (
+              {showLoading ? (
+                <div className="h-24 animate-pulse rounded-md bg-cream-200/60 dark:bg-deep-900/60" />
+              ) : session ? (
                 <>
                   <div className="mb-3 flex items-center gap-3 rounded-md bg-cream-200/60 px-3 py-2.5 dark:bg-deep-900/60">
                     <Avatar name={session.name} email={session.email} />

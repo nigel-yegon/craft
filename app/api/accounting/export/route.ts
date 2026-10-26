@@ -8,56 +8,82 @@ export async function GET(req: NextRequest) {
   const to = searchParams.get("to");
 
   if (!from || !to) {
-    return Response.json({ error: "Missing from/to dates" }, { status: 400 });
+    return Response.json(
+      { error: "Missing from/to dates" },
+      { status: 400 },
+    );
   }
 
-  const summary = await getAccountingSummary(from, to);
+  try {
+    const summary = await getAccountingSummary(from, to);
+    const pdf = generateSimplePdf(summary);
 
-  // Build a minimal PDF using raw PDF syntax (no dependencies).
-  // For production, swap this for @formepdf/next or a PDF API.
-  const pdf = generateSimplePdf(summary);
-
-  return new Response(pdf, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="accounting-${from}-to-${to}.pdf"`,
-    },
-  });
+    return new Response(pdf.buffer as ArrayBuffer, {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="accounting-${from}-to-${to}.pdf"`,
+      },
+    });
+  } catch (err) {
+    console.error("[accounting/export] failed:", err);
+    return Response.json(
+      { error: err instanceof Error ? err.message : "Export failed" },
+      { status: 500 },
+    );
+  }
 }
 
-/**
- * Minimal PDF generator — no external dependencies.
- * Produces a single-page summary suitable for quick exports.
- * For branded, multi-page reports, replace with @formepdf/next
- * (works on Vercel, no Puppeteer) [citation:2].
- */
-function generateSimplePdf(summary: ReturnType<typeof getAccountingSummary> extends Promise<infer T> ? T : never): Uint8Array {
-  const lines = [
-    `Accounting Report`,
+// ─── PDF generation ───────────────────────────────────────────────
+
+type AccountingSummaryData = Awaited<
+  ReturnType<typeof getAccountingSummary>
+>;
+
+function generateSimplePdf(
+  summary: AccountingSummaryData,
+): Uint8Array<ArrayBuffer> {
+  const lines: string[] = [
+    "CRAFT STUDIOS",
+    "Accounting Report",
+    "",
     `Period: ${summary.period.from} to ${summary.period.to}`,
-    ``,
-    `Revenue (paid invoices): KES ${summary.revenue.total.toLocaleString()}`,
-    `Expenses (approved): KES ${summary.expenses.total.toLocaleString()}`,
-    `Gross profit: KES ${summary.profit.gross.toLocaleString()} (${summary.profit.margin}%)`,
-    ``,
-    `Balance sheet:`,
-    `  Receivables (pending invoices): KES ${summary.balanceSheet.receivables.toLocaleString()}`,
-    `  Payables (pending expenses): KES ${summary.balanceSheet.payables.toLocaleString()}`,
-    `  Net position: KES ${summary.balanceSheet.netPosition.toLocaleString()}`,
-    ``,
-    `Revenue rows:`,
+    "",
+    "─── Revenue ───────────────────────────────────────",
+    `  Revenue (paid invoices):  KES ${summary.revenue.total.toLocaleString()}`,
+    `  Expenses (approved):      KES ${summary.expenses.total.toLocaleString()}`,
+    `  Gross profit:             KES ${summary.profit.gross.toLocaleString()} (${summary.profit.margin}%)`,
+    "",
+    "─── Balance sheet ─────────────────────────────────",
+    `  Receivables (pending invoices):  KES ${summary.balanceSheet.receivables.toLocaleString()}`,
+    `  Payables (pending expenses):     KES ${summary.balanceSheet.payables.toLocaleString()}`,
+    `  Net position:                    KES ${summary.balanceSheet.netPosition.toLocaleString()}`,
+    "",
+    "─── Revenue rows ──────────────────────────────────",
     ...summary.revenue.rows.map(
-      (r) => `  ${r.invoiceNumber} | ${r.customerName} | KES ${r.amount.toLocaleString()} | ${r.paidAt.slice(0, 10)}`,
+      (r) =>
+        `  ${r.invoiceNumber.padEnd(16)} ${r.customerName.slice(0, 28).padEnd(30)} KES ${r.amount.toLocaleString().padStart(12)} ${r.paidAt.slice(0, 10)}`,
     ),
-    ``,
-    `Expense rows:`,
+    "",
+    "─── Expense rows ──────────────────────────────────",
     ...summary.expenses.rows.map(
-      (e) => `  ${e.reference} | ${e.category} | KES ${e.amount.toLocaleString()} | ${e.incurredAt.slice(0, 10)}`,
+      (e) =>
+        `  ${e.reference.padEnd(14)} ${e.category.slice(0, 12).padEnd(14)} KES ${e.amount.toLocaleString().padStart(10)} ${e.incurredAt.slice(0, 10)}`,
     ),
+    "",
+    "─── Project profitability ─────────────────────────",
+    ...summary.projectProfitability
+      .filter((p) => p.revenue > 0 || p.expenses > 0)
+      .map(
+        (p) =>
+          `  ${p.projectTitle.slice(0, 34).padEnd(36)} +${p.revenue.toLocaleString().padStart(10)} −${p.expenses.toLocaleString().padStart(10)} = ${p.profit.toLocaleString().padStart(10)}`,
+      ),
   ];
 
   const content = lines
-    .map((line, i) => `BT /F1 10 Tf 50 ${750 - i * 14} Td (${escapePdf(line)}) Tj ET`)
+    .map(
+      (line, i) =>
+        `BT /F1 9 Tf 40 ${752 - i * 12} Td (${escapePdf(line)}) Tj ET`,
+    )
     .join("\n");
 
   const objects = [
@@ -70,11 +96,18 @@ function generateSimplePdf(summary: ReturnType<typeof getAccountingSummary> exte
 
   const header = `%PDF-1.4\n`;
   const body = objects.join("\n");
-  const xref = `\nxref\n0 6\n0000000000 65535 f \n${objects.map((_, i) => `${String(10 + i * 70).padStart(10, "0")} 00000 n `).join("\n")}\ntrailer << /Size 6 /Root 1 0 R >>\nstartxref\n0\n%%EOF`;
+  const xref = `\nxref\n0 6\n0000000000 65535 f \n${objects
+    .map((_, i) => `${String(10 + i * 70).padStart(10, "0")} 00000 n `)
+    .join("\n")}\ntrailer << /Size 6 /Root 1 0 R >>\nstartxref\n0\n%%EOF`;
 
+  // TextEncoder.encode returns Uint8Array<ArrayBuffer> in modern libs,
+  // but the explicit return type annotation keeps it narrow regardless.
   return new TextEncoder().encode(header + body + xref);
 }
 
 function escapePdf(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
 }
