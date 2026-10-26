@@ -15,6 +15,7 @@ import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./prisma/generated/prisma/client";
 import { seedOfferings } from "./seed-offerings";
+import { seedProjects } from "./seed-projects";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -337,6 +338,7 @@ async function main() {
   await seedAuthArtifacts();
   await seedPayments();
   await seedOfferings(prisma);
+   await seedProjects(prisma);
 
   console.log("\n✅ All done.\n");
   console.log("Sample logins:");

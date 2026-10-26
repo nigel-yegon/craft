@@ -197,3 +197,46 @@ model Quote {
 
   invoice        Invoice?
 }
+// ─── Portfolio ────────────────────────────────────────────────────
+
+model Project {
+  id              Int       @id @default(autoincrement())
+  slug            String    @unique
+  title           String
+  summary         String    // short teaser (listing)
+  description     String    @db.Text  // long-form body (slug page)
+
+  status          String    @default("IN_PROGRESS")
+  // PLANNED | IN_PROGRESS | COMPLETED | ON_HOLD | ARCHIVED
+
+  category        String    // "Brand" | "Digital" | "Spaces" | "Campaigns" | "Print"
+  clientName      String
+  clientContact   String?
+  clientIndustry  String?
+
+  // Commercial
+  costKes         Int?
+  durationWeeks   Int?
+  startDate       DateTime?
+  endDate         DateTime?
+
+  // Narrative
+  processes       String[]  @default([])  // ["Discovery", "Brand strategy", "Design system"]
+  technologies    String[]  @default([])  // ["Next.js", "Figma", "Shopify"]
+
+  // Media
+  coverImage      String?
+  galleryImages   String[]  @default([])
+
+  // Showcase
+  featured        Boolean   @default(false)
+  published       Boolean   @default(false)
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([published])
+  @@index([featured])
+}

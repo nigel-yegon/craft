@@ -11,6 +11,7 @@ import { useScrollDirection } from "../components/use-scroll-direction";
 
 import { PaymentsPanel } from "./payments/payments-panel";
 import { QuotesPanel } from "./quotes/quotes-panel";
+import { ProjectsPanel } from "./projects/projects-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -50,6 +51,20 @@ const HEADER_HEIGHT = "lg:min-h-24";
 // ─── Tones ────────────────────────────────────────────────────────
 
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
+  projects: {
+  ring: "ring-rose-500/20",
+  border: "border-rose-300 dark:border-rose-800",
+  borderHover: "hover:border-rose-500",
+  bgSoft: "bg-rose-50 dark:bg-rose-950/40",
+  bgActive: "bg-rose-100 dark:bg-rose-950/70",
+  text: "text-rose-700 dark:text-rose-300",
+  button: "bg-rose-700",
+  buttonHover: "hover:bg-rose-800",
+  bar: "bg-rose-600",
+  pillBg: "bg-rose-100 dark:bg-rose-950",
+  pillText: "text-rose-800 dark:text-rose-200",
+  icon: <BriefcaseIcon />,
+},
   quotes: {
     ring: "ring-brand-500/20",
     border: "border-brand-300 dark:border-brand-800",
@@ -80,9 +95,17 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   },
 };
 
+
 // ─── Module groups ────────────────────────────────────────────────
 
 const MODULE_GROUPS: ModuleGroup[] = [
+  {
+  key: "content",
+  label: "Content",
+  modules: [
+    { key: "projects", label: "Portfolio", description: "Projects & case studies", icon: TONES.projects.icon, tone: TONES.projects },
+  ],
+},
   {
     key: "dashboard",
     label: "Dashboard",
@@ -128,6 +151,7 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
               {activeModule === "quotes" && <QuotesPanel search={search} />}
               {activeModule === "payments" && <PaymentsPanel search={search} />}
+              {activeModule === "projects" && <ProjectsPanel search={search} />}
             </div>
           </div>
         </main>
@@ -312,6 +336,7 @@ function DashboardHeader({
     overview: "Dashboard",
     quotes: "Quotes",
     payments: "Payments",
+    projects: "Portfolio",
   };
 
   const searchable = activeModule !== "overview";
@@ -425,6 +450,15 @@ function WalletIcon() {
       <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
       <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
       <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+    </svg>
+  );
+}
+function BriefcaseIcon() {
+  return (
+    <svg {...iconBase}>
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+      <path d="M2 13h20" />
     </svg>
   );
 }
