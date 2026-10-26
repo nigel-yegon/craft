@@ -1,26 +1,33 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Footer } from "./components/footer";
 import { Navbar } from "./components/navbar";
 import { AppSessionProvider } from "./components/session-provider";
 import { ThemeProvider } from "./components/theme-provider";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
+const spaceGrotesk = localFont({
+  src: [
+    { path: "./fonts/SpaceGrotesk-Light.woff2", weight: "300", style: "normal" },
+    { path: "./fonts/SpaceGrotesk-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/SpaceGrotesk-Medium.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/SpaceGrotesk-SemiBold.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/SpaceGrotesk-Bold.woff2", weight: "700", style: "normal" },
+  ],
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
+const jetbrainsMono = localFont({
+  src: [
+    { path: "./fonts/JetBrainsMono-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/JetBrainsMono-Medium.woff2", weight: "500", style: "normal" },
+  ],
   variable: "--font-mono",
-  weight: ["400", "500"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -40,6 +47,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
