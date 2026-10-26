@@ -15,7 +15,7 @@ import { ProjectsPanel } from "./projects/projects-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 
-type ModuleKey = "overview" | "quotes" | "payments";
+type ModuleKey = "overview" | "quotes" | "payments" | "projects";
 
 type ModuleTone = {
   ring: string;
@@ -52,19 +52,19 @@ const HEADER_HEIGHT = "lg:min-h-24";
 
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   projects: {
-  ring: "ring-rose-500/20",
-  border: "border-rose-300 dark:border-rose-800",
-  borderHover: "hover:border-rose-500",
-  bgSoft: "bg-rose-50 dark:bg-rose-950/40",
-  bgActive: "bg-rose-100 dark:bg-rose-950/70",
-  text: "text-rose-700 dark:text-rose-300",
-  button: "bg-rose-700",
-  buttonHover: "hover:bg-rose-800",
-  bar: "bg-rose-600",
-  pillBg: "bg-rose-100 dark:bg-rose-950",
-  pillText: "text-rose-800 dark:text-rose-200",
-  icon: <BriefcaseIcon />,
-},
+    ring: "ring-rose-500/20",
+    border: "border-rose-300 dark:border-rose-800",
+    borderHover: "hover:border-rose-500",
+    bgSoft: "bg-rose-50 dark:bg-rose-950/40",
+    bgActive: "bg-rose-100 dark:bg-rose-950/70",
+    text: "text-rose-700 dark:text-rose-300",
+    button: "bg-rose-700",
+    buttonHover: "hover:bg-rose-800",
+    bar: "bg-rose-600",
+    pillBg: "bg-rose-100 dark:bg-rose-950",
+    pillText: "text-rose-800 dark:text-rose-200",
+    icon: <BriefcaseIcon />,
+  },
   quotes: {
     ring: "ring-brand-500/20",
     border: "border-brand-300 dark:border-brand-800",
@@ -95,22 +95,21 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   },
 };
 
-
 // ─── Module groups ────────────────────────────────────────────────
 
 const MODULE_GROUPS: ModuleGroup[] = [
-  {
-  key: "content",
-  label: "Content",
-  modules: [
-    { key: "projects", label: "Portfolio", description: "Projects & case studies", icon: TONES.projects.icon, tone: TONES.projects },
-  ],
-},
   {
     key: "dashboard",
     label: "Dashboard",
     modules: [
       { key: "overview", label: "Overview", description: "Dashboard summary", icon: <GridIcon /> },
+    ],
+  },
+  {
+    key: "content",
+    label: "Content",
+    modules: [
+      { key: "projects", label: "Portfolio", description: "Projects & case studies", icon: TONES.projects.icon, tone: TONES.projects },
     ],
   },
   {
@@ -198,7 +197,7 @@ function DashboardSidebar({
       <div className="flex h-full flex-col border-r border-deep-200 bg-cream-100 dark:border-deep-800 dark:bg-deep-900">
         <div
           className={[
-            "sticky top-0 z-20 flex items-center border-b bg-cream-100 dark:bg-deep-900 border-deep-200 px-6 dark:border-deep-800",
+            "flex items-center border-b border-deep-200 px-6 dark:border-deep-800",
             HEADER_HEIGHT,
           ].join(" ")}
         >
@@ -397,6 +396,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
     <div className="mx-auto max-w-7xl space-y-8">
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { key: "projects" as const, label: "Projects", value: 0 },
           { key: "quotes" as const, label: "Quotes", value: 0 },
           { key: "payments" as const, label: "Payments", value: 0 },
         ].map((kpi) => (
