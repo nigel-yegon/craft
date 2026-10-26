@@ -1,13 +1,8 @@
 // prisma/seed-projects.ts
 //
-// Populates the portfolio with sample projects representing a mixed
-// practice: government digital, hospitality branding, corporate identity,
-// retail, and internal R&D.
-//
-// Run standalone:
-//   npx tsx prisma/seed-projects.ts
-//
-// Or as part of the master seed (imported and called from prisma/seed.ts).
+// Populates the portfolio with sample projects.
+// Cover images are expected at public/images/projects/<slug>.jpg
+// (or .webp). Galleries reference <slug>-1.jpg, <slug>-2.jpg, etc.
 
 import type { PrismaClient } from "./prisma/generated/prisma/client";
 
@@ -23,7 +18,7 @@ type SeedProject = {
   clientIndustry?: string;
   costKes?: number;
   durationWeeks?: number;
-  startDate?: string; // ISO date (YYYY-MM-DD)
+  startDate?: string;
   endDate?: string;
   processes: string[];
   technologies: string[];
@@ -69,11 +64,11 @@ const SEED_PROJECTS: SeedProject[] = [
       "Vercel",
       "Cloudinary",
     ],
-    coverImage: "/images/projects/tour-kenya.jpg",
+    coverImage: "/images/projects/tour-kenya-ntsp.jpg",
     galleryImages: [
-      "/images/projects/tour-kenya-1.jpg",
-      "/images/projects/tour-kenya-2.jpg",
-      "/images/projects/tour-kenya-3.jpg",
+      "/images/projects/tour-kenya-ntsp-1.jpg",
+      "/images/projects/tour-kenya-ntsp-2.jpg",
+      "/images/projects/tour-kenya-ntsp-3.jpg",
     ],
     featured: true,
     published: true,
@@ -113,10 +108,10 @@ const SEED_PROJECTS: SeedProject[] = [
       "Vercel",
       "Sentry",
     ],
-    coverImage: "/images/projects/eldoret-city.jpg",
+    coverImage: "/images/projects/eldoret-city-portal.jpg",
     galleryImages: [
-      "/images/projects/eldoret-1.jpg",
-      "/images/projects/eldoret-2.jpg",
+      "/images/projects/eldoret-city-portal-1.jpg",
+      "/images/projects/eldoret-city-portal-2.jpg",
     ],
     featured: true,
     published: true,
@@ -148,18 +143,12 @@ const SEED_PROJECTS: SeedProject[] = [
       "Photography direction",
       "Launch campaign assets",
     ],
-    technologies: [
-      "Next.js",
-      "Shopify",
-      "Figma",
-      "Tailwind CSS",
-      "Sanity",
-    ],
-    coverImage: "/images/projects/baridi.jpg",
+    technologies: ["Next.js", "Shopify", "Figma", "Tailwind CSS", "Sanity"],
+    coverImage: "/images/projects/baridi-brand-identity.jpg",
     galleryImages: [
-      "/images/projects/baridi-1.jpg",
-      "/images/projects/baridi-2.jpg",
-      "/images/projects/baridi-3.jpg",
+      "/images/projects/baridi-brand-identity-1.jpg",
+      "/images/projects/baridi-brand-identity-2.jpg",
+      "/images/projects/baridi-brand-identity-3.jpg",
     ],
     featured: true,
     published: true,
@@ -191,8 +180,8 @@ const SEED_PROJECTS: SeedProject[] = [
       "Performance and accessibility audit",
     ],
     technologies: ["Next.js", "TypeScript", "Tailwind CSS", "Sanity", "Vercel"],
-    coverImage: "/images/projects/wilcom.jpg",
-    galleryImages: ["/images/projects/wilcom-1.jpg"],
+    coverImage: "/images/projects/wilcom-corporate-site.jpg",
+    galleryImages: ["/images/projects/wilcom-corporate-site-1.jpg"],
     featured: false,
     published: true,
   },
@@ -224,16 +213,16 @@ const SEED_PROJECTS: SeedProject[] = [
       "Media rollout and reporting",
     ],
     technologies: ["Figma", "Adobe Photoshop", "Adobe InDesign", "After Effects"],
-    coverImage: "/images/projects/sarova.jpg",
+    coverImage: "/images/projects/sarova-digital-campaign.jpg",
     galleryImages: [
-      "/images/projects/sarova-1.jpg",
-      "/images/projects/sarova-2.jpg",
+      "/images/projects/sarova-digital-campaign-1.jpg",
+      "/images/projects/sarova-digital-campaign-2.jpg",
     ],
     featured: false,
     published: true,
   },
 
-  // ─── 6. Java House — in-progress ──────────────────────────────
+  // ─── 6. Java House ─────────────────────────────────────────────
   {
     slug: "java-house-loyalty-redesign",
     title: "Java House — Loyalty Experience Redesign",
@@ -257,7 +246,7 @@ const SEED_PROJECTS: SeedProject[] = [
       "Engineering handoff and QA",
     ],
     technologies: ["Figma", "React Native", "Storybook", "TypeScript"],
-    coverImage: "/images/projects/java-house.jpg",
+    coverImage: "/images/projects/java-house-loyalty-redesign.jpg",
     featured: false,
     published: true,
   },
@@ -287,12 +276,12 @@ const SEED_PROJECTS: SeedProject[] = [
       "OOH and digital adaptation",
     ],
     technologies: ["Adobe Illustrator", "Adobe InDesign", "Esko", "Figma"],
-    coverImage: "/images/projects/kbl.jpg",
+    coverImage: "/images/projects/kenya-breweries-brand-refresh.jpg",
     featured: false,
     published: true,
   },
 
-  // ─── 8. Nakumatt Legacy — archived ─────────────────────────────
+  // ─── 8. Nakumatt Legacy ────────────────────────────────────────
   {
     slug: "nakumatt-legacy-brand-archive",
     title: "Nakumatt Legacy — Brand Archive",
@@ -316,12 +305,12 @@ const SEED_PROJECTS: SeedProject[] = [
       "Editorial captions",
     ],
     technologies: ["Next.js", "PostgreSQL", "Cloudinary", "Vercel"],
-    coverImage: "/images/projects/nakumatt.jpg",
+    coverImage: "/images/projects/nakumatt-legacy-brand-archive.jpg",
     featured: false,
     published: false,
   },
 
-  // ─── 9. Kigali Coffee — planned ────────────────────────────────
+  // ─── 9. Kigali Coffee ──────────────────────────────────────────
   {
     slug: "kigali-coffee-ecommerce",
     title: "Kigali Coffee — E-commerce & Subscription",
@@ -343,12 +332,12 @@ const SEED_PROJECTS: SeedProject[] = [
       "Build and launch",
     ],
     technologies: ["Next.js", "Shopify", "Figma", "Sanity"],
-    coverImage: "/images/projects/kigali-coffee.jpg",
+    coverImage: "/images/projects/kigali-coffee-ecommerce.jpg",
     featured: false,
     published: true,
   },
 
-  // ─── 10. Strathmore — spaces ───────────────────────────────────
+  // ─── 10. Strathmore ────────────────────────────────────────────
   {
     slug: "strathmore-student-hub-signage",
     title: "Strathmore — Student Hub Wayfinding",
@@ -372,16 +361,16 @@ const SEED_PROJECTS: SeedProject[] = [
       "Production and installation supervision",
     ],
     technologies: ["Figma", "Adobe Illustrator", "AutoCAD"],
-    coverImage: "/images/projects/strathmore.jpg",
+    coverImage: "/images/projects/strathmore-student-hub-signage.jpg",
     galleryImages: [
-      "/images/projects/strathmore-1.jpg",
-      "/images/projects/strathmore-2.jpg",
+      "/images/projects/strathmore-student-hub-signage-1.jpg",
+      "/images/projects/strathmore-student-hub-signage-2.jpg",
     ],
     featured: false,
     published: true,
   },
 
-  // ─── 11. Greenspoon — campaign ────────────────────────────────
+  // ─── 11. Greenspoon ────────────────────────────────────────────
   {
     slug: "greenspoon-farm-to-table",
     title: "Greenspoon — Farm to Table Campaign",
@@ -405,16 +394,16 @@ const SEED_PROJECTS: SeedProject[] = [
       "Campaign rollout",
     ],
     technologies: ["Figma", "Adobe Photoshop", "Premiere Pro", "Instagram Ads"],
-    coverImage: "/images/projects/greenspoon.jpg",
+    coverImage: "/images/projects/greenspoon-farm-to-table.jpg",
     galleryImages: [
-      "/images/projects/greenspoon-1.jpg",
-      "/images/projects/greenspoon-2.jpg",
+      "/images/projects/greenspoon-farm-to-table-1.jpg",
+      "/images/projects/greenspoon-farm-to-table-2.jpg",
     ],
     featured: false,
     published: true,
   },
 
-  // ─── 12. Craft Labs — internal R&D (on hold) ──────────────────
+  // ─── 12. Craft Labs ────────────────────────────────────────────
   {
     slug: "craft-labs-design-system",
     title: "Craft Labs — Internal Design System",
@@ -436,7 +425,7 @@ const SEED_PROJECTS: SeedProject[] = [
       "Documentation site",
     ],
     technologies: ["Figma", "React", "TypeScript", "Storybook", "Tailwind CSS"],
-    coverImage: "/images/projects/craft-labs.jpg",
+    coverImage: "/images/projects/craft-labs-design-system.jpg",
     featured: false,
     published: false,
   },

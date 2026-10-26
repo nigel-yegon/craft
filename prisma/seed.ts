@@ -16,6 +16,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./prisma/generated/prisma/client";
 import { seedOfferings } from "./seed-offerings";
 import { seedProjects } from "./seed-projects";
+import { seedAccounting } from "./seed-accounting"; 
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -339,6 +340,7 @@ async function main() {
   await seedPayments();
   await seedOfferings(prisma);
    await seedProjects(prisma);
+   await seedAccounting(prisma);
 
   console.log("\n✅ All done.\n");
   console.log("Sample logins:");

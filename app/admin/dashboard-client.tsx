@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
+import { useEffect } from "react";   // add to the existing react import line
+import { getOverviewStats, type OverviewStats } from "./actions/stats";
+
 import FadeIn from "../components/fade-in";
 import { Stagger } from "../components/stagger";
 import { useScrollDirection } from "../components/use-scroll-direction";
@@ -12,10 +15,11 @@ import { useScrollDirection } from "../components/use-scroll-direction";
 import { PaymentsPanel } from "./payments/payments-panel";
 import { QuotesPanel } from "./quotes/quotes-panel";
 import { ProjectsPanel } from "./projects/projects-panel";
+import { AccountingPanel } from "./accounting/accounting-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 
-type ModuleKey = "overview" | "quotes" | "payments" | "projects";
+type ModuleKey = "overview" | "quotes" | "payments" | "projects" | "accounting";
 
 type ModuleTone = {
   ring: string;
@@ -93,6 +97,20 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillText: "text-emerald-800 dark:text-emerald-200",
     icon: <WalletIcon />,
   },
+  accounting: {
+    ring: "ring-violet-500/20",
+    border: "border-violet-300 dark:border-violet-800",
+    borderHover: "hover:border-violet-500",
+    bgSoft: "bg-violet-50 dark:bg-violet-950/40",
+    bgActive: "bg-violet-100 dark:bg-violet-950/70",
+    text: "text-violet-700 dark:text-violet-300",
+    button: "bg-violet-700",
+    buttonHover: "hover:bg-violet-800",
+    bar: "bg-violet-600",
+    pillBg: "bg-violet-100 dark:bg-violet-950",
+    pillText: "text-violet-800 dark:text-violet-200",
+    icon: <CalculatorIcon />,
+  },
 };
 
 // ─── Module groups ────────────────────────────────────────────────
@@ -118,6 +136,7 @@ const MODULE_GROUPS: ModuleGroup[] = [
     modules: [
       { key: "quotes", label: "Quotes", description: "Requests → quotes", icon: TONES.quotes.icon, tone: TONES.quotes },
       { key: "payments", label: "Payments", description: "Invoices & M-Pesa", icon: TONES.payments.icon, tone: TONES.payments },
+      { key: "accounting", label: "Accounting", description: "Revenue, expenses, reports", icon: TONES.accounting.icon, tone: TONES.accounting },
     ],
   },
 ];
@@ -151,6 +170,7 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "quotes" && <QuotesPanel search={search} />}
               {activeModule === "payments" && <PaymentsPanel search={search} />}
               {activeModule === "projects" && <ProjectsPanel search={search} />}
+              {activeModule === "accounting" && <AccountingPanel />}
             </div>
           </div>
         </main>
@@ -336,9 +356,10 @@ function DashboardHeader({
     quotes: "Quotes",
     payments: "Payments",
     projects: "Portfolio",
+    accounting: "Accounting",
   };
 
-  const searchable = activeModule !== "overview";
+  const searchable = activeModule !== "overview" && activeModule !== "accounting";
 
   return (
     <header
@@ -391,40 +412,365 @@ function DashboardHeader({
 
 // ─── Overview ────────────────────────────────────────────────────
 
+// app/admin/dashboard-client.tsx — replace the Overview function
+// and add these imports at the top:
+
+// import { useEffect } from "react";     ← add this to existing react imports
+// import { getOverviewStats, type OverviewStats } from "./actions/stats";
+
 function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
+  const [stats, setStats] = useState<OverviewStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await getOverviewStats();
+        if (!cancelled) setStats(data);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="mx-auto max-w-7xl space-y-8">
+      {/* KPI strip */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { key: "projects" as const, label: "Projects", value: 0 },
-          { key: "quotes" as const, label: "Quotes", value: 0 },
-          { key: "payments" as const, label: "Payments", value: 0 },
-        ].map((kpi) => (
-          <button
-            key={kpi.key}
-            type="button"
-            onClick={() => onNavigate(kpi.key)}
-            className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-cream-50 px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:bg-deep-900 ${TONES[kpi.key].border}`}
-          >
-            <span className={`absolute inset-y-0 left-0 w-1 ${TONES[kpi.key].bar}`} aria-hidden />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
-              {kpi.label}
-            </span>
-            <div className="mt-2 text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
-              {kpi.value.toLocaleString()}
-            </div>
-          </button>
-        ))}
+        <Kpi
+          label="Projects"
+          value={stats?.projects.total ?? 0}
+          secondary={
+            stats
+              ? `${stats.projects.published} published · ${stats.projects.featured} featured`
+              : undefined
+          }
+          loading={loading}
+          tone="projects"
+          onClick={() => onNavigate("projects")}
+        />
+        <Kpi
+          label="Quotes"
+          value={stats?.quotes.quotes ?? 0}
+          secondary={
+            stats
+              ? `${stats.quotes.pendingRequests} new requests · ${stats.quotes.acceptedQuotes} accepted`
+              : undefined
+          }
+          loading={loading}
+          tone="quotes"
+          onClick={() => onNavigate("quotes")}
+        />
+        <Kpi
+          label="Invoices"
+          value={stats?.payments.invoices ?? 0}
+          secondary={
+            stats
+              ? `${stats.payments.paid} paid · ${stats.payments.pending} pending`
+              : undefined
+          }
+          loading={loading}
+          tone="payments"
+          onClick={() => onNavigate("payments")}
+        />
+        <Kpi
+          label="Revenue"
+          value={stats?.accounting.revenue ?? 0}
+          secondary={
+            stats
+              ? `Expenses KES ${stats.accounting.expenses.toLocaleString()}`
+              : undefined
+          }
+          loading={loading}
+          tone="accounting"
+          onClick={() => onNavigate("accounting")}
+          isCurrency
+        />
       </section>
 
-      <div className="rounded-2xl border-2 border-dashed border-deep-200 bg-cream-50 p-10 text-center dark:border-deep-800 dark:bg-deep-900">
-        <h3 className="text-sm font-semibold text-deep-800 dark:text-cream-100">
-          Wire up your data
-        </h3>
-        <p className="mx-auto mt-2 max-w-md text-xs leading-6 text-deep-500 dark:text-cream-500">
-          Overview stats, charts and activity lists go here.
-        </p>
+      {/* Financial summary */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+            Financial position
+          </h3>
+          {loading || !stats ? (
+            <div className="mt-4 space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-6 animate-pulse rounded bg-cream-100 dark:bg-deep-800" />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              <Row label="Revenue (paid)" value={stats.accounting.revenue} tone="emerald" />
+              <Row label="Expenses (approved)" value={stats.accounting.expenses} tone="rose" />
+              <div className="border-t border-deep-200 pt-3 dark:border-deep-800">
+                <Row
+                  label="Net profit"
+                  value={stats.accounting.profit}
+                  tone={stats.accounting.profit >= 0 ? "emerald" : "rose"}
+                  bold
+                />
+              </div>
+              <div className="border-t border-deep-200 pt-3 dark:border-deep-800">
+                <Row label="Receivables (pending invoices)" value={stats.accounting.receivables} tone="amber" />
+                <Row label="Payables (pending expenses)" value={stats.accounting.payables} tone="amber" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Pipeline breakdown */}
+        <div className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+            Pipeline
+          </h3>
+          {loading || !stats ? (
+            <div className="mt-4 space-y-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-6 animate-pulse rounded bg-cream-100 dark:bg-deep-800" />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3 text-sm">
+              <PipelineRow
+                label="Quote requests"
+                value={stats.quotes.requests}
+                sub={`${stats.quotes.pendingRequests} awaiting pricing`}
+                tone="quotes"
+                onClick={() => onNavigate("quotes")}
+              />
+              <PipelineRow
+                label="Quotes issued"
+                value={stats.quotes.quotes}
+                sub={`KES ${stats.quotes.totalQuotedValue.toLocaleString()} total value`}
+                tone="quotes"
+                onClick={() => onNavigate("quotes")}
+              />
+              <PipelineRow
+                label="Invoices"
+                value={stats.payments.invoices}
+                sub={`KES ${stats.payments.totalOutstanding.toLocaleString()} outstanding`}
+                tone="payments"
+                onClick={() => onNavigate("payments")}
+              />
+              <PipelineRow
+                label="Projects"
+                value={stats.projects.total}
+                sub={`${stats.projects.byStatus.IN_PROGRESS ?? 0} in progress · ${stats.projects.byStatus.COMPLETED ?? 0} completed`}
+                tone="projects"
+                onClick={() => onNavigate("projects")}
+              />
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Recent activity */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <ActivityCard
+          title="Recent projects"
+          loading={loading}
+          items={(stats?.recentActivity.projects ?? []).map((p) => ({
+            id: p.title,
+            primary: p.title,
+            secondary: p.status,
+            meta: new Date(p.createdAt).toLocaleDateString(),
+          }))}
+          empty="No projects yet"
+          onViewAll={() => onNavigate("projects")}
+        />
+        <ActivityCard
+          title="Recent invoices"
+          loading={loading}
+          items={(stats?.recentActivity.invoices ?? []).map((i) => ({
+            id: i.invoiceNumber,
+            primary: i.invoiceNumber,
+            secondary: `${i.customerName} · KES ${i.amount.toLocaleString()}`,
+            meta: i.status,
+          }))}
+          empty="No invoices yet"
+          onViewAll={() => onNavigate("payments")}
+        />
+      </section>
+    </div>
+  );
+}
+
+// ─── Overview helpers ────────────────────────────────────────────
+
+function Kpi({
+  label,
+  value,
+  secondary,
+  loading,
+  tone,
+  onClick,
+  isCurrency,
+}: {
+  label: string;
+  value: number;
+  secondary?: string;
+  loading: boolean;
+  tone: keyof typeof TONES;
+  onClick: () => void;
+  isCurrency?: boolean;
+}) {
+  const meta = TONES[tone];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-cream-50 px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:bg-deep-900 ${meta.border}`}
+    >
+      <span className={`absolute inset-y-0 left-0 w-1 ${meta.bar}`} aria-hidden />
+      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+        {label}
+      </span>
+      <div className="mt-2 text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
+        {loading ? (
+          <span className="inline-block h-7 w-16 animate-pulse rounded bg-cream-100 dark:bg-deep-800" />
+        ) : isCurrency ? (
+          `KES ${value.toLocaleString()}`
+        ) : (
+          value.toLocaleString()
+        )}
       </div>
+      {secondary && !loading && (
+        <span className="mt-1 text-[10px] text-deep-400 dark:text-cream-600">
+          {secondary}
+        </span>
+      )}
+    </button>
+  );
+}
+
+function Row({
+  label,
+  value,
+  tone,
+  bold,
+}: {
+  label: string;
+  value: number;
+  tone: "emerald" | "rose" | "amber";
+  bold?: boolean;
+}) {
+  const colors = {
+    emerald: "text-emerald-700 dark:text-emerald-300",
+    rose: "text-rose-700 dark:text-rose-300",
+    amber: "text-amber-700 dark:text-amber-300",
+  };
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-deep-600 dark:text-cream-400">{label}</span>
+      <span
+        className={`font-mono text-sm ${colors[tone]} ${bold ? "font-bold" : ""}`}
+      >
+        KES {value.toLocaleString()}
+      </span>
+    </div>
+  );
+}
+
+function PipelineRow({
+  label,
+  value,
+  sub,
+  tone,
+  onClick,
+}: {
+  label: string;
+  value: number;
+  sub: string;
+  tone: keyof typeof TONES;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition hover:bg-cream-100 dark:hover:bg-deep-800"
+    >
+      <div>
+        <p className="text-sm font-medium text-deep-800 dark:text-cream-100">
+          {label}
+        </p>
+        <p className="text-[10px] text-deep-500 dark:text-cream-500">{sub}</p>
+      </div>
+      <span className={`font-mono text-lg font-bold ${TONES[tone].text}`}>
+        {value}
+      </span>
+    </button>
+  );
+}
+
+function ActivityCard({
+  title,
+  items,
+  empty,
+  loading,
+  onViewAll,
+}: {
+  title: string;
+  items: { id: string; primary: string; secondary: string; meta: string }[];
+  empty: string;
+  loading: boolean;
+  onViewAll: () => void;
+}) {
+  return (
+    <div className="flex flex-col rounded-2xl border border-deep-200 bg-cream-50 dark:border-deep-800 dark:bg-deep-900">
+      <div className="flex items-center justify-between border-b border-deep-200 px-4 py-3 dark:border-deep-800">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+          {title}
+        </h3>
+        <button
+          type="button"
+          onClick={onViewAll}
+          className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
+        >
+          View all →
+        </button>
+      </div>
+      {loading ? (
+        <div className="space-y-2 p-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="h-10 animate-pulse rounded bg-cream-100 dark:bg-deep-800"
+            />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <div className="flex flex-1 items-center justify-center px-4 py-8 text-xs text-deep-400 dark:text-cream-600">
+          {empty}
+        </div>
+      ) : (
+        <ul className="divide-y divide-deep-100 dark:divide-deep-800">
+          {items.map((item) => (
+            <li
+              key={item.id}
+              className="flex items-start gap-2 px-4 py-2.5 text-xs"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium text-deep-800 dark:text-cream-100">
+                  {item.primary}
+                </p>
+                <p className="truncate text-deep-500 dark:text-cream-500">
+                  {item.secondary}
+                </p>
+              </div>
+              <span className="shrink-0 rounded-full bg-cream-200 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-deep-600 dark:bg-deep-800 dark:text-cream-400">
+                {item.meta}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -468,6 +814,17 @@ function QuoteIcon() {
       <path d="M6 2h9l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" />
       <path d="M14 2v4h4" />
       <path d="M8 12h8M8 16h5" />
+    </svg>
+  );
+}
+function CalculatorIcon() {
+  return (
+    <svg {...iconBase}>
+      <rect x="4" y="2" width="16" height="20" rx="2" />
+      <path d="M8 6h8" />
+      <path d="M8 10h2M12 10h2M16 10h2" />
+      <path d="M8 14h2M12 14h2M16 14h2" />
+      <path d="M8 18h2M12 18h2M16 18h2" />
     </svg>
   );
 }

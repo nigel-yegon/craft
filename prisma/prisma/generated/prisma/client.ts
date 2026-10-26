@@ -96,3 +96,8 @@ export type Quote = Prisma.QuoteModel
  * 
  */
 export type Project = Prisma.ProjectModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel

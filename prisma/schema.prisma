@@ -196,47 +196,80 @@ model Quote {
   updatedAt      DateTime     @updatedAt
 
   invoice        Invoice?
+  project        Project?
+
+  @@index([status])
+  @@index([createdAt])
 }
+
 // ─── Portfolio ────────────────────────────────────────────────────
 
 model Project {
   id              Int       @id @default(autoincrement())
   slug            String    @unique
   title           String
-  summary         String    // short teaser (listing)
-  description     String    @db.Text  // long-form body (slug page)
+  summary         String
+  description     String    @db.Text
 
   status          String    @default("IN_PROGRESS")
   // PLANNED | IN_PROGRESS | COMPLETED | ON_HOLD | ARCHIVED
 
-  category        String    // "Brand" | "Digital" | "Spaces" | "Campaigns" | "Print"
+  category        String
   clientName      String
   clientContact   String?
   clientIndustry  String?
 
-  // Commercial
   costKes         Int?
   durationWeeks   Int?
   startDate       DateTime?
   endDate         DateTime?
 
-  // Narrative
-  processes       String[]  @default([])  // ["Discovery", "Brand strategy", "Design system"]
-  technologies    String[]  @default([])  // ["Next.js", "Figma", "Shopify"]
+  processes       String[]  @default([])
+  technologies    String[]  @default([])
 
-  // Media
   coverImage      String?
   galleryImages   String[]  @default([])
 
-  // Showcase
   featured        Boolean   @default(false)
   published       Boolean   @default(false)
 
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
+  // Link back to the quote this project was sold through (optional)
+  quoteId         Int?      @unique
+  quote           Quote?    @relation(fields: [quoteId], references: [id])
+
+  // Costs incurred delivering this project
+  expenses        Expense[]
+
   @@index([status])
   @@index([category])
   @@index([published])
   @@index([featured])
+}
+
+// ─── Accounting: Expenses ─────────────────────────────────────────
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  reference   String   @unique   // "EXP-2026-0001"
+  description String
+  category    String   // "Software" | "Contractor" | "Equipment" | "Travel" | "Office" | "Other"
+  amount      Int      // KES
+  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  incurredAt  DateTime
+  paidAt      DateTime?
+  vendorName  String?
+
+  projectId   Int?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([projectId])
+  @@index([incurredAt])
 }
