@@ -491,3 +491,16 @@ select:focus-visible {
     position: relative;
   }
 }
+@layer components {
+  .stack-card {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    isolation: isolate;
+    will-change: transform, opacity, filter;
+  }
+
+  [data-page-container] {
+    position: relative;
+  }
+}

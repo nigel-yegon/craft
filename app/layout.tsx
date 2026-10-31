@@ -67,9 +67,14 @@ export default function RootLayout({
             >
               <Navbar />
             </Suspense>
-            {/* flex-1 keeps the footer at the bottom; PageReveal handles the animation */}
+            {/* flex-1 keeps the footer at the bottom; PageReveal handles the animation.
+                Suspense is required because PageReveal uses usePathname(),
+                which Next.js 16 cannot resolve at build time for dynamic routes
+                like /portfolio/[slug]. */}
             <div className="flex-1">
-              <PageReveal>{children}</PageReveal>
+              <Suspense fallback={<div className="min-h-screen" />}>
+                <PageReveal>{children}</PageReveal>
+              </Suspense>
             </div>
             <Footer />
           </AppSessionProvider>
