@@ -7,6 +7,7 @@ import { Footer } from "./components/footer";
 import { Navbar } from "./components/navbar";
 import { AppSessionProvider } from "./components/session-provider";
 import { ThemeProvider } from "./components/theme-provider";
+import { PageReveal } from "./components/page-reveal";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const spaceGrotesk = localFont({
@@ -66,7 +67,10 @@ export default function RootLayout({
             >
               <Navbar />
             </Suspense>
-            <div className="flex-1">{children}</div>
+            {/* flex-1 keeps the footer at the bottom; PageReveal handles the animation */}
+            <div className="flex-1">
+              <PageReveal>{children}</PageReveal>
+            </div>
             <Footer />
           </AppSessionProvider>
         </ThemeProvider>

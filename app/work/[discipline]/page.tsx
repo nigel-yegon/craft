@@ -1,4 +1,4 @@
-
+// app/work/[discipline]/page.tsx
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -190,6 +190,7 @@ export default async function DisciplinePage({
         <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 lg:py-20">
           <Link
             href="/work"
+            data-reveal
             className="inline-flex items-center gap-2 text-sm text-text-secondary transition hover:text-accent"
           >
             <ArrowLeft size={16} aria-hidden="true" />
@@ -200,6 +201,7 @@ export default async function DisciplinePage({
             {section.projects.map((project, index) => (
               <article
                 key={project.title}
+                data-reveal
                 className="flex min-h-72 flex-col bg-surface p-6 sm:p-8"
               >
                 <div className="flex items-center justify-between gap-4">
@@ -235,7 +237,10 @@ export default async function DisciplinePage({
             ))}
           </div>
 
-          <p className="mt-6 text-xs leading-6 text-text-muted">
+          <p
+            data-reveal
+            className="mt-6 text-xs leading-6 text-text-muted"
+          >
             Portfolio entries are currently illustrative placeholders. Replace
             them with verified projects, approved descriptions and project
             imagery before publishing.
@@ -245,15 +250,16 @@ export default async function DisciplinePage({
 
       <section className="bg-(--charcoal-deep) text-(--ivory)">
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-16 sm:px-8 md:flex-row md:items-end md:justify-between lg:py-20">
-          <div>
+          <div data-reveal>
             <p className="section-kicker">Have a project in mind?</p>
             <h2 className="mt-5 max-w-2xl text-3xl font-medium tracking-tight sm:text-4xl">
-              Let's make the next one together.
+              Let&apos;s make the next one together.
             </h2>
           </div>
 
           <Link
             href="/contact"
+            data-reveal
             className="inline-flex shrink-0 items-center gap-2 bg-(--olive-light) px-5 py-3 text-sm font-medium text-(--charcoal-deep) transition hover:bg-(--ivory)"
           >
             Start a conversation

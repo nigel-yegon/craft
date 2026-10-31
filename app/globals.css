@@ -425,3 +425,69 @@ select:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+/* Append to app/globals.css */
+
+/* ------------------------------------------------------------------ */
+/* STACKED CARDS                                                       */
+/* ------------------------------------------------------------------ */
+
+/* Every card is a full viewport, clipped, and shares a radius so the  */
+/* stack reads as physical cards. The reveal engine animates these.    */
+[data-card] {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  transform-origin: 50% 0%;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+/* The first card sits above the rest so its recede-behind is visible. */
+[data-card]:first-of-type {
+  z-index: 1;
+}
+
+/* Cards after the first start stacked on top of one another visually. */
+[data-card]:not(:first-of-type) {
+  z-index: 2;
+}
+
+/* Reduced motion: no pin, no scroll-jack, no clipping. Content flows. */
+@media (prefers-reduced-motion: reduce) {
+  [data-card] {
+    min-height: auto;
+    overflow: visible;
+    will-change: auto;
+  }
+}
+/* globals.css */
+@layer components {
+  .stack-card {
+    min-height: 100vh;
+    min-height: 100svh;      /* mobile-safe */
+    position: relative;
+    will-change: transform, opacity, filter;
+    /* Prevent the outgoing card's blur filter from bleeding past its box */
+    isolation: isolate;
+  }
+
+  /* The page wrapper must not clip stacked cards while they travel. */
+  [data-page-container] {
+    position: relative;
+  }
+}
+@layer components {
+  .stack-card {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    isolation: isolate;                 /* contain the blur filter */
+    will-change: transform, opacity, filter;
+  }
+
+  /* The page container must not clip pinned cards while they travel. */
+  [data-page-container] {
+    position: relative;
+  }
+}

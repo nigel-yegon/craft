@@ -46,7 +46,7 @@ async function ProjectContent({
   return (
     <article className="mt-6">
       {project.coverImage && (
-        <div className="aspect-[16/9] overflow-hidden rounded-3xl bg-cream-200 dark:bg-deep-800">
+        <div className="aspect-video overflow-hidden rounded-3xl bg-cream-200 dark:bg-deep-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={project.coverImage}
@@ -138,7 +138,7 @@ async function ProjectContent({
               {project.galleryImages.map((url, i) => (
                 <div
                   key={i}
-                  className="aspect-[4/3] overflow-hidden rounded-xl bg-cream-200 dark:bg-deep-800"
+                  className="aspect-4/3 overflow-hidden rounded-xl bg-cream-200 dark:bg-deep-800"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -183,7 +183,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 function ProjectSkeleton() {
   return (
     <div className="mt-6 animate-pulse">
-      <div className="aspect-[16/9] rounded-3xl bg-cream-100 dark:bg-deep-900" />
+      <div className="aspect-video rounded-3xl bg-cream-100 dark:bg-deep-900" />
       <div className="mt-8 space-y-3">
         <div className="h-3 w-24 rounded bg-cream-100 dark:bg-deep-900" />
         <div className="h-10 w-3/4 rounded bg-cream-100 dark:bg-deep-900" />

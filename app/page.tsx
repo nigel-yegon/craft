@@ -1,18 +1,19 @@
-
 import Link from "next/link";
 import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
-  Box,
   Check,
   Layers3,
-  Lightbulb,
   MoveUpRight,
   PanelsTopLeft,
   Shapes,
   Workflow,
 } from "lucide-react";
+
+/* ---------------------------------------------------------------- */
+/* Data (unchanged)                                                  */
+/* ---------------------------------------------------------------- */
 
 const services = [
   {
@@ -123,11 +124,22 @@ const process = [
   },
 ];
 
+/* ---------------------------------------------------------------- */
+/* Page                                                              */
+/* ---------------------------------------------------------------- */
+
 export default function HomePage() {
   return (
-    <main className="overflow-hidden bg-background text-foreground">
-      {/* HERO */}
-      <section className="relative isolate min-h-170 overflow-hidden bg-[#20221e] text-[#f4f0e7] lg:min-h-190">
+    // NOTE: `overflow-hidden` was removed from <main> — it would clip
+    // GSAP's pinned cards and break ScrollTrigger measurement.
+    <main className="bg-background text-foreground">
+      {/* ============================================================ */}
+      {/* CARD 01 — HERO                                                */}
+      {/* ============================================================ */}
+      <section
+        data-card
+        className="stack-card relative isolate overflow-hidden bg-[#20221e] text-[#f4f0e7]"
+      >
         <div
           aria-hidden="true"
           className="absolute inset-0 -z-20 bg-cover bg-center"
@@ -145,14 +157,20 @@ export default function HomePage() {
           className="absolute inset-0 -z-10 bg-linear-to-t from-[#171915]/70 via-transparent to-[#171915]/10"
         />
 
-        <div className="mx-auto flex min-h-170 max-w-7xl flex-col justify-between px-5 pb-8 pt-20 sm:px-8 lg:min-h-190 lg:px-12 lg:pb-10 lg:pt-28">
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-between px-5 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-10 lg:pt-28">
           <div className="max-w-4xl">
-            <p className="mb-7 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[#c2cf9c] sm:text-xs">
+            <p
+              data-reveal
+              className="mb-7 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[#c2cf9c] sm:text-xs"
+            >
               <span className="h-px w-8 bg-[#a9b77d]" />
               An integrated creative & technology studio
             </p>
 
-            <h1 className="max-w-4xl text-5xl font-light leading-[0.98] tracking-[-0.065em] sm:text-7xl lg:text-[100px]">
+            <h1
+              data-reveal
+              className="max-w-4xl text-5xl font-light leading-[0.98] tracking-[-0.065em] sm:text-7xl lg:text-[100px]"
+            >
               Spaces.
               <br />
               Systems.
@@ -162,7 +180,10 @@ export default function HomePage() {
               </span>
             </h1>
 
-            <div className="mt-8 grid max-w-2xl gap-7 sm:grid-cols-[1fr_auto] sm:items-end">
+            <div
+              data-reveal
+              className="mt-8 grid max-w-2xl gap-7 sm:grid-cols-[1fr_auto] sm:items-end"
+            >
               <p className="max-w-md text-sm leading-7 text-white/75 sm:text-base">
                 We bring creative thinking, spatial design and intelligent
                 technology together to turn ambitious ideas into meaningful,
@@ -188,7 +209,10 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="mt-16 flex flex-wrap items-end justify-between gap-6 border-t border-white/20 pt-5">
+          <div
+            data-reveal
+            className="mt-16 flex flex-wrap items-end justify-between gap-6 border-t border-white/20 pt-5"
+          >
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/60">
               Independent thinking. Integrated delivery.
             </p>
@@ -203,47 +227,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* STUDIO INTRODUCTION */}
+      {/* ============================================================ */}
+      {/* CARD 02 — STUDIO INTRODUCTION                                 */}
+      {/* ============================================================ */}
       <section
+        data-card
         id="studio"
-        className="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-12 lg:gap-16 lg:px-12"
+        className="stack-card bg-background"
       >
-        <div className="lg:col-span-5">
-          <p className="section-kicker">01 / The studio</p>
-          <h2 className="mt-6 max-w-lg text-4xl font-light leading-[1.08] tracking-tighter sm:text-5xl lg:text-6xl">
-            Different disciplines.
-            <br />
-            <span className="text-olive">One clear vision.</span>
-          </h2>
-        </div>
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="grid w-full gap-10 lg:grid-cols-12 lg:gap-16">
+            <div data-reveal className="lg:col-span-5">
+              <p className="section-kicker">01 / The studio</p>
+              <h2 className="mt-6 max-w-lg text-4xl font-light leading-[1.08] tracking-tighter sm:text-5xl lg:text-6xl">
+                Different disciplines.
+                <br />
+                <span className="text-olive">One clear vision.</span>
+              </h2>
+            </div>
 
-        <div className="flex flex-col justify-between gap-8 lg:col-span-6 lg:col-start-7">
-          <p className="max-w-2xl text-base leading-8 text-foreground/75 sm:text-lg sm:leading-9">
-            Craft Studios is a fully integrated creative studio working across
-            spaces, visual expression and technology. We connect the dots
-            between an initial idea, a considered design, an engineered
-            solution and its implementation.
-          </p>
-          <p className="max-w-2xl text-sm leading-7 text-foreground/65">
-            Rather than treating every discipline as a separate destination,
-            we bring them together around what the project actually needs.
-            One connected process. A more coherent result.
-          </p>
-          <Link
-            href="/studio"
-            className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm font-medium transition hover:gap-5"
-          >
-            Get to know Craft Studios
-            <ArrowUpRight size={16} />
-          </Link>
+            <div
+              data-reveal
+              className="flex flex-col justify-between gap-8 lg:col-span-6 lg:col-start-7"
+            >
+              <p className="max-w-2xl text-base leading-8 text-foreground/75 sm:text-lg sm:leading-9">
+                Craft Studios is a fully integrated creative studio working
+                across spaces, visual expression and technology. We connect the
+                dots between an initial idea, a considered design, an
+                engineered solution and its implementation.
+              </p>
+              <p className="max-w-2xl text-sm leading-7 text-foreground/65">
+                Rather than treating every discipline as a separate
+                destination, we bring them together around what the project
+                actually needs. One connected process. A more coherent result.
+              </p>
+              <Link
+                href="/studio"
+                className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm font-medium transition hover:gap-5"
+              >
+                Get to know Craft Studios
+                <ArrowUpRight size={16} />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* SERVICES */}
-      <section className="bg-cream-200 py-20 text-[#292a25] sm:py-28">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+      {/* ============================================================ */}
+      {/* CARD 03 — SERVICES                                            */}
+      {/* ============================================================ */}
+      <section
+        data-card
+        className="stack-card bg-cream-200 text-[#292a25]"
+      >
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-            <div>
+            <div data-reveal>
               <p className="section-kicker">02 / What we do</p>
               <h2 className="mt-5 max-w-2xl text-4xl font-light leading-tight tracking-tighter sm:text-5xl lg:text-6xl">
                 Made to work
@@ -251,7 +290,10 @@ export default function HomePage() {
                 <span className="text-olive">better together.</span>
               </h2>
             </div>
-            <p className="max-w-sm text-sm leading-7 text-[#292a25]/70">
+            <p
+              data-reveal
+              className="max-w-sm text-sm leading-7 text-[#292a25]/70"
+            >
               Four connected disciplines. One adaptable team, from the first
               sketch to the final handover.
             </p>
@@ -265,6 +307,7 @@ export default function HomePage() {
                 <Link
                   key={service.number}
                   href={service.href}
+                  data-reveal
                   className="group flex min-h-75 flex-col border-b border-r border-[#292a25]/15 p-6 transition-colors hover:bg-[#f4f0e7] sm:p-8 lg:min-h-82.5 lg:p-10"
                 >
                   <div className="flex items-start justify-between">
@@ -305,77 +348,90 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* PORTFOLIO */}
-      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
-        <div className="mb-14 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div>
-            <p className="section-kicker">03 / Selected perspectives</p>
-            <h2 className="mt-5 text-4xl font-light tracking-tighter sm:text-5xl lg:text-6xl">
-              Ideas, made tangible.
-            </h2>
+      {/* ============================================================ */}
+      {/* CARD 04 — PORTFOLIO                                           */}
+      {/* ============================================================ */}
+      <section data-card className="stack-card bg-background">
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mb-14 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div data-reveal>
+              <p className="section-kicker">03 / Selected perspectives</p>
+              <h2 className="mt-5 text-4xl font-light tracking-tighter sm:text-5xl lg:text-6xl">
+                Ideas, made tangible.
+              </h2>
+            </div>
+            <Link
+              href="/work"
+              data-reveal
+              className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm transition hover:gap-5"
+            >
+              View all work
+              <ArrowUpRight size={16} />
+            </Link>
           </div>
-          <Link
-            href="/work"
-            className="inline-flex w-fit items-center gap-3 border-b border-olive pb-2 text-sm transition hover:gap-5"
-          >
-            View all work
-            <ArrowUpRight size={16} />
-          </Link>
-        </div>
 
-        <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-12 md:gap-y-20">
-          {projects.map((project) => (
-            <article key={project.number} className={project.className}>
-              <Link
-                href="/work"
-                className="group block"
-                aria-label={`Explore work: ${project.title}`}
+          <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-12 md:gap-y-20">
+            {projects.map((project) => (
+              <article
+                key={project.number}
+                data-reveal
+                className={project.className}
               >
-                <div className="relative aspect-5/4 overflow-hidden bg-cream-200">
-                  {/* Remote images are used here so no image-host configuration is needed. */}
-                  <img
-                    src={project.image}
-                    alt={project.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
-                  />
-                  <span className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#f4f0e7] text-[#292a25] transition group-hover:bg-olive group-hover:text-white">
-                    <MoveUpRight size={18} />
-                  </span>
-                </div>
-
-                <div className="mt-5 flex items-start justify-between gap-5">
-                  <div>
-                    <p className="font-mono text-[10px] tracking-[0.15em] text-olive">
-                      {project.category}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
-                      {project.title}
-                    </h3>
-                    <p className="mt-2 max-w-md text-sm leading-6 text-foreground/65">
-                      {project.description}
-                    </p>
+                <Link
+                  href="/work"
+                  className="group block"
+                  aria-label={`Explore work: ${project.title}`}
+                >
+                  <div className="relative aspect-5/4 overflow-hidden bg-cream-200">
+                    <img
+                      src={project.image}
+                      alt={project.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                    />
+                    <span className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#f4f0e7] text-[#292a25] transition group-hover:bg-olive group-hover:text-white">
+                      <MoveUpRight size={18} />
+                    </span>
                   </div>
-                  <span className="pt-1 font-mono text-xs text-foreground/40">
-                    {project.number}
-                  </span>
-                </div>
-              </Link>
-            </article>
-          ))}
-        </div>
 
-        <p className="mt-12 max-w-xl text-xs leading-6 text-foreground/50">
-          The imagery above is illustrative. Replace it with verified studio
-          projects as your portfolio is ready to publish.
-        </p>
+                  <div className="mt-5 flex items-start justify-between gap-5">
+                    <div>
+                      <p className="font-mono text-[10px] tracking-[0.15em] text-olive">
+                        {project.category}
+                      </p>
+                      <h3 className="mt-2 text-2xl font-medium tracking-tight sm:text-3xl">
+                        {project.title}
+                      </h3>
+                      <p className="mt-2 max-w-md text-sm leading-6 text-foreground/65">
+                        {project.description}
+                      </p>
+                    </div>
+                    <span className="pt-1 font-mono text-xs text-foreground/40">
+                      {project.number}
+                    </span>
+                  </div>
+                </Link>
+              </article>
+            ))}
+          </div>
+
+          <p className="mt-12 max-w-xl text-xs leading-6 text-foreground/50">
+            The imagery above is illustrative. Replace it with verified studio
+            projects as your portfolio is ready to publish.
+          </p>
+        </div>
       </section>
 
-      {/* PROCESS */}
-      <section className="bg-[#242620] py-20 text-[#f4f0e7] sm:py-28">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-5">
+      {/* ============================================================ */}
+      {/* CARD 05 — PROCESS                                             */}
+      {/* ============================================================ */}
+      <section
+        data-card
+        className="stack-card bg-[#242620] text-[#f4f0e7]"
+      >
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="grid w-full gap-12 lg:grid-cols-12 lg:gap-16">
+            <div data-reveal className="lg:col-span-5">
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-300">
                 04 / How we work
               </p>
@@ -398,9 +454,10 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-6 lg:col-start-7">
-              {process.map((step, index) => (
+              {process.map((step) => (
                 <div
                   key={step.number}
+                  data-reveal
                   className="grid grid-cols-[48px_1fr] gap-4 border-t border-white/15 py-6 sm:grid-cols-[60px_1fr] sm:py-8"
                 >
                   <span className="font-mono text-xs text-brand-300">
@@ -425,73 +482,97 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* BRAND PRINCIPLE */}
-      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
-        <div className="grid gap-8 border-b border-foreground/15 pb-12 sm:grid-cols-[1fr_auto] sm:items-end">
-          <div>
-            <p className="section-kicker">05 / Our guiding principle</p>
-            <h2 className="mt-6 max-w-4xl text-5xl font-light leading-[1.02] tracking-[-0.06em] sm:text-7xl lg:text-8xl">
-              Ideas,
-              <br />
-              <span className="text-olive">Integrated.</span>
-            </h2>
-          </div>
-          <div className="max-w-xs">
-            <p className="text-sm leading-7 text-foreground/70">
-              Creative vision meets practical thinking. Every detail has a
-              purpose, every discipline has a place, and every solution is
-              designed to work in the real world.
-            </p>
+      {/* ============================================================ */}
+      {/* CARD 06 — BRAND PRINCIPLE                                     */}
+      {/* ============================================================ */}
+      <section data-card className="stack-card bg-background">
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl items-end px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div
+            data-reveal
+            className="w-full grid gap-8 border-b border-foreground/15 pb-12 sm:grid-cols-[1fr_auto] sm:items-end"
+          >
+            <div>
+              <p className="section-kicker">05 / Our guiding principle</p>
+              <h2 className="mt-6 max-w-4xl text-5xl font-light leading-[1.02] tracking-[-0.06em] sm:text-7xl lg:text-8xl">
+                Ideas,
+                <br />
+                <span className="text-olive">Integrated.</span>
+              </h2>
+            </div>
+            <div className="max-w-xs">
+              <p className="text-sm leading-7 text-foreground/70">
+                Creative vision meets practical thinking. Every detail has a
+                purpose, every discipline has a place, and every solution is
+                designed to work in the real world.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* PROJECT ENQUIRY */}
-      <section className="px-5 pb-20 sm:px-8 sm:pb-28 lg:px-12">
-        <div className="relative mx-auto max-w-7xl overflow-hidden bg-[#dfe4d1] px-6 py-12 text-[#252720] sm:px-12 sm:py-16 lg:px-16 lg:py-20">
-          <div
-            aria-hidden="true"
-            className="absolute -right-16 -top-24 h-72 w-72 rounded-full border border-[#65734b]/20 sm:h-96 sm:w-96"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -right-4 -top-12 h-56 w-56 rounded-full border border-[#65734b]/20 sm:h-72 sm:w-72"
-          />
+      {/* ============================================================ */}
+      {/* CARD 07 — PROJECT ENQUIRY                                     */}
+      {/* ============================================================ */}
+      <section data-card className="stack-card bg-background">
+        <div className="mx-auto flex min-h-[100svh] max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="relative w-full overflow-hidden bg-[#dfe4d1] px-6 py-12 text-[#252720] sm:px-12 sm:py-16 lg:px-16 lg:py-20">
+            <div
+              aria-hidden="true"
+              className="absolute -right-16 -top-24 h-72 w-72 rounded-full border border-[#65734b]/20 sm:h-96 sm:w-96"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute -right-4 -top-12 h-56 w-56 rounded-full border border-[#65734b]/20 sm:h-72 sm:w-72"
+            />
 
-          <div className="relative max-w-3xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#65734b]">
-              Have something in mind?
-            </p>
-            <h2 className="mt-6 text-4xl font-light leading-[1.05] tracking-tighter sm:text-6xl lg:text-7xl">
-              Let&apos;s make
-              <br />
-              something meaningful.
-            </h2>
-            <p className="mt-6 max-w-xl text-sm leading-7 text-[#252720]/70 sm:text-base">
-              Tell us what you are imagining, building or trying to solve.
-              We&apos;ll help connect the ideas to a way forward.
-            </p>
+            <div data-reveal className="relative max-w-3xl">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#65734b]">
+                Have something in mind?
+              </p>
+              <h2 className="mt-6 text-4xl font-light leading-[1.05] tracking-tighter sm:text-6xl lg:text-7xl">
+                Let&apos;s make
+                <br />
+                something meaningful.
+              </h2>
+              <p className="mt-6 max-w-xl text-sm leading-7 text-[#252720]/70 sm:text-base">
+                Tell us what you are imagining, building or trying to solve.
+                We&apos;ll help connect the ideas to a way forward.
+              </p>
+              <Link
+                href="/contact"
+                className="mt-8 inline-flex min-h-12 items-center gap-4 bg-[#252720] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f0e7] transition hover:bg-[#424638] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#252720]"
+              >
+                Start a conversation
+                <ArrowUpRight size={17} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* CARD 08 — FOOTER BRAND STRIP                                  */}
+      {/* ============================================================ */}
+      <section
+        data-card
+        className="stack-card flex flex-col justify-end bg-background"
+      >
+        <div className="border-t border-foreground/10 px-5 py-5 sm:px-8 lg:px-12">
+          <div
+            data-reveal
+            className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>Craft Studios</span>
+            <span>Spaces. Systems. Experiences.</span>
             <Link
               href="/contact"
-              className="mt-8 inline-flex min-h-12 items-center gap-4 bg-[#252720] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f0e7] transition hover:bg-[#424638] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#252720]"
+              className="inline-flex items-center gap-2 hover:text-foreground"
             >
-              Start a conversation
-              <ArrowUpRight size={17} />
+              Have a project? <ArrowUpRight size={12} />
             </Link>
           </div>
         </div>
       </section>
-
-      {/* FOOTER BRAND STRIP */}
-      <div className="border-t border-foreground/10 px-5 py-5 sm:px-8 lg:px-12">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between">
-          <span>Craft Studios</span>
-          <span>Spaces. Systems. Experiences.</span>
-          <Link href="/contact" className="inline-flex items-center gap-2 hover:text-foreground">
-            Have a project? <ArrowUpRight size={12} />
-          </Link>
-        </div>
-      </div>
     </main>
   );
 }

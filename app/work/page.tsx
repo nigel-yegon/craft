@@ -69,6 +69,7 @@ export default function WorkPage() {
         {SECTIONS.map((section, i) => (
           <section
             key={section.key}
+            data-reveal
             className="border-b border-deep-200 py-16 last:border-b-0 dark:border-deep-800 lg:py-24"
           >
             <div className="grid gap-10 lg:grid-cols-[0.4fr_1fr] lg:gap-20">
@@ -86,7 +87,7 @@ export default function WorkPage() {
 
               <ul className="divide-y divide-deep-200 dark:divide-deep-800">
                 {section.entries.map((entry) => (
-                  <li key={entry.title}>
+                  <li key={entry.title} data-reveal>
                     <Link
                       href={`/work/${section.key}`}
                       className="group flex items-baseline justify-between gap-6 py-5 transition"
