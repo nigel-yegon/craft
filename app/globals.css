@@ -426,36 +426,34 @@ select:focus-visible {
   }
 }
 @layer components {
-  /* Sticky stacking container. Each .card-spacer becomes the
-     "scroll track" for one card. The card inside sticks to the
-     top of this track while you scroll through it. */
+  /* The spacer is the scroll track. It must be TALLER than the card
+     so the sticky card has travel room. The extra height is the
+     "linger" — scroll distance during which the card stays pinned
+     at top before releasing. */
   .card-spacer {
     position: relative;
-    /* Each spacer is exactly one viewport tall. The sticky child
-       pins within this height. Stacking emerges naturally. */
-    height: 100vh;
-    height: 100svh;
+    /* Minimum: card height + at least one viewport of linger.
+       If the card is taller than 100svh (services, portfolio),
+       the spacer grows to card height + 100svh automatically. */
+    min-height: 200svh;
   }
 
-  /* The card itself. Sticky within .card-spacer, so it holds its
-     position while the NEXT card slides up over it. */
+  /* Cards are sticky but NOT locked to 100svh. They size to
+     their content, with a minimum of one viewport so short
+     sections still feel full-screen. */
   .stack-card {
     position: sticky;
-    top: 0;                     /* sticks to viewport top */
+    top: 0;
     display: block;
     width: 100%;
-    height: 100vh;
-    height: 100svh;
-    overflow: hidden;           /* clip the hero bg / decorative circles */
-    /* Note: no `isolation` (kills the outgoing-card blur backdrop),
-       no `will-change` (GSAP adds it per-tween; 8 cards × 3 props
-       would exhaust the compositor). */
+    min-height: 100vh;
+    min-height: 100svh;
+    /* No fixed height — let content determine it. Tall sections
+       (services grid, portfolio grid) will overflow 100svh, which
+       is correct; they still scroll naturally inside the viewport. */
+    overflow: hidden; /* only clips decorative bg, not content flow */
   }
 
-  /* The page container just needs to not create a new scroll
-     context that breaks sticky. `overflow-x: clip` prevents the
-     horizontal scrollbar from mid-animation transforms, and
-     importantly does NOT break position: sticky (unlike `hidden`). */
   [data-page-container] {
     position: relative;
     overflow-x: clip;

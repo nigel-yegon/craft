@@ -115,10 +115,7 @@ export default function HomePage() {
       {/* CARD 01 — HERO                                                */}
       {/* ============================================================ */}
       <div className="card-spacer">
-        <section
-          data-card
-          className="stack-card bg-[#20221e] text-[#f4f0e7]"
-        >
+        <section data-card className="stack-card bg-[#20221e] text-[#f4f0e7]">
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-20 bg-cover bg-center"
@@ -136,7 +133,7 @@ export default function HomePage() {
             className="absolute inset-0 -z-10 bg-linear-to-t from-[#171915]/70 via-transparent to-[#171915]/10"
           />
 
-          <div className="mx-auto flex h-full max-w-7xl flex-col justify-between px-5 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-10 lg:pt-28">
+          <div className="mx-auto flex min-h-svh max-w-7xl flex-col justify-between px-5 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-10 lg:pt-28">
             <div className="max-w-4xl">
               <p
                 data-reveal
@@ -210,7 +207,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card id="studio" className="stack-card bg-background">
-          <div className="mx-auto flex h-full max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="grid w-full gap-10 lg:grid-cols-12 lg:gap-16">
               <div data-reveal className="lg:col-span-5">
                 <p className="section-kicker">01 / The studio</p>
@@ -255,7 +252,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card className="stack-card bg-cream-200 text-[#292a25]">
-          <div className="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <div data-reveal>
                 <p className="section-kicker">02 / What we do</p>
@@ -325,7 +322,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card className="stack-card bg-background">
-          <div className="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="mb-14 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
               <div data-reveal>
                 <p className="section-kicker">03 / Selected perspectives</p>
@@ -397,7 +394,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card className="stack-card bg-[#242620] text-[#f4f0e7]">
-          <div className="mx-auto flex h-full max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl flex-col justify-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="grid w-full gap-12 lg:grid-cols-12 lg:gap-16">
               <div data-reveal className="lg:col-span-5">
                 <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-300">
@@ -456,7 +453,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card className="stack-card bg-background">
-          <div className="mx-auto flex h-full max-w-7xl items-end px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl items-end px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div
               data-reveal
               className="w-full grid gap-8 border-b border-foreground/15 pb-12 sm:grid-cols-[1fr_auto] sm:items-end"
@@ -486,7 +483,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       <div className="card-spacer">
         <section data-card className="stack-card bg-background">
-          <div className="mx-auto flex h-full max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
+          <div className="mx-auto flex min-h-svh max-w-7xl items-center px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="relative w-full overflow-hidden bg-[#dfe4d1] px-6 py-12 text-[#252720] sm:px-12 sm:py-16 lg:px-16 lg:py-20">
               <div
                 aria-hidden="true"
@@ -524,34 +521,11 @@ export default function HomePage() {
       </div>
 
       {/* ============================================================ */}
-      {/* CARD 08 — FOOTER BRAND STRIP                                  */}
+      {/* FOOTER STRIP — not a stacked card, just normal flow           */}
       {/* ============================================================ */}
-      {/* <div className="card-spacer">
-        <section data-card className="stack-card flex flex-col justify-end bg-background">
-          <div className="border-t border-foreground/10 px-5 py-5 sm:px-8 lg:px-12">
-            <div
-              data-reveal
-              className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <span>Craft Studios</span>
-              <span>Spaces. Systems. Experiences.</span>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 hover:text-foreground"
-              >
-                Have a project? <ArrowUpRight size={12} />
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div> */}
-      {/* Not a stacked card — just a footer strip at the end of the page. */}
-      <section className="border-t border-foreground/10 bg-background">
+      <footer className="border-t border-foreground/10 bg-background">
         <div className="px-5 py-5 sm:px-8 lg:px-12">
-          <div
-            data-reveal
-            className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between"
-          >
+          <div className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between">
             <span>Craft Studios</span>
             <span>Spaces. Systems. Experiences.</span>
             <Link
@@ -562,7 +536,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </footer>
     </main>
   );
 }
