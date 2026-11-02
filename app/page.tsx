@@ -526,7 +526,7 @@ export default function HomePage() {
       {/* ============================================================ */}
       {/* CARD 08 — FOOTER BRAND STRIP                                  */}
       {/* ============================================================ */}
-      <div className="card-spacer">
+      {/* <div className="card-spacer">
         <section data-card className="stack-card flex flex-col justify-end bg-background">
           <div className="border-t border-foreground/10 px-5 py-5 sm:px-8 lg:px-12">
             <div
@@ -544,7 +544,25 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-      </div>
+      </div> */}
+      {/* Not a stacked card — just a footer strip at the end of the page. */}
+      <section className="border-t border-foreground/10 bg-background">
+        <div className="px-5 py-5 sm:px-8 lg:px-12">
+          <div
+            data-reveal
+            className="mx-auto flex max-w-7xl flex-col gap-2 text-[10px] uppercase tracking-[0.16em] text-foreground/50 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span>Craft Studios</span>
+            <span>Spaces. Systems. Experiences.</span>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 hover:text-foreground"
+            >
+              Have a project? <ArrowUpRight size={12} />
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
