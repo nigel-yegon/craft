@@ -7,7 +7,7 @@ if (typeof window !== "undefined") {
 }
 
 /* ------------------------------------------------------------------ */
-/* Fade-to-reveal (used on pages that are NOT stacked cards)           */
+/* Fade-to-reveal — for pages WITHOUT stacked cards                    */
 /* ------------------------------------------------------------------ */
 
 export type RevealOptions = {
@@ -64,29 +64,27 @@ export function revealPage(
 }
 
 /* ------------------------------------------------------------------ */
-/* Stacked cards — viewport-height sections that pin and stack         */
+/* Stacked cards — CSS sticky handles layout, GSAP scrubs the fade     */
 /* ------------------------------------------------------------------ */
 
 export type StackedCardsOptions = {
+  spacerSelector?: string;
   selector?: string;
-  travel?: number;
   outgoingScale?: number;
   outgoingOpacity?: number;
   outgoingBlur?: number;
   incomingOpacity?: number;
   incomingScale?: number;
-  start?: string;
 };
 
 const CARD_DEFAULTS: Required<StackedCardsOptions> = {
+  spacerSelector: ".card-spacer",
   selector: "[data-card]",
-  travel: 100,
   outgoingScale: 0.92,
-  outgoingOpacity: 0.55,
-  outgoingBlur: 6,
-  incomingOpacity: 0.65,
-  incomingScale: 0.96,
-  start: "top bottom",
+  outgoingOpacity: 0.5,
+  outgoingBlur: 8,
+  incomingOpacity: 0.6,
+  incomingScale: 0.97,
 };
 
 export function buildStackedCards(
@@ -96,9 +94,16 @@ export function buildStackedCards(
   if (!container || typeof window === "undefined") return () => {};
 
   const opts = { ...CARD_DEFAULTS, ...options };
-  const cards = gsap.utils.toArray<HTMLElement>(
-    container.querySelectorAll<HTMLElement>(opts.selector)
+
+  const spacers = gsap.utils.toArray<HTMLElement>(
+    container.querySelectorAll<HTMLElement>(opts.spacerSelector)
   );
+
+  const cards: HTMLElement[] = [];
+  for (const spacer of spacers) {
+    const card = spacer.querySelector<HTMLElement>(opts.selector);
+    if (card) cards.push(card);
+  }
 
   if (cards.length < 2) return () => {};
 
@@ -111,77 +116,50 @@ export function buildStackedCards(
     return () => {};
   }
 
-  const mm = gsap.matchMedia();
+  const ctx = gsap.context(() => {
+    // Baseline: first card at full opacity, no scale, no blur.
+    gsap.set(cards[0], { opacity: 1, scale: 1, filter: "blur(0px)" });
 
-  mm.add("(min-width: 0px)", () => {
-    const ctx = gsap.context(() => {
-      gsap.set(cards[0], { opacity: 1, scale: 1, filter: "blur(0px)" });
+    cards.forEach((card, i) => {
+      if (i === 0) return;
+      const previous = cards[i - 1];
 
-      cards.forEach((card, i) => {
-        if (i === 0) return;
-        const previous = cards[i - 1];
-
-        gsap.fromTo(
-          card,
-          {
-            yPercent: opts.travel,
-            scale: opts.incomingScale,
-            opacity: opts.incomingOpacity,
-          },
-          {
-            yPercent: 0,
-            scale: 1,
-            opacity: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              start: opts.start,
-              end: "top top",
-              scrub: true,
-              invalidateOnRefresh: true,
-            },
-          }
-        );
-
-        gsap.to(previous, {
-          scale: opts.outgoingScale,
-          opacity: opts.outgoingOpacity,
-          filter: `blur(${opts.outgoingBlur}px)`,
+      // Incoming card: fade + scale in as it slides over the previous
+      // one via CSS sticky's natural geometry.
+      gsap.fromTo(
+        card,
+        { scale: opts.incomingScale, opacity: opts.incomingOpacity },
+        {
+          scale: 1,
+          opacity: 1,
           ease: "none",
           scrollTrigger: {
             trigger: card,
-            start: opts.start,
+            start: "top bottom",
             end: "top top",
             scrub: true,
             invalidateOnRefresh: true,
           },
-        });
+        }
+      );
 
-        ScrollTrigger.create({
-          trigger: previous,
-          start: "top top",
-          end: () => `+=${card.offsetHeight}`,
-          pin: true,
-          pinSpacing: false,
-          anticipatePin: 1,
+      // Outgoing card: recede (dim, shrink, blur) as the incoming
+      // card sweeps over it.
+      gsap.to(previous, {
+        scale: opts.outgoingScale,
+        opacity: opts.outgoingOpacity,
+        filter: `blur(${opts.outgoingBlur}px)`,
+        ease: "none",
+        scrollTrigger: {
+          trigger: card,
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
           invalidateOnRefresh: true,
-        });
+        },
       });
+    });
+  }, container);
 
-      const last = cards[cards.length - 1];
-      ScrollTrigger.create({
-        trigger: last,
-        start: "top top",
-        end: () => `+=${last.offsetHeight}`,
-        pin: true,
-        pinSpacing: false,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
-      });
-    }, container);
-
-    return () => ctx.revert();
-  });
-
-  return () => mm.revert();
+  return () => ctx.revert();
 }

@@ -547,4 +547,4 @@ function assemblePdf(pages: PdfPage[], logo: LogoImage | null): Uint8Array {
 
 function escapePdf(s: string): string {
   return s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-}
+}                                                                                                                                                                                                                                                                                                      

@@ -1,53 +1,43 @@
 // app/components/page-reveal.tsx
 "use client";
 
-import { useRef } from "react";
-import { useSelectedLayoutSegments } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useSelectedLayoutSegments, useParams } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { revealPage, buildStackedCards } from "@/lib/reveal";
+import { revealPage, buildStackedCards } from "../../lib/reveal";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 export function PageReveal({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [hydrated, setHydrated] = useState(false);
 
-  // `useSelectedLayoutSegments` is safe during prerender (unlike
-  // `usePathname`), and gives us a stable string key we can use to
-  // re-run the GSAP effect whenever the route changes.
+  // Flip after React's first hydration commit. Double RAF ensures
+  // we're past the commit + paint, not just the commit.
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setHydrated(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const segments = useSelectedLayoutSegments();
-  const routeKey = segments.join("/");
+  const params = useParams();
+  const routeKey = `${segments.join("/")}|${JSON.stringify(params)}`;
 
   useGSAP(
     () => {
       const el = containerRef.current;
-      if (!el) return;
+      if (!el || !hydrated) return;  // ← gate: no GSAP until hydrated
 
-      // Auto-wrap top-level <section> children into stacked cards if
-      // the page hasn't explicitly opted in via [data-card]. Pages
-      // that do opt in (like the homepage) are left untouched.
-      let promoted = false;
-      if (!el.querySelector("[data-card]")) {
-        const sections = Array.from(el.children).filter(
-          (n): n is HTMLElement =>
-            n instanceof HTMLElement && n.tagName === "SECTION"
-        );
-        if (sections.length >= 2) {
-          sections.forEach((s) => {
-            s.setAttribute("data-card", "");
-            s.classList.add("stack-card");
-          });
-          promoted = true;
-        }
-      }
-
-      const hasCards = !!el.querySelector("[data-card]");
+      const hasCards = !!el.querySelector(".card-spacer");
       let cleanupCards: (() => void) | undefined;
+      let cancelled = false;
 
-      // Wait for fonts + layout to settle so ScrollTrigger measures
-      // pin distances against the final layout, not the pre-font one.
       const build = () => {
+        if (cancelled) return;
         if (hasCards) {
           cleanupCards = buildStackedCards(el);
         } else {
@@ -63,19 +53,11 @@ export function PageReveal({ children }: { children: React.ReactNode }) {
       }
 
       return () => {
+        cancelled = true;
         cleanupCards?.();
-        // Undo promoted attributes so we don't leak state across routes.
-        if (promoted) {
-          el.querySelectorAll<HTMLElement>("[data-card]").forEach((n) => {
-            n.removeAttribute("data-card");
-            n.classList.remove("stack-card");
-          });
-        }
-        // ScrollTrigger leaves global state behind; nuke it on teardown.
-        ScrollTrigger.getAll().forEach((t) => t.kill());
       };
     },
-    { scope: containerRef, dependencies: [routeKey] }
+    { scope: containerRef, dependencies: [routeKey, hydrated] }  // ← re-run when hydrated flips
   );
 
   return (

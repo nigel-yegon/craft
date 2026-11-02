@@ -425,82 +425,39 @@ select:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
-/* Append to app/globals.css */
-
-/* ------------------------------------------------------------------ */
-/* STACKED CARDS                                                       */
-/* ------------------------------------------------------------------ */
-
-/* Every card is a full viewport, clipped, and shares a radius so the  */
-/* stack reads as physical cards. The reveal engine animates these.    */
-[data-card] {
-  position: relative;
-  width: 100%;
-  min-height: 100svh;
-  overflow: hidden;
-  transform-origin: 50% 0%;
-  will-change: transform, opacity, filter;
-  backface-visibility: hidden;
-}
-
-/* The first card sits above the rest so its recede-behind is visible. */
-[data-card]:first-of-type {
-  z-index: 1;
-}
-
-/* Cards after the first start stacked on top of one another visually. */
-[data-card]:not(:first-of-type) {
-  z-index: 2;
-}
-
-/* Reduced motion: no pin, no scroll-jack, no clipping. Content flows. */
-@media (prefers-reduced-motion: reduce) {
-  [data-card] {
-    min-height: auto;
-    overflow: visible;
-    will-change: auto;
-  }
-}
-/* globals.css */
 @layer components {
-  .stack-card {
-    min-height: 100vh;
-    min-height: 100svh;      /* mobile-safe */
+  /* Sticky stacking container. Each .card-spacer becomes the
+     "scroll track" for one card. The card inside sticks to the
+     top of this track while you scroll through it. */
+  .card-spacer {
     position: relative;
-    will-change: transform, opacity, filter;
-    /* Prevent the outgoing card's blur filter from bleeding past its box */
-    isolation: isolate;
+    /* Each spacer is exactly one viewport tall. The sticky child
+       pins within this height. Stacking emerges naturally. */
+    height: 100vh;
+    height: 100svh;
   }
 
-  /* The page wrapper must not clip stacked cards while they travel. */
+  /* The card itself. Sticky within .card-spacer, so it holds its
+     position while the NEXT card slides up over it. */
+  .stack-card {
+    position: sticky;
+    top: 0;                     /* sticks to viewport top */
+    display: block;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;           /* clip the hero bg / decorative circles */
+    /* Note: no `isolation` (kills the outgoing-card blur backdrop),
+       no `will-change` (GSAP adds it per-tween; 8 cards × 3 props
+       would exhaust the compositor). */
+  }
+
+  /* The page container just needs to not create a new scroll
+     context that breaks sticky. `overflow-x: clip` prevents the
+     horizontal scrollbar from mid-animation transforms, and
+     importantly does NOT break position: sticky (unlike `hidden`). */
   [data-page-container] {
     position: relative;
-  }
-}
-@layer components {
-  .stack-card {
-    position: relative;
-    min-height: 100vh;
-    min-height: 100svh;
-    isolation: isolate;                 /* contain the blur filter */
-    will-change: transform, opacity, filter;
-  }
-
-  /* The page container must not clip pinned cards while they travel. */
-  [data-page-container] {
-    position: relative;
-  }
-}
-@layer components {
-  .stack-card {
-    position: relative;
-    min-height: 100vh;
-    min-height: 100svh;
-    isolation: isolate;
-    will-change: transform, opacity, filter;
-  }
-
-  [data-page-container] {
-    position: relative;
+    overflow-x: clip;
   }
 }

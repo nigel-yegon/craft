@@ -15,23 +15,31 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: String(credentials.email).toLowerCase() },
-        });
-        if (!user?.passwordHash) return null;
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: String(credentials.email).toLowerCase() },
+          });
+          if (!user?.passwordHash) return null;
 
-        const valid = await bcrypt.compare(
-          String(credentials.password),
-          user.passwordHash,
-        );
-        if (!valid) return null;
+          const valid = await bcrypt.compare(
+            String(credentials.password),
+            user.passwordHash,
+          );
+          if (!valid) return null;
 
-        return {
-          id: user.id,
-          name: user.name ?? user.email.split("@")[0],
-          email: user.email,
-          role: user.role,
-        };
+          return {
+            id: user.id,
+            name: user.name ?? user.email.split("@")[0],
+            email: user.email,
+            role: user.role,
+          };
+        } catch (err) {
+          // Surface the real error in server logs. Returning null keeps
+          // NextAuth from throwing a misleading "provider not supported"
+          // error to the client when the DB is unreachable.
+          console.error("[auth] authorize database error:", err);
+          return null;
+        }
       },
     }),
   ],
