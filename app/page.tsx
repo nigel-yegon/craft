@@ -509,7 +509,7 @@ export default function HomePage() {
                 </p>
                 <Link
                   href="/contact"
-                  className="mt-8 inline-flex min-h-12 items-center gap-4 bg-[#252720] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f0e7] transition hover:bg-[#424638] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#252720]"
+                  className="mt-8 inline-flex min-h-12 items-center gap-4 bg-[#94b04e] px-5 text-xs font-semibold uppercase tracking-[0.12em] text-[#f4f0e7] transition hover:bg-[#5a731c] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#383c2e]"
                 >
                   Start a conversation
                   <ArrowUpRight size={17} />

@@ -6,8 +6,8 @@ import { ContactForm } from "../components/contact-form";
 export const metadata: Metadata = { title: "Contact" };
 
 const DETAILS = [
-  { label: "Email", value: "studio@craft.studio" },
-  { label: "Phone", value: "+254 (0) 700 000 000" },
+  { label: "Email", value: "info@craft.co.ke" },
+  { label: "Phone", value: "+254 (0) 725 408 209" },
   { label: "Studio", value: "Nairobi, Kenya" },
   { label: "Hours", value: "Mon–Fri · 09:00–17:00 EAT" },
 ] as const;
