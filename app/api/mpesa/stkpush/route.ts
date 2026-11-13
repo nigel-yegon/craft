@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+// 👇 Increase the timeout limit for Vercel (Requires Pro plan or Fluid Compute)
+export const maxDuration = 60; 
+
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
 const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY!;
 const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET!;
@@ -9,9 +12,8 @@ const PASSKEY = process.env.MPESA_PASSKEY!;
 const SHORTCODE = process.env.MPESA_SHORTCODE!;
 const CALLBACK_URL = process.env.MPESA_CALLBACK_URL!;
 
-// ─── CORS Headers ───────────────────────────────────────────────────
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*", // Update to your exact domain in production
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
@@ -39,15 +41,10 @@ function eatTimestamp(): string {
   return `${now.getUTCFullYear()}${p(now.getUTCMonth() + 1)}${p(now.getUTCDate())}${p(now.getUTCHours())}${p(now.getUTCMinutes())}${p(now.getUTCSeconds())}`;
 }
 
-// ─── Handle CORS Preflight ──────────────────────────────────────────
 export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 204,
-    headers: corsHeaders,
-  });
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
 
-// ─── Main POST Handler ──────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -60,33 +57,63 @@ export async function POST(req: NextRequest) {
     }
 
     const { phone, amount, plan } = parsed.data;
-    const token = await getToken();
+    
+    // 1. Get Token
+    let token: string;
+    try {
+      token = await getToken();
+    } catch (e) {
+      return NextResponse.json(
+        { error: "Failed to authenticate with Safaricom" },
+        { status: 502, headers: corsHeaders }
+      );
+    }
+
     const timestamp = eatTimestamp();
     const password = Buffer.from(`${SHORTCODE}${PASSKEY}${timestamp}`).toString("base64");
 
-    const darajaRes = await fetch(
-      `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          BusinessShortCode: SHORTCODE,
-          Password: password,
-          Timestamp: timestamp,
-          TransactionType: "CustomerPayBillOnline",
-          Amount: amount,
-          PartyA: phone,
-          PartyB: SHORTCODE,
-          PhoneNumber: phone,
-          CallBackURL: CALLBACK_URL,
-          AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
-          TransactionDesc: `${plan} plan`.slice(0, 13),
-        }),
+    // 2. Initiate STK Push with a manual timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 seconds
+
+    let darajaRes;
+    try {
+      darajaRes = await fetch(
+        `${MPESA_BASE_URL}/mpesa/stkpush/v1/processrequest`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            BusinessShortCode: SHORTCODE,
+            Password: password,
+            Timestamp: timestamp,
+            TransactionType: "CustomerPayBillOnline",
+            Amount: amount,
+            PartyA: phone,
+            PartyB: SHORTCODE,
+            PhoneNumber: phone,
+            CallBackURL: CALLBACK_URL,
+            AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
+            TransactionDesc: `${plan} plan`.slice(0, 13),
+          }),
+          signal: controller.signal,
+        }
+      );
+    } catch (e: any) {
+      clearTimeout(timeoutId);
+      if (e.name === 'AbortError') {
+        return NextResponse.json(
+          { error: "Safaricom server timed out. Please try again." },
+          { status: 504, headers: corsHeaders }
+        );
       }
-    );
+      throw e;
+    }
+    
+    clearTimeout(timeoutId);
 
     const data = await darajaRes.json();
 
@@ -97,17 +124,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await prisma.mpesaTransaction.create({
-      data: {
-        checkoutRequestId: data.CheckoutRequestID,
-        merchantRequestId: data.MerchantRequestID,
-        phoneNumber: phone,
-        amount,
-        status: "PENDING",
-        source: "subscription",       // ─── Uncommented
-        subscriptionPlan: plan,       // ─── Uncommented
-      },
-    });
+    // 3. Save to DB
+    try {
+      await prisma.mpesaTransaction.create({
+        data: {
+          checkoutRequestId: data.CheckoutRequestID,
+          merchantRequestId: data.MerchantRequestID,
+          phoneNumber: phone,
+          amount,
+          status: "PENDING",
+          source: "subscription",
+          subscriptionPlan: plan,
+        },
+      });
+    } catch (dbError) {
+      console.error("Database save failed:", dbError);
+      // We don't return an error here because the STK push was already sent to the phone.
+      // If we return an error, the user will think it failed, but they will still get a PIN prompt.
+    }
 
     return NextResponse.json(
       {
