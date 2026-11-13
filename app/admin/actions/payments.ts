@@ -130,7 +130,7 @@ export async function sendPaymentPrompt(invoiceId: number) {
     BusinessShortCode: shortcode,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerPayBillOnline",
+    TransactionType: "CustomerBuyGoodsOnline",
     Amount: invoice.amount,
     PartyA: invoice.customerPhone,
     PartyB: shortcode,
