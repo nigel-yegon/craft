@@ -6,12 +6,12 @@ export const maxDuration = 60;
 
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
 
-// ─── M-Pesa Configuration (Buy Goods / Till) ────────────────────────
-// Using your Till number for the shortcode, and its specific passkey.
+// ─── M-Pesa Configuration ───────────────────────────────────────────
 const CONSUMER_KEY = (process.env.MPESA_CONSUMER_KEY || "").trim();
 const CONSUMER_SECRET = (process.env.MPESA_CONSUMER_SECRET || "").trim();
 const PASSKEY = (process.env.MPESA_PASSKEY || "").trim(); 
-const TILL_NUMBER = (process.env.MPESA_TILL_NUMBER || "").trim(); // 9090113
+const STORE_NUMBER = (process.env.MPESA_STORE_NUMBER || "").trim(); // 7098820
+const TILL_NUMBER = (process.env.MPESA_TILL_NUMBER || "").trim();   // 9090113
 const CALLBACK_URL = (process.env.MPESA_CALLBACK_URL || "").trim();
 
 const corsHeaders = {
@@ -81,21 +81,21 @@ export async function POST(req: NextRequest) {
 
     const timestamp = eatTimestamp();
     
-    // Password uses the TILL number (Buy Goods requirement)
-    const password = Buffer.from(`${TILL_NUMBER}${PASSKEY}${timestamp}`).toString("base64");
+    // Password MUST be generated using the Store Number and its Passkey
+    const password = Buffer.from(`${STORE_NUMBER}${PASSKEY}${timestamp}`).toString("base64");
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-    // 2. The exact payload Safaricom expects for Buy Goods (Till)
+    // 2. Payload configured for Buy Goods (Store -> Till)
     const payload = {
-      BusinessShortCode: TILL_NUMBER,
+      BusinessShortCode: STORE_NUMBER,        // 7098820
       Password: password,
       Timestamp: timestamp,
-      TransactionType: "CustomerBuyGoodsOnline", // CRITICAL: Buy Goods type
+      TransactionType: "CustomerBuyGoodsOnline", // Correct type for Till
       Amount: amount,
       PartyA: phone,
-      PartyB: TILL_NUMBER,
+      PartyB: TILL_NUMBER,                    // 9090113
       PhoneNumber: phone,
       CallBackURL: CALLBACK_URL,
       AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
@@ -155,7 +155,6 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbError) {
       console.error("Database save failed:", dbError);
-      // Not throwing here so the user still sees the prompt on their phone
     }
 
     return NextResponse.json(
