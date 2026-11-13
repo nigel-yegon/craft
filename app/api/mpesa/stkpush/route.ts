@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
-export const maxDuration = 60;
-
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
 
 // ─── M-Pesa Configuration ───────────────────────────────────────────

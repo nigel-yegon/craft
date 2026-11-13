@@ -2,17 +2,19 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
-import { useEffect } from "react";   // add to the existing react import line
 import { getOverviewStats, type OverviewStats } from "./actions/stats";
 
 import FadeIn from "../components/fade-in";
 import { Stagger } from "../components/stagger";
 import { useScrollDirection } from "../components/use-scroll-direction";
 
+// ─── Module Imports ────────────────────────────────────────────────────────
 import { PaymentsPanel } from "./payments/payments-panel";
+import { SubscriptionsPanel } from "./subscriptions/subscriptions-panel";
+import { TransactionPanel } from "./transactions/transaction-panel";
 import { QuotesPanel } from "./quotes/quotes-panel";
 import { ProjectsPanel } from "./projects/projects-panel";
 import { AccountingPanel } from "./accounting/accounting-panel";
@@ -168,7 +170,12 @@ export function DashboardClient({ userName }: { userName: string }) {
             <div key={activeModule}>
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
               {activeModule === "quotes" && <QuotesPanel search={search} />}
-              {activeModule === "payments" && <PaymentsPanel search={search} />}
+
+              {/* Payments module handles the 3 tabs */}
+              {activeModule === "payments" && (
+                <PaymentsModule search={search} />
+              )}
+
               {activeModule === "projects" && <ProjectsPanel search={search} />}
               {activeModule === "accounting" && <AccountingPanel />}
             </div>
@@ -179,6 +186,68 @@ export function DashboardClient({ userName }: { userName: string }) {
   );
 }
 
+// ─── Sub-Component: PaymentsModule Tabs ───────────────────────────
+
+// app/admin/dashboard-client.tsx
+
+function PaymentsModule({ search }: { search: string }) {
+  const [activeTab, setActiveTab] = useState<"invoices" | "transactions" | "subscriptions">("invoices");
+
+  const tabs = [
+    { key: "invoices", label: "Invoices" },
+    { key: "transactions", label: "All Transactions" },
+    { key: "subscriptions", label: "Subscriptions" },
+  ] as const;
+
+  return (
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* ─── Header & Tabs (Matching Quotes Panel Structure) ─── */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+              <WalletIcon />
+            </span>
+            <h2 className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+              Payments
+            </h2>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-deep-600 dark:text-cream-400">
+            Manage invoices, review all M-Pesa transactions, and track active subscriptions.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 border-b border-deep-200 dark:border-deep-800">
+        {tabs.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setActiveTab(t.key)}
+            className={[
+              "relative px-4 py-2.5 text-sm font-semibold transition",
+              activeTab === t.key
+                ? "text-emerald-700 dark:text-emerald-300"
+                : "text-deep-500 hover:text-deep-700 dark:text-cream-500 dark:hover:text-cream-300",
+            ].join(" ")}
+          >
+            {t.label}
+            {activeTab === t.key && (
+              <span className="absolute inset-x-0 -bottom-px h-0.5 bg-emerald-600 dark:bg-emerald-400" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* ─── Tab Content ─── */}
+      <div className="mt-4">
+        {activeTab === "invoices" && <PaymentsPanel search={search} />}
+        {activeTab === "transactions" && <TransactionPanel search={search} />}
+        {activeTab === "subscriptions" && <SubscriptionsPanel search={search} />}
+      </div>
+    </div>
+  );
+}
 // ─── Sidebar ──────────────────────────────────────────────────────
 
 function DashboardSidebar({
@@ -412,12 +481,6 @@ function DashboardHeader({
 
 // ─── Overview ────────────────────────────────────────────────────
 
-// app/admin/dashboard-client.tsx — replace the Overview function
-// and add these imports at the top:
-
-// import { useEffect } from "react";     ← add this to existing react imports
-// import { getOverviewStats, type OverviewStats } from "./actions/stats";
-
 function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -444,11 +507,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         <Kpi
           label="Projects"
           value={stats?.projects.total ?? 0}
-          secondary={
-            stats
-              ? `${stats.projects.published} published · ${stats.projects.featured} featured`
-              : undefined
-          }
+          secondary={stats ? `${stats.projects.published} published · ${stats.projects.featured} featured` : undefined}
           loading={loading}
           tone="projects"
           onClick={() => onNavigate("projects")}
@@ -456,11 +515,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         <Kpi
           label="Quotes"
           value={stats?.quotes.quotes ?? 0}
-          secondary={
-            stats
-              ? `${stats.quotes.pendingRequests} new requests · ${stats.quotes.acceptedQuotes} accepted`
-              : undefined
-          }
+          secondary={stats ? `${stats.quotes.pendingRequests} new requests · ${stats.quotes.acceptedQuotes} accepted` : undefined}
           loading={loading}
           tone="quotes"
           onClick={() => onNavigate("quotes")}
@@ -468,11 +523,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         <Kpi
           label="Invoices"
           value={stats?.payments.invoices ?? 0}
-          secondary={
-            stats
-              ? `${stats.payments.paid} paid · ${stats.payments.pending} pending`
-              : undefined
-          }
+          secondary={stats ? `${stats.payments.paid} paid · ${stats.payments.pending} pending` : undefined}
           loading={loading}
           tone="payments"
           onClick={() => onNavigate("payments")}
@@ -480,11 +531,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         <Kpi
           label="Revenue"
           value={stats?.accounting.revenue ?? 0}
-          secondary={
-            stats
-              ? `Expenses KES ${stats.accounting.expenses.toLocaleString()}`
-              : undefined
-          }
+          secondary={stats ? `Expenses KES ${stats.accounting.expenses.toLocaleString()}` : undefined}
           loading={loading}
           tone="accounting"
           onClick={() => onNavigate("accounting")}

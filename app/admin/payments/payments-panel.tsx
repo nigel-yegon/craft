@@ -45,7 +45,7 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
       [inv.invoiceNumber, inv.customerName, inv.customerPhone]
         .join(" ")
         .toLowerCase()
-        .includes(q),
+        .includes(q)
     );
   }, [invoices, search]);
 
@@ -117,10 +117,10 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
-            Payments
+            Invoices
           </h2>
           <p className="mt-1 text-sm text-deep-600 dark:text-cream-400">
-            Create an invoice, then send an M-Pesa Paybill prompt.
+            Create an invoice, then send an M-Pesa prompt.
           </p>
         </div>
         <button
@@ -220,7 +220,7 @@ export function PaymentsPanel({ search = "" }: { search?: string }) {
                   disabled={pending}
                   className="rounded-lg bg-emerald-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-800 disabled:opacity-60"
                 >
-                  Send Payment Prompt
+                  Send Prompt
                 </button>
                 <button
                   type="button"
