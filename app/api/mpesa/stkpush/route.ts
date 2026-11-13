@@ -2,15 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
-// 👇 Increase the timeout limit for Vercel (Requires Pro plan or Fluid Compute)
-export const maxDuration = 60; 
+export const maxDuration = 60;
 
+// Safely load and trim environment variables to prevent hidden spaces/newlines
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
-const CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY!;
-const CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET!;
-const PASSKEY = process.env.MPESA_PASSKEY!;
-const SHORTCODE = process.env.MPESA_SHORTCODE!;
-const CALLBACK_URL = process.env.MPESA_CALLBACK_URL!;
+const CONSUMER_KEY = (process.env.MPESA_CONSUMER_KEY || "").trim();
+const CONSUMER_SECRET = (process.env.MPESA_CONSUMER_SECRET || "").trim();
+const PASSKEY = (process.env.MPESA_PASSKEY || "").trim();
+const SHORTCODE = (process.env.MPESA_SHORTCODE || "").trim();
+const CALLBACK_URL = (process.env.MPESA_CALLBACK_URL || "").trim();
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,11 +26,18 @@ const bodySchema = z.object({
 
 async function getToken(): Promise<string> {
   const auth = Buffer.from(`${CONSUMER_KEY}:${CONSUMER_SECRET}`).toString("base64");
+  
   const res = await fetch(
     `${MPESA_BASE_URL}/oauth/v1/generate?grant_type=client_credentials`,
     { headers: { Authorization: `Basic ${auth}` } }
   );
-  if (!res.ok) throw new Error(`OAuth failed: ${res.status}`);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("OAuth Failed Body:", errorText);
+    throw new Error(`OAuth failed with status ${res.status}`);
+  }
+  
   const data = await res.json();
   return data.access_token;
 }
@@ -49,6 +56,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = bodySchema.safeParse(body);
+    
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid body", issues: parsed.error.issues },
@@ -58,13 +66,13 @@ export async function POST(req: NextRequest) {
 
     const { phone, amount, plan } = parsed.data;
     
-    // 1. Get Token
+    // 1. Get OAuth Token
     let token: string;
     try {
       token = await getToken();
-    } catch (e) {
+    } catch (e: any) {
       return NextResponse.json(
-        { error: "Failed to authenticate with Safaricom" },
+        { error: e.message || "Failed to authenticate with Safaricom" },
         { status: 502, headers: corsHeaders }
       );
     }
@@ -74,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     // 2. Initiate STK Push with a manual timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 seconds
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     let darajaRes;
     try {
@@ -139,8 +147,7 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbError) {
       console.error("Database save failed:", dbError);
-      // We don't return an error here because the STK push was already sent to the phone.
-      // If we return an error, the user will think it failed, but they will still get a PIN prompt.
+      // We deliberately do not fail the request here. The STK push was sent.
     }
 
     return NextResponse.json(
@@ -150,10 +157,11 @@ export async function POST(req: NextRequest) {
       },
       { headers: corsHeaders }
     );
-  } catch (err) {
+    
+  } catch (err: any) {
     console.error("STK Push error:", err);
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : "STK Push failed" },
+      { error: err.message || "STK Push failed" },
       { status: 500, headers: corsHeaders }
     );
   }
