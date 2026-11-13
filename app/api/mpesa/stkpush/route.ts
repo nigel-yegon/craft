@@ -5,11 +5,13 @@ import { prisma } from "@/lib/prisma";
 export const maxDuration = 60;
 
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
+
+// ─── M-Pesa Configuration (Buy Goods / Till) ────────────────────────
+// Using your Till number for the shortcode, and its specific passkey.
 const CONSUMER_KEY = (process.env.MPESA_CONSUMER_KEY || "").trim();
 const CONSUMER_SECRET = (process.env.MPESA_CONSUMER_SECRET || "").trim();
-const PASSKEY = (process.env.MPESA_PASSKEY || "").trim();
-const SHORTCODE = (process.env.MPESA_SHORTCODE || "").trim(); // Paybill: 7098820
-const TILL_NUMBER = (process.env.MPESA_TILL_NUMBER || "").trim(); // Till: 9090113
+const PASSKEY = (process.env.MPESA_PASSKEY || "").trim(); 
+const TILL_NUMBER = (process.env.MPESA_TILL_NUMBER || "").trim(); // 9090113
 const CALLBACK_URL = (process.env.MPESA_CALLBACK_URL || "").trim();
 
 const corsHeaders = {
@@ -66,6 +68,7 @@ export async function POST(req: NextRequest) {
 
     const { phone, amount, plan } = parsed.data;
     
+    // 1. Get OAuth Token
     let token: string;
     try {
       token = await getToken();
@@ -77,21 +80,22 @@ export async function POST(req: NextRequest) {
     }
 
     const timestamp = eatTimestamp();
-    // Password is generated using the Paybill (SHORTCODE) and PASSKEY
-    const password = Buffer.from(`${SHORTCODE}${PASSKEY}${timestamp}`).toString("base64");
+    
+    // Password uses the TILL number (Buy Goods requirement)
+    const password = Buffer.from(`${TILL_NUMBER}${PASSKEY}${timestamp}`).toString("base64");
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-    // The exact payload Safaricom expects for a Paybill linked to a Till
+    // 2. The exact payload Safaricom expects for Buy Goods (Till)
     const payload = {
-      BusinessShortCode: SHORTCODE,       // Paybill (7098820)
+      BusinessShortCode: TILL_NUMBER,
       Password: password,
       Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline", 
+      TransactionType: "CustomerBuyGoodsOnline", // CRITICAL: Buy Goods type
       Amount: amount,
       PartyA: phone,
-      PartyB: TILL_NUMBER,                // Till (9090113) - THIS IS THE FIX
+      PartyB: TILL_NUMBER,
       PhoneNumber: phone,
       CallBackURL: CALLBACK_URL,
       AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
@@ -136,6 +140,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 3. Save to Database
     try {
       await prisma.mpesaTransaction.create({
         data: {
@@ -150,6 +155,7 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbError) {
       console.error("Database save failed:", dbError);
+      // Not throwing here so the user still sees the prompt on their phone
     }
 
     return NextResponse.json(
