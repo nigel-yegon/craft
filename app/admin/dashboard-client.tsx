@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 import { getOverviewStats, type OverviewStats } from "./actions/stats";
 
@@ -20,7 +20,6 @@ import { ProjectsPanel } from "./projects/projects-panel";
 import { AccountingPanel } from "./accounting/accounting-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
-
 type ModuleKey = "overview" | "quotes" | "payments" | "projects" | "accounting";
 
 type ModuleTone = {
@@ -55,26 +54,25 @@ type ModuleGroup = {
 const HEADER_HEIGHT = "lg:min-h-24";
 
 // ─── Tones ────────────────────────────────────────────────────────
-
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   projects: {
     ring: "ring-rose-500/20",
-    border: "border-rose-300 dark:border-rose-800",
-    borderHover: "hover:border-rose-500",
+    border: "border-rose-200/60 dark:border-rose-800/60",
+    borderHover: "hover:border-rose-400 dark:hover:border-rose-600",
     bgSoft: "bg-rose-50 dark:bg-rose-950/40",
     bgActive: "bg-rose-100 dark:bg-rose-950/70",
     text: "text-rose-700 dark:text-rose-300",
     button: "bg-rose-700",
     buttonHover: "hover:bg-rose-800",
-    bar: "bg-rose-600",
+    bar: "bg-rose-500",
     pillBg: "bg-rose-100 dark:bg-rose-950",
     pillText: "text-rose-800 dark:text-rose-200",
     icon: <BriefcaseIcon />,
   },
   quotes: {
     ring: "ring-brand-500/20",
-    border: "border-brand-300 dark:border-brand-800",
-    borderHover: "hover:border-brand-500",
+    border: "border-brand-200/60 dark:border-brand-800/60",
+    borderHover: "hover:border-brand-400 dark:hover:border-brand-600",
     bgSoft: "bg-brand-50 dark:bg-brand-950/40",
     bgActive: "bg-brand-100 dark:bg-brand-950/70",
     text: "text-brand-700 dark:text-brand-300",
@@ -87,35 +85,33 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
   },
   payments: {
     ring: "ring-emerald-500/20",
-    border: "border-emerald-300 dark:border-emerald-800",
-    borderHover: "hover:border-emerald-500",
+    border: "border-emerald-200/60 dark:border-emerald-800/60",
+    borderHover: "hover:border-emerald-400 dark:hover:border-emerald-600",
     bgSoft: "bg-emerald-50 dark:bg-emerald-950/40",
     bgActive: "bg-emerald-100 dark:bg-emerald-950/70",
     text: "text-emerald-700 dark:text-emerald-300",
     button: "bg-emerald-700",
     buttonHover: "hover:bg-emerald-800",
-    bar: "bg-emerald-600",
+    bar: "bg-emerald-500",
     pillBg: "bg-emerald-100 dark:bg-emerald-950",
     pillText: "text-emerald-800 dark:text-emerald-200",
     icon: <WalletIcon />,
   },
   accounting: {
     ring: "ring-violet-500/20",
-    border: "border-violet-300 dark:border-violet-800",
-    borderHover: "hover:border-violet-500",
+    border: "border-violet-200/60 dark:border-violet-800/60",
+    borderHover: "hover:border-violet-400 dark:hover:border-violet-600",
     bgSoft: "bg-violet-50 dark:bg-violet-950/40",
     bgActive: "bg-violet-100 dark:bg-violet-950/70",
     text: "text-violet-700 dark:text-violet-300",
     button: "bg-violet-700",
     buttonHover: "hover:bg-violet-800",
-    bar: "bg-violet-600",
+    bar: "bg-violet-500",
     pillBg: "bg-violet-100 dark:bg-violet-950",
     pillText: "text-violet-800 dark:text-violet-200",
     icon: <CalculatorIcon />,
   },
 };
-
-// ─── Module groups ────────────────────────────────────────────────
 
 const MODULE_GROUPS: ModuleGroup[] = [
   {
@@ -144,7 +140,6 @@ const MODULE_GROUPS: ModuleGroup[] = [
 ];
 
 // ─── Root ─────────────────────────────────────────────────────────
-
 export function DashboardClient({ userName }: { userName: string }) {
   const [activeModule, setActiveModule] = useState<ModuleKey>("overview");
   const [search, setSearch] = useState("");
@@ -170,12 +165,7 @@ export function DashboardClient({ userName }: { userName: string }) {
             <div key={activeModule}>
               {activeModule === "overview" && <Overview onNavigate={setActiveModule} />}
               {activeModule === "quotes" && <QuotesPanel search={search} />}
-
-              {/* Payments module handles the 3 tabs */}
-              {activeModule === "payments" && (
-                <PaymentsModule search={search} />
-              )}
-
+              {activeModule === "payments" && <PaymentsModule search={search} />}
               {activeModule === "projects" && <ProjectsPanel search={search} />}
               {activeModule === "accounting" && <AccountingPanel />}
             </div>
@@ -187,9 +177,6 @@ export function DashboardClient({ userName }: { userName: string }) {
 }
 
 // ─── Sub-Component: PaymentsModule Tabs ───────────────────────────
-
-// app/admin/dashboard-client.tsx
-
 function PaymentsModule({ search }: { search: string }) {
   const [activeTab, setActiveTab] = useState<"invoices" | "transactions" | "subscriptions">("invoices");
 
@@ -201,7 +188,6 @@ function PaymentsModule({ search }: { search: string }) {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      {/* ─── Header & Tabs (Matching Quotes Panel Structure) ─── */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -239,7 +225,6 @@ function PaymentsModule({ search }: { search: string }) {
         ))}
       </div>
 
-      {/* ─── Tab Content ─── */}
       <div className="mt-4">
         {activeTab === "invoices" && <PaymentsPanel search={search} />}
         {activeTab === "transactions" && <TransactionPanel search={search} />}
@@ -248,8 +233,8 @@ function PaymentsModule({ search }: { search: string }) {
     </div>
   );
 }
-// ─── Sidebar ──────────────────────────────────────────────────────
 
+// ─── Sidebar ──────────────────────────────────────────────────────
 function DashboardSidebar({
   activeModule,
   onNavigate,
@@ -346,11 +331,11 @@ function DashboardSidebar({
                             type="button"
                             onClick={() => onNavigate(m.key)}
                             className={[
-                              "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition",
+                              "group relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition-all",
                               active && tone
-                                ? `${tone.bgActive} ${tone.text}`
+                                ? `${tone.bgActive} ${tone.text} shadow-sm`
                                 : active
-                                  ? "bg-brand-100 text-brand-700 dark:bg-brand-950 dark:text-brand-300"
+                                  ? "bg-brand-100 text-brand-700 shadow-sm dark:bg-brand-950 dark:text-brand-300"
                                   : "text-deep-600 hover:bg-cream-200 hover:text-deep-900 dark:text-cream-400 dark:hover:bg-deep-800 dark:hover:text-cream-100",
                             ].join(" ")}
                           >
@@ -359,7 +344,7 @@ function DashboardSidebar({
                             )}
                             <span
                               className={[
-                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition",
+                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors",
                                 active && tone
                                   ? tone.bgSoft
                                   : "bg-cream-200 text-deep-500 group-hover:bg-cream-300 dark:bg-deep-800 dark:text-cream-500 dark:group-hover:bg-deep-700",
@@ -406,7 +391,6 @@ function DashboardSidebar({
 }
 
 // ─── Header ───────────────────────────────────────────────────────
-
 function DashboardHeader({
   activeModule,
   search,
@@ -480,7 +464,6 @@ function DashboardHeader({
 }
 
 // ─── Overview ────────────────────────────────────────────────────
-
 function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
   const [stats, setStats] = useState<OverviewStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -564,8 +547,8 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
                 />
               </div>
               <div className="border-t border-deep-200 pt-3 dark:border-deep-800">
-                <Row label="Receivables (pending invoices)" value={stats.accounting.receivables} tone="amber" />
-                <Row label="Payables (pending expenses)" value={stats.accounting.payables} tone="amber" />
+                <Row label="Receivables" value={stats.accounting.receivables} tone="amber" />
+                <Row label="Payables" value={stats.accounting.payables} tone="amber" />
               </div>
             </div>
           )}
@@ -583,7 +566,7 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
               ))}
             </div>
           ) : (
-            <div className="mt-4 space-y-3 text-sm">
+            <div className="mt-4 space-y-1 text-sm">
               <PipelineRow
                 label="Quote requests"
                 value={stats.quotes.requests}
@@ -649,7 +632,6 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
 }
 
 // ─── Overview helpers ────────────────────────────────────────────
-
 function Kpi({
   label,
   value,
@@ -668,30 +650,47 @@ function Kpi({
   isCurrency?: boolean;
 }) {
   const meta = TONES[tone];
+
+  const toneGradients = {
+    projects: "from-rose-50/60 to-white dark:from-rose-950/20 dark:to-deep-900",
+    quotes: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900",
+    payments: "from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-deep-900",
+    accounting: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
+  };
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-cream-50 px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:bg-deep-900 ${meta.border}`}
+      className={[
+        "group relative flex flex-col overflow-hidden rounded-2xl border text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md",
+        "bg-linear-to-br",
+        toneGradients[tone],
+        meta.border,
+        meta.borderHover,
+      ].join(" ")}
     >
       <span className={`absolute inset-y-0 left-0 w-1 ${meta.bar}`} aria-hidden />
-      <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
-        {label}
-      </span>
-      <div className="mt-2 text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
-        {loading ? (
-          <span className="inline-block h-7 w-16 animate-pulse rounded bg-cream-100 dark:bg-deep-800" />
-        ) : isCurrency ? (
-          `KES ${value.toLocaleString()}`
-        ) : (
-          value.toLocaleString()
+      
+      <div className="px-5 py-5">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+          {label}
+        </span>
+        <div className="mt-2 text-2xl font-bold tracking-tight text-deep-800 dark:text-cream-100">
+          {loading ? (
+            <span className="inline-block h-7 w-16 animate-pulse rounded bg-deep-100 dark:bg-deep-800" />
+          ) : isCurrency ? (
+            `KES ${value.toLocaleString()}`
+          ) : (
+            value.toLocaleString()
+          )}
+        </div>
+        {secondary && !loading && (
+          <span className="mt-1.5 block text-[10px] text-deep-500 dark:text-cream-500">
+            {secondary}
+          </span>
         )}
       </div>
-      {secondary && !loading && (
-        <span className="mt-1 text-[10px] text-deep-400 dark:text-cream-600">
-          {secondary}
-        </span>
-      )}
     </button>
   );
 }
@@ -714,10 +713,8 @@ function Row({
   };
   return (
     <div className="flex items-center justify-between">
-      <span className="text-xs text-deep-600 dark:text-cream-400">{label}</span>
-      <span
-        className={`font-mono text-sm ${colors[tone]} ${bold ? "font-bold" : ""}`}
-      >
+      <span className="text-xs font-medium text-deep-600 dark:text-cream-400">{label}</span>
+      <span className={`font-mono text-sm ${colors[tone]} ${bold ? "font-bold" : ""}`}>
         KES {value.toLocaleString()}
       </span>
     </div>
@@ -741,10 +738,10 @@ function PipelineRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition hover:bg-cream-100 dark:hover:bg-deep-800"
+      className="group flex w-full items-center justify-between rounded-lg px-2 py-2 text-left transition-colors hover:bg-cream-100 dark:hover:bg-deep-800"
     >
       <div>
-        <p className="text-sm font-medium text-deep-800 dark:text-cream-100">
+        <p className="text-sm font-medium text-deep-800 group-hover:text-deep-900 dark:text-cream-100">
           {label}
         </p>
         <p className="text-[10px] text-deep-500 dark:text-cream-500">{sub}</p>
@@ -778,18 +775,16 @@ function ActivityCard({
         <button
           type="button"
           onClick={onViewAll}
-          className="text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
+          className="group flex items-center gap-1 text-xs font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400"
         >
-          View all →
+          View all
+          <ChevronRight size={14} className="transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
       {loading ? (
         <div className="space-y-2 p-4">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-10 animate-pulse rounded bg-cream-100 dark:bg-deep-800"
-            />
+            <div key={i} className="h-10 animate-pulse rounded bg-cream-100 dark:bg-deep-800" />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -801,7 +796,7 @@ function ActivityCard({
           {items.map((item) => (
             <li
               key={item.id}
-              className="flex items-start gap-2 px-4 py-2.5 text-xs"
+              className="flex items-start gap-2 px-4 py-3 text-xs transition-colors hover:bg-cream-100/50 dark:hover:bg-deep-800/50"
             >
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium text-deep-800 dark:text-cream-100">
@@ -823,7 +818,6 @@ function ActivityCard({
 }
 
 // ─── Icons ────────────────────────────────────────────────────────
-
 const iconBase = {
   fill: "none",
   stroke: "currentColor",
