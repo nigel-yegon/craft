@@ -101,6 +101,10 @@ model MpesaTransaction {
   rawCallback        Json?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+  source        String    @default("invoice") // "invoice" | "subscription"
+  subscriptionPlan String? // "weekly" | "monthly" | "yearly"
+
+  @@index([source])
 
   @@index([invoiceId])
   @@index([status])
