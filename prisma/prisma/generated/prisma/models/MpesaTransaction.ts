@@ -51,6 +51,8 @@ export type MpesaTransactionMinAggregateOutputType = {
   resultDesc: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  source: string | null
+  subscriptionPlan: string | null
 }
 
 export type MpesaTransactionMaxAggregateOutputType = {
@@ -66,6 +68,8 @@ export type MpesaTransactionMaxAggregateOutputType = {
   resultDesc: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  source: string | null
+  subscriptionPlan: string | null
 }
 
 export type MpesaTransactionCountAggregateOutputType = {
@@ -82,6 +86,8 @@ export type MpesaTransactionCountAggregateOutputType = {
   rawCallback: number
   createdAt: number
   updatedAt: number
+  source: number
+  subscriptionPlan: number
   _all: number
 }
 
@@ -111,6 +117,8 @@ export type MpesaTransactionMinAggregateInputType = {
   resultDesc?: true
   createdAt?: true
   updatedAt?: true
+  source?: true
+  subscriptionPlan?: true
 }
 
 export type MpesaTransactionMaxAggregateInputType = {
@@ -126,6 +134,8 @@ export type MpesaTransactionMaxAggregateInputType = {
   resultDesc?: true
   createdAt?: true
   updatedAt?: true
+  source?: true
+  subscriptionPlan?: true
 }
 
 export type MpesaTransactionCountAggregateInputType = {
@@ -142,6 +152,8 @@ export type MpesaTransactionCountAggregateInputType = {
   rawCallback?: true
   createdAt?: true
   updatedAt?: true
+  source?: true
+  subscriptionPlan?: true
   _all?: true
 }
 
@@ -245,6 +257,8 @@ export type MpesaTransactionGroupByOutputType = {
   rawCallback: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
+  source: string
+  subscriptionPlan: string | null
   _count: MpesaTransactionCountAggregateOutputType | null
   _avg: MpesaTransactionAvgAggregateOutputType | null
   _sum: MpesaTransactionSumAggregateOutputType | null
@@ -284,6 +298,8 @@ export type MpesaTransactionWhereInput = {
   rawCallback?: Prisma.JsonNullableFilter<"MpesaTransaction">
   createdAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
+  source?: Prisma.StringFilter<"MpesaTransaction"> | string
+  subscriptionPlan?: Prisma.StringNullableFilter<"MpesaTransaction"> | string | null
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
 }
 
@@ -301,6 +317,8 @@ export type MpesaTransactionOrderByWithRelationInput = {
   rawCallback?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  subscriptionPlan?: Prisma.SortOrderInput | Prisma.SortOrder
   invoice?: Prisma.InvoiceOrderByWithRelationInput
 }
 
@@ -321,6 +339,8 @@ export type MpesaTransactionWhereUniqueInput = Prisma.AtLeast<{
   rawCallback?: Prisma.JsonNullableFilter<"MpesaTransaction">
   createdAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
+  source?: Prisma.StringFilter<"MpesaTransaction"> | string
+  subscriptionPlan?: Prisma.StringNullableFilter<"MpesaTransaction"> | string | null
   invoice?: Prisma.XOR<Prisma.InvoiceNullableScalarRelationFilter, Prisma.InvoiceWhereInput> | null
 }, "id" | "checkoutRequestId" | "mpesaReceiptNumber">
 
@@ -338,6 +358,8 @@ export type MpesaTransactionOrderByWithAggregationInput = {
   rawCallback?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  subscriptionPlan?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.MpesaTransactionCountOrderByAggregateInput
   _avg?: Prisma.MpesaTransactionAvgOrderByAggregateInput
   _max?: Prisma.MpesaTransactionMaxOrderByAggregateInput
@@ -362,6 +384,8 @@ export type MpesaTransactionScalarWhereWithAggregatesInput = {
   rawCallback?: Prisma.JsonNullableWithAggregatesFilter<"MpesaTransaction">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MpesaTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MpesaTransaction"> | Date | string
+  source?: Prisma.StringWithAggregatesFilter<"MpesaTransaction"> | string
+  subscriptionPlan?: Prisma.StringNullableWithAggregatesFilter<"MpesaTransaction"> | string | null
 }
 
 export type MpesaTransactionCreateInput = {
@@ -376,6 +400,8 @@ export type MpesaTransactionCreateInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
   invoice?: Prisma.InvoiceCreateNestedOneWithoutTransactionsInput
 }
 
@@ -393,6 +419,8 @@ export type MpesaTransactionUncheckedCreateInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
 }
 
 export type MpesaTransactionUpdateInput = {
@@ -407,6 +435,8 @@ export type MpesaTransactionUpdateInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   invoice?: Prisma.InvoiceUpdateOneWithoutTransactionsNestedInput
 }
 
@@ -424,6 +454,8 @@ export type MpesaTransactionUncheckedUpdateInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MpesaTransactionCreateManyInput = {
@@ -440,6 +472,8 @@ export type MpesaTransactionCreateManyInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
 }
 
 export type MpesaTransactionUpdateManyMutationInput = {
@@ -454,6 +488,8 @@ export type MpesaTransactionUpdateManyMutationInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MpesaTransactionUncheckedUpdateManyInput = {
@@ -470,6 +506,8 @@ export type MpesaTransactionUncheckedUpdateManyInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MpesaTransactionListRelationFilter = {
@@ -496,6 +534,8 @@ export type MpesaTransactionCountOrderByAggregateInput = {
   rawCallback?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  subscriptionPlan?: Prisma.SortOrder
 }
 
 export type MpesaTransactionAvgOrderByAggregateInput = {
@@ -517,6 +557,8 @@ export type MpesaTransactionMaxOrderByAggregateInput = {
   resultDesc?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  subscriptionPlan?: Prisma.SortOrder
 }
 
 export type MpesaTransactionMinOrderByAggregateInput = {
@@ -532,6 +574,8 @@ export type MpesaTransactionMinOrderByAggregateInput = {
   resultDesc?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  source?: Prisma.SortOrder
+  subscriptionPlan?: Prisma.SortOrder
 }
 
 export type MpesaTransactionSumOrderByAggregateInput = {
@@ -594,6 +638,8 @@ export type MpesaTransactionCreateWithoutInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
 }
 
 export type MpesaTransactionUncheckedCreateWithoutInvoiceInput = {
@@ -609,6 +655,8 @@ export type MpesaTransactionUncheckedCreateWithoutInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
 }
 
 export type MpesaTransactionCreateOrConnectWithoutInvoiceInput = {
@@ -654,6 +702,8 @@ export type MpesaTransactionScalarWhereInput = {
   rawCallback?: Prisma.JsonNullableFilter<"MpesaTransaction">
   createdAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MpesaTransaction"> | Date | string
+  source?: Prisma.StringFilter<"MpesaTransaction"> | string
+  subscriptionPlan?: Prisma.StringNullableFilter<"MpesaTransaction"> | string | null
 }
 
 export type MpesaTransactionCreateManyInvoiceInput = {
@@ -669,6 +719,8 @@ export type MpesaTransactionCreateManyInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  source?: string
+  subscriptionPlan?: string | null
 }
 
 export type MpesaTransactionUpdateWithoutInvoiceInput = {
@@ -683,6 +735,8 @@ export type MpesaTransactionUpdateWithoutInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MpesaTransactionUncheckedUpdateWithoutInvoiceInput = {
@@ -698,6 +752,8 @@ export type MpesaTransactionUncheckedUpdateWithoutInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type MpesaTransactionUncheckedUpdateManyWithoutInvoiceInput = {
@@ -713,6 +769,8 @@ export type MpesaTransactionUncheckedUpdateManyWithoutInvoiceInput = {
   rawCallback?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  source?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionPlan?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -731,6 +789,8 @@ export type MpesaTransactionSelect<ExtArgs extends runtime.Types.Extensions.Inte
   rawCallback?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  source?: boolean
+  subscriptionPlan?: boolean
   invoice?: boolean | Prisma.MpesaTransaction$invoiceArgs<ExtArgs>
 }, ExtArgs["result"]["mpesaTransaction"]>
 
@@ -748,6 +808,8 @@ export type MpesaTransactionSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   rawCallback?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  source?: boolean
+  subscriptionPlan?: boolean
   invoice?: boolean | Prisma.MpesaTransaction$invoiceArgs<ExtArgs>
 }, ExtArgs["result"]["mpesaTransaction"]>
 
@@ -765,6 +827,8 @@ export type MpesaTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   rawCallback?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  source?: boolean
+  subscriptionPlan?: boolean
   invoice?: boolean | Prisma.MpesaTransaction$invoiceArgs<ExtArgs>
 }, ExtArgs["result"]["mpesaTransaction"]>
 
@@ -782,9 +846,11 @@ export type MpesaTransactionSelectScalar = {
   rawCallback?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  source?: boolean
+  subscriptionPlan?: boolean
 }
 
-export type MpesaTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "merchantRequestId" | "checkoutRequestId" | "mpesaReceiptNumber" | "phoneNumber" | "amount" | "status" | "resultCode" | "resultDesc" | "rawCallback" | "createdAt" | "updatedAt", ExtArgs["result"]["mpesaTransaction"]>
+export type MpesaTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invoiceId" | "merchantRequestId" | "checkoutRequestId" | "mpesaReceiptNumber" | "phoneNumber" | "amount" | "status" | "resultCode" | "resultDesc" | "rawCallback" | "createdAt" | "updatedAt" | "source" | "subscriptionPlan", ExtArgs["result"]["mpesaTransaction"]>
 export type MpesaTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invoice?: boolean | Prisma.MpesaTransaction$invoiceArgs<ExtArgs>
 }
@@ -814,6 +880,8 @@ export type $MpesaTransactionPayload<ExtArgs extends runtime.Types.Extensions.In
     rawCallback: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
+    source: string
+    subscriptionPlan: string | null
   }, ExtArgs["result"]["mpesaTransaction"]>
   composites: {}
 }
@@ -1251,6 +1319,8 @@ export interface MpesaTransactionFieldRefs {
   readonly rawCallback: Prisma.FieldRef<"MpesaTransaction", 'Json'>
   readonly createdAt: Prisma.FieldRef<"MpesaTransaction", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MpesaTransaction", 'DateTime'>
+  readonly source: Prisma.FieldRef<"MpesaTransaction", 'String'>
+  readonly subscriptionPlan: Prisma.FieldRef<"MpesaTransaction", 'String'>
 }
     
 

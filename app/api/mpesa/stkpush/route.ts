@@ -9,6 +9,13 @@ const PASSKEY = process.env.MPESA_PASSKEY!;
 const SHORTCODE = process.env.MPESA_SHORTCODE!;
 const CALLBACK_URL = process.env.MPESA_CALLBACK_URL!;
 
+// ─── CORS Headers ───────────────────────────────────────────────────
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*", // Update to your exact domain in production
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 const bodySchema = z.object({
   phone: z.string().regex(/^254(7|1)\d{8}$/, "Phone must be 2547XXXXXXXX"),
   amount: z.number().int().positive(),
@@ -32,6 +39,15 @@ function eatTimestamp(): string {
   return `${now.getUTCFullYear()}${p(now.getUTCMonth() + 1)}${p(now.getUTCDate())}${p(now.getUTCHours())}${p(now.getUTCMinutes())}${p(now.getUTCSeconds())}`;
 }
 
+// ─── Handle CORS Preflight ──────────────────────────────────────────
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
+// ─── Main POST Handler ──────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -39,7 +55,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid body", issues: parsed.error.issues },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -77,7 +93,7 @@ export async function POST(req: NextRequest) {
     if (!darajaRes.ok || !data.CheckoutRequestID) {
       return NextResponse.json(
         { error: "STK Push rejected", detail: data },
-        { status: 502 }
+        { status: 502, headers: corsHeaders }
       );
     }
 
@@ -88,21 +104,23 @@ export async function POST(req: NextRequest) {
         phoneNumber: phone,
         amount,
         status: "PENDING",
-        // If you added source/subscriptionPlan columns:
-        // source: "subscription",
-        // subscriptionPlan: plan,
+        source: "subscription",       // ─── Uncommented
+        subscriptionPlan: plan,       // ─── Uncommented
       },
     });
 
-    return NextResponse.json({
-      checkoutRequestId: data.CheckoutRequestID,
-      customerMessage: data.CustomerMessage,
-    });
+    return NextResponse.json(
+      {
+        checkoutRequestId: data.CheckoutRequestID,
+        customerMessage: data.CustomerMessage,
+      },
+      { headers: corsHeaders }
+    );
   } catch (err) {
     console.error("STK Push error:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "STK Push failed" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

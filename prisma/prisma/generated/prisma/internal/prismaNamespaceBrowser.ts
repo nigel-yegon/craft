@@ -164,7 +164,9 @@ export const MpesaTransactionScalarFieldEnum = {
   resultDesc: 'resultDesc',
   rawCallback: 'rawCallback',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  source: 'source',
+  subscriptionPlan: 'subscriptionPlan'
 } as const
 
 export type MpesaTransactionScalarFieldEnum = (typeof MpesaTransactionScalarFieldEnum)[keyof typeof MpesaTransactionScalarFieldEnum]
