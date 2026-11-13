@@ -4,12 +4,12 @@ import { prisma } from "@/lib/prisma";
 
 export const maxDuration = 60;
 
-// Safely load and trim environment variables to prevent hidden spaces/newlines
 const MPESA_BASE_URL = "https://api.safaricom.co.ke";
 const CONSUMER_KEY = (process.env.MPESA_CONSUMER_KEY || "").trim();
 const CONSUMER_SECRET = (process.env.MPESA_CONSUMER_SECRET || "").trim();
 const PASSKEY = (process.env.MPESA_PASSKEY || "").trim();
-const SHORTCODE = (process.env.MPESA_SHORTCODE || "").trim();
+const SHORTCODE = (process.env.MPESA_SHORTCODE || "").trim(); // Paybill: 7098820
+const TILL_NUMBER = (process.env.MPESA_TILL_NUMBER || "").trim(); // Till: 9090113
 const CALLBACK_URL = (process.env.MPESA_CALLBACK_URL || "").trim();
 
 const corsHeaders = {
@@ -66,7 +66,6 @@ export async function POST(req: NextRequest) {
 
     const { phone, amount, plan } = parsed.data;
     
-    // 1. Get OAuth Token
     let token: string;
     try {
       token = await getToken();
@@ -78,11 +77,28 @@ export async function POST(req: NextRequest) {
     }
 
     const timestamp = eatTimestamp();
+    // Password is generated using the Paybill (SHORTCODE) and PASSKEY
     const password = Buffer.from(`${SHORTCODE}${PASSKEY}${timestamp}`).toString("base64");
 
-    // 2. Initiate STK Push with a manual timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+    // The exact payload Safaricom expects for a Paybill linked to a Till
+    const payload = {
+      BusinessShortCode: SHORTCODE,       // Paybill (7098820)
+      Password: password,
+      Timestamp: timestamp,
+      TransactionType: "CustomerPayBillOnline", 
+      Amount: amount,
+      PartyA: phone,
+      PartyB: TILL_NUMBER,                // Till (9090113) - THIS IS THE FIX
+      PhoneNumber: phone,
+      CallBackURL: CALLBACK_URL,
+      AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
+      TransactionDesc: `${plan} plan`.slice(0, 13),
+    };
+
+    console.log("Sending STK Push Payload:", payload);
 
     let darajaRes;
     try {
@@ -94,19 +110,7 @@ export async function POST(req: NextRequest) {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            BusinessShortCode: SHORTCODE,
-            Password: password,
-            Timestamp: timestamp,
-            TransactionType: "CustomerBuyGoodsOnline",
-            Amount: amount,
-            PartyA: phone,
-            PartyB: SHORTCODE,
-            PhoneNumber: phone,
-            CallBackURL: CALLBACK_URL,
-            AccountReference: `SUB-${plan.toUpperCase()}`.slice(0, 12),
-            TransactionDesc: `${plan} plan`.slice(0, 13),
-          }),
+          body: JSON.stringify(payload),
           signal: controller.signal,
         }
       );
@@ -132,7 +136,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Save to DB
     try {
       await prisma.mpesaTransaction.create({
         data: {
@@ -147,7 +150,6 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbError) {
       console.error("Database save failed:", dbError);
-      // We deliberately do not fail the request here. The STK push was sent.
     }
 
     return NextResponse.json(
