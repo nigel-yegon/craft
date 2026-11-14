@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -13,13 +11,7 @@ const corsHeaders = {
 
 const bodySchema = z.object({
   businessId: z.string().min(1),
-  type: z.enum([
-    "subscription",
-    "code",
-    "alert",
-    "backup",
-    "system",
-  ]),
+  type: z.enum(["subscription", "code", "alert", "backup", "system"]),
   title: z.string().min(1).max(120),
   body: z.string().max(2000).optional().default(""),
   actionRoute: z.string().max(200).nullable().optional(),
@@ -33,13 +25,6 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     // TODO: add admin auth (getServerSession / bearer token / etc.)
-    // const session = await getServerSession();
-    // if (!session?.user?.isAdmin) {
-    //   return NextResponse.json(
-    //     { error: "Unauthorized" },
-    //     { status: 401, headers: corsHeaders },
-    //   );
-    // }
 
     const body = await req.json();
     const parsed = bodySchema.safeParse(body);
