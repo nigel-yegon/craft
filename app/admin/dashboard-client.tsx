@@ -18,9 +18,16 @@ import { TransactionPanel } from "./transactions/transaction-panel";
 import { QuotesPanel } from "./quotes/quotes-panel";
 import { ProjectsPanel } from "./projects/projects-panel";
 import { AccountingPanel } from "./accounting/accounting-panel";
+import { NotificationsPanel } from "./notifications/notifications-panel"; // ⭐ NEW
 
 // ─── Types ────────────────────────────────────────────────────────
-type ModuleKey = "overview" | "quotes" | "payments" | "projects" | "accounting";
+type ModuleKey =
+  | "overview"
+  | "quotes"
+  | "payments"
+  | "projects"
+  | "accounting"
+  | "notifications"; // ⭐ NEW
 
 type ModuleTone = {
   ring: string;
@@ -111,6 +118,22 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillText: "text-violet-800 dark:text-violet-200",
     icon: <CalculatorIcon />,
   },
+  // ⭐ NEW tone for Notifications — violet family to match the
+  //    Flutter screen's type badge for subscription notifications
+  notifications: {
+    ring: "ring-violet-500/20",
+    border: "border-violet-200/60 dark:border-violet-800/60",
+    borderHover: "hover:border-violet-400 dark:hover:border-violet-600",
+    bgSoft: "bg-violet-50 dark:bg-violet-950/40",
+    bgActive: "bg-violet-100 dark:bg-violet-950/70",
+    text: "text-violet-700 dark:text-violet-300",
+    button: "bg-violet-700",
+    buttonHover: "hover:bg-violet-800",
+    bar: "bg-violet-500",
+    pillBg: "bg-violet-100 dark:bg-violet-950",
+    pillText: "text-violet-800 dark:text-violet-200",
+    icon: <BellIcon />,
+  },
 };
 
 const MODULE_GROUPS: ModuleGroup[] = [
@@ -135,6 +158,8 @@ const MODULE_GROUPS: ModuleGroup[] = [
       { key: "quotes", label: "Quotes", description: "Requests → quotes", icon: TONES.quotes.icon, tone: TONES.quotes },
       { key: "payments", label: "Payments", description: "Invoices & M-Pesa", icon: TONES.payments.icon, tone: TONES.payments },
       { key: "accounting", label: "Accounting", description: "Revenue, expenses, reports", icon: TONES.accounting.icon, tone: TONES.accounting },
+      // ⭐ NEW — Communications in Operations
+      { key: "notifications", label: "Notifications", description: "Announcements & alerts", icon: TONES.notifications.icon, tone: TONES.notifications },
     ],
   },
 ];
@@ -168,6 +193,7 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "payments" && <PaymentsModule search={search} />}
               {activeModule === "projects" && <ProjectsPanel search={search} />}
               {activeModule === "accounting" && <AccountingPanel />}
+              {activeModule === "notifications" && <NotificationsPanel search={search} />}
             </div>
           </div>
         </main>
@@ -410,9 +436,16 @@ function DashboardHeader({
     payments: "Payments",
     projects: "Portfolio",
     accounting: "Accounting",
+    notifications: "Notifications", // ⭐ NEW
   };
 
-  const searchable = activeModule !== "overview" && activeModule !== "accounting";
+  // Notifications uses its own in-panel search input (matches the panel's
+  // filter logic on businessId/title/type) — hide the global header search
+  // for that module, same as accounting.
+  const searchable =
+    activeModule !== "overview" &&
+    activeModule !== "accounting" &&
+    activeModule !== "notifications"; // ⭐ NEW
 
   return (
     <header
@@ -656,6 +689,7 @@ function Kpi({
     quotes: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900",
     payments: "from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-deep-900",
     accounting: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
+    notifications: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
   };
 
   return (
@@ -671,7 +705,6 @@ function Kpi({
       ].join(" ")}
     >
       <span className={`absolute inset-y-0 left-0 w-1 ${meta.bar}`} aria-hidden />
-      
       <div className="px-5 py-5">
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
           {label}
@@ -866,6 +899,15 @@ function CalculatorIcon() {
       <path d="M8 10h2M12 10h2M16 10h2" />
       <path d="M8 14h2M12 14h2M16 14h2" />
       <path d="M8 18h2M12 18h2M16 18h2" />
+    </svg>
+  );
+}
+// ⭐ NEW — Notifications bell icon for the sidebar
+function BellIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
   );
 }
