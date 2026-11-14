@@ -3,8 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -15,6 +13,16 @@ const querySchema = z.object({
   businessId: z.string().min(1, "businessId is required"),
   since: z.string().datetime().optional(),
 });
+
+type NotificationRow = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  actionRoute: string | null;
+  payload: unknown;
+  publishedAt: Date;
+};
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: corsHeaders });
@@ -56,7 +64,7 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(
-      rows.map((r) => ({
+      (rows as NotificationRow[]).map((r: NotificationRow) => ({
         id: r.id,
         type: r.type,
         title: r.title,
