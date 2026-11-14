@@ -277,3 +277,17 @@ model Expense {
   @@index([projectId])
   @@index([incurredAt])
 }
+
+model Notification {
+  id          String   @id @default(uuid())
+  businessId  String
+  type        String
+  title       String
+  body        String   @default("")
+  actionRoute String?
+  payload     Json?
+  publishedAt DateTime @default(now())
+
+  @@index([businessId, publishedAt])
+  @@map("notifications")
+}

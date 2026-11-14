@@ -62,7 +62,8 @@ export const ModelName = {
   QuoteRequestItem: 'QuoteRequestItem',
   Quote: 'Quote',
   Project: 'Project',
-  Expense: 'Expense'
+  Expense: 'Expense',
+  Notification: 'Notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -285,6 +286,20 @@ export const ExpenseScalarFieldEnum = {
 } as const
 
 export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  businessId: 'businessId',
+  type: 'type',
+  title: 'title',
+  body: 'body',
+  actionRoute: 'actionRoute',
+  payload: 'payload',
+  publishedAt: 'publishedAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const SortOrder = {

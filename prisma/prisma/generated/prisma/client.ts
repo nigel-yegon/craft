@@ -101,3 +101,8 @@ export type Project = Prisma.ProjectModel
  * 
  */
 export type Expense = Prisma.ExpenseModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
