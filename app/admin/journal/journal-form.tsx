@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { JOURNAL_CATEGORIES } from "../actions/journal";
+import { JOURNAL_CATEGORIES } from "../actions/journal-constants";
 import type { JournalRow, JournalInput } from "../actions/journal";
 
 const inputClass =

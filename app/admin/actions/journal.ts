@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { JOURNAL_CATEGORIES, type JournalCategory } from "./journal-constants";
 
 export type JournalRow = {
   id: number;
@@ -21,8 +22,6 @@ export type JournalRow = {
   published: boolean;
   publishedAt: string | null;
 };
-
-const JOURNAL_CATEGORIES = ["STUDIO", "PROCESS", "TECH", "CASE_STUDY", "CULTURE", "ANNOUNCEMENT"] as const;
 
 const journalInputSchema = z.object({
   slug: z.string().min(1).max(120).regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
