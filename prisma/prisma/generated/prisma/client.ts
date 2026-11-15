@@ -111,3 +111,13 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type StoreItem = Prisma.StoreItemModel
+/**
+ * Model TeamMember
+ * 
+ */
+export type TeamMember = Prisma.TeamMemberModel
+/**
+ * Model JournalPost
+ * 
+ */
+export type JournalPost = Prisma.JournalPostModel

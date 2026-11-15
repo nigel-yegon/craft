@@ -410,7 +410,9 @@ export const ModelName = {
   Project: 'Project',
   Expense: 'Expense',
   Notification: 'Notification',
-  StoreItem: 'StoreItem'
+  StoreItem: 'StoreItem',
+  TeamMember: 'TeamMember',
+  JournalPost: 'JournalPost'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -426,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction" | "offering" | "quoteRequest" | "quoteRequestItem" | "quote" | "project" | "expense" | "notification" | "storeItem"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction" | "offering" | "quoteRequest" | "quoteRequestItem" | "quote" | "project" | "expense" | "notification" | "storeItem" | "teamMember" | "journalPost"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1466,6 +1468,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    TeamMember: {
+      payload: Prisma.$TeamMemberPayload<ExtArgs>
+      fields: Prisma.TeamMemberFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TeamMemberFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TeamMemberFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        findFirst: {
+          args: Prisma.TeamMemberFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TeamMemberFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        findMany: {
+          args: Prisma.TeamMemberFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>[]
+        }
+        create: {
+          args: Prisma.TeamMemberCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        createMany: {
+          args: Prisma.TeamMemberCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TeamMemberCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>[]
+        }
+        delete: {
+          args: Prisma.TeamMemberDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        update: {
+          args: Prisma.TeamMemberUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        deleteMany: {
+          args: Prisma.TeamMemberDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TeamMemberUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TeamMemberUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>[]
+        }
+        upsert: {
+          args: Prisma.TeamMemberUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TeamMemberPayload>
+        }
+        aggregate: {
+          args: Prisma.TeamMemberAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTeamMember>
+        }
+        groupBy: {
+          args: Prisma.TeamMemberGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamMemberGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TeamMemberCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TeamMemberCountAggregateOutputType> | number
+        }
+      }
+    }
+    JournalPost: {
+      payload: Prisma.$JournalPostPayload<ExtArgs>
+      fields: Prisma.JournalPostFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.JournalPostFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.JournalPostFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        findFirst: {
+          args: Prisma.JournalPostFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.JournalPostFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        findMany: {
+          args: Prisma.JournalPostFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>[]
+        }
+        create: {
+          args: Prisma.JournalPostCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        createMany: {
+          args: Prisma.JournalPostCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.JournalPostCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>[]
+        }
+        delete: {
+          args: Prisma.JournalPostDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        update: {
+          args: Prisma.JournalPostUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        deleteMany: {
+          args: Prisma.JournalPostDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.JournalPostUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.JournalPostUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>[]
+        }
+        upsert: {
+          args: Prisma.JournalPostUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$JournalPostPayload>
+        }
+        aggregate: {
+          args: Prisma.JournalPostAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateJournalPost>
+        }
+        groupBy: {
+          args: Prisma.JournalPostGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JournalPostGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.JournalPostCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.JournalPostCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1745,6 +1895,58 @@ export const StoreItemScalarFieldEnum = {
 } as const
 
 export type StoreItemScalarFieldEnum = (typeof StoreItemScalarFieldEnum)[keyof typeof StoreItemScalarFieldEnum]
+
+
+export const TeamMemberScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  role: 'role',
+  bio: 'bio',
+  shortBio: 'shortBio',
+  photoUrl: 'photoUrl',
+  email: 'email',
+  phone: 'phone',
+  expertise: 'expertise',
+  disciplines: 'disciplines',
+  linkedinUrl: 'linkedinUrl',
+  githubUrl: 'githubUrl',
+  twitterUrl: 'twitterUrl',
+  websiteUrl: 'websiteUrl',
+  joinedAt: 'joinedAt',
+  location: 'location',
+  yearsExperience: 'yearsExperience',
+  sortOrder: 'sortOrder',
+  featured: 'featured',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamMemberScalarFieldEnum = (typeof TeamMemberScalarFieldEnum)[keyof typeof TeamMemberScalarFieldEnum]
+
+
+export const JournalPostScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  subtitle: 'subtitle',
+  excerpt: 'excerpt',
+  content: 'content',
+  coverImageUrl: 'coverImageUrl',
+  galleryUrls: 'galleryUrls',
+  category: 'category',
+  tags: 'tags',
+  authorId: 'authorId',
+  readTimeMinutes: 'readTimeMinutes',
+  featured: 'featured',
+  published: 'published',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JournalPostScalarFieldEnum = (typeof JournalPostScalarFieldEnum)[keyof typeof JournalPostScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2042,6 +2244,8 @@ export type GlobalOmitConfig = {
   expense?: Prisma.ExpenseOmit
   notification?: Prisma.NotificationOmit
   storeItem?: Prisma.StoreItemOmit
+  teamMember?: Prisma.TeamMemberOmit
+  journalPost?: Prisma.JournalPostOmit
 }
 
 /* Types for Logging */

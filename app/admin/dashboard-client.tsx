@@ -19,7 +19,9 @@ import { QuotesPanel } from "./quotes/quotes-panel";
 import { ProjectsPanel } from "./projects/projects-panel";
 import { AccountingPanel } from "./accounting/accounting-panel";
 import { NotificationsPanel } from "./notifications/notifications-panel";
-import { OfferingsPanel } from "./offerings/offerings-panel"; // ⭐ Storefront
+import { OfferingsPanel } from "./offerings/offerings-panel";
+import { TeamPanel } from "./team/team-panel";
+import { JournalPanel } from "./journal/journal-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ModuleKey =
@@ -29,7 +31,9 @@ type ModuleKey =
   | "projects"
   | "accounting"
   | "notifications"
-  | "offerings"; // ⭐ Storefront
+  | "offerings"
+  | "team"
+  | "journal";
 
 type ModuleTone = {
   ring: string;
@@ -134,7 +138,6 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillText: "text-violet-800 dark:text-violet-200",
     icon: <BellIcon />,
   },
-  // ⭐ Storefront tone — uses the brand palette (matches quotes)
   offerings: {
     ring: "ring-brand-500/20",
     border: "border-brand-200/60 dark:border-brand-800/60",
@@ -148,6 +151,34 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillBg: "bg-brand-100 dark:bg-brand-950",
     pillText: "text-brand-800 dark:text-brand-200",
     icon: <StorefrontIcon />,
+  },
+  team: {
+    ring: "ring-rose-500/20",
+    border: "border-rose-200/60 dark:border-rose-800/60",
+    borderHover: "hover:border-rose-400 dark:hover:border-rose-600",
+    bgSoft: "bg-rose-50 dark:bg-rose-950/40",
+    bgActive: "bg-rose-100 dark:bg-rose-950/70",
+    text: "text-rose-700 dark:text-rose-300",
+    button: "bg-rose-700",
+    buttonHover: "hover:bg-rose-800",
+    bar: "bg-rose-500",
+    pillBg: "bg-rose-100 dark:bg-rose-950",
+    pillText: "text-rose-800 dark:text-rose-200",
+    icon: <UsersIcon />,
+  },
+  journal: {
+    ring: "ring-sky-500/20",
+    border: "border-sky-200/60 dark:border-sky-800/60",
+    borderHover: "hover:border-sky-400 dark:hover:border-sky-600",
+    bgSoft: "bg-sky-50 dark:bg-sky-950/40",
+    bgActive: "bg-sky-100 dark:bg-sky-950/70",
+    text: "text-sky-700 dark:text-sky-300",
+    button: "bg-sky-600",
+    buttonHover: "hover:bg-sky-700",
+    bar: "bg-sky-500",
+    pillBg: "bg-sky-100 dark:bg-sky-950",
+    pillText: "text-sky-800 dark:text-sky-200",
+    icon: <BookIcon />,
   },
 };
 
@@ -164,8 +195,9 @@ const MODULE_GROUPS: ModuleGroup[] = [
     label: "Content",
     modules: [
       { key: "projects", label: "Portfolio", description: "Projects & case studies", icon: TONES.projects.icon, tone: TONES.projects },
-      // ⭐ Storefront lives under Content — manages the /store catalogue
       { key: "offerings", label: "Storefront", description: "Public catalogue & offerings", icon: TONES.offerings.icon, tone: TONES.offerings },
+      { key: "team", label: "Team", description: "Team profiles", icon: TONES.team.icon, tone: TONES.team },
+      { key: "journal", label: "Journal", description: "Blog posts", icon: TONES.journal.icon, tone: TONES.journal },
     ],
   },
   {
@@ -210,7 +242,9 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "projects" && <ProjectsPanel search={search} />}
               {activeModule === "accounting" && <AccountingPanel />}
               {activeModule === "notifications" && <NotificationsPanel search={search} />}
-              {activeModule === "offerings" && <OfferingsPanel search={search} />} {/* ⭐ Storefront */}
+              {activeModule === "offerings" && <OfferingsPanel search={search} />}
+              {activeModule === "team" && <TeamPanel search={search} />}
+              {activeModule === "journal" && <JournalPanel search={search} />}
             </div>
           </div>
         </main>
@@ -454,15 +488,19 @@ function DashboardHeader({
     projects: "Portfolio",
     accounting: "Accounting",
     notifications: "Notifications",
-    offerings: "Storefront", // ⭐
+    offerings: "Storefront",
+    team: "Team",       // ⭐
+    journal: "Journal", // ⭐
   };
 
-  // Storefront manages its own filters. Hide global search.
+  // Team & Journal manage their own filters. Hide global search.
   const searchable =
     activeModule !== "overview" &&
     activeModule !== "accounting" &&
     activeModule !== "notifications" &&
-    activeModule !== "offerings"; // ⭐
+    activeModule !== "offerings" &&
+    activeModule !== "team" &&    // ⭐
+    activeModule !== "journal";   // ⭐
 
   return (
     <header
@@ -604,7 +642,6 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
           )}
         </div>
 
-        {/* Pipeline breakdown */}
         <div className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
           <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
             Pipeline
@@ -650,7 +687,6 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         </div>
       </section>
 
-      {/* Recent activity */}
       <section className="grid gap-4 md:grid-cols-2">
         <ActivityCard
           title="Recent projects"
@@ -707,7 +743,9 @@ function Kpi({
     payments: "from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-deep-900",
     accounting: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
     notifications: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
-    offerings: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900", // ⭐
+    offerings: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900",
+    team: "from-rose-50/60 to-white dark:from-rose-950/20 dark:to-deep-900",       // ⭐
+    journal: "from-sky-50/60 to-white dark:from-sky-950/20 dark:to-deep-900",      // ⭐
   };
 
   return (
@@ -928,13 +966,31 @@ function BellIcon() {
     </svg>
   );
 }
-// ⭐ NEW — Storefront icon (package/shop icon)
 function StorefrontIcon() {
   return (
     <svg {...iconBase}>
       <path d="M3 9h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
       <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
       <path d="M8 13h8" />
+    </svg>
+  );
+}
+// ⭐ NEW — Team icon
+function UsersIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+// ⭐ NEW — Journal icon
+function BookIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
     </svg>
   );
 }

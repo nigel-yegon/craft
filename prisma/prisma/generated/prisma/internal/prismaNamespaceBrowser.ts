@@ -64,7 +64,9 @@ export const ModelName = {
   Project: 'Project',
   Expense: 'Expense',
   Notification: 'Notification',
-  StoreItem: 'StoreItem'
+  StoreItem: 'StoreItem',
+  TeamMember: 'TeamMember',
+  JournalPost: 'JournalPost'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -323,6 +325,58 @@ export const StoreItemScalarFieldEnum = {
 } as const
 
 export type StoreItemScalarFieldEnum = (typeof StoreItemScalarFieldEnum)[keyof typeof StoreItemScalarFieldEnum]
+
+
+export const TeamMemberScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  role: 'role',
+  bio: 'bio',
+  shortBio: 'shortBio',
+  photoUrl: 'photoUrl',
+  email: 'email',
+  phone: 'phone',
+  expertise: 'expertise',
+  disciplines: 'disciplines',
+  linkedinUrl: 'linkedinUrl',
+  githubUrl: 'githubUrl',
+  twitterUrl: 'twitterUrl',
+  websiteUrl: 'websiteUrl',
+  joinedAt: 'joinedAt',
+  location: 'location',
+  yearsExperience: 'yearsExperience',
+  sortOrder: 'sortOrder',
+  featured: 'featured',
+  published: 'published',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TeamMemberScalarFieldEnum = (typeof TeamMemberScalarFieldEnum)[keyof typeof TeamMemberScalarFieldEnum]
+
+
+export const JournalPostScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  subtitle: 'subtitle',
+  excerpt: 'excerpt',
+  content: 'content',
+  coverImageUrl: 'coverImageUrl',
+  galleryUrls: 'galleryUrls',
+  category: 'category',
+  tags: 'tags',
+  authorId: 'authorId',
+  readTimeMinutes: 'readTimeMinutes',
+  featured: 'featured',
+  published: 'published',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JournalPostScalarFieldEnum = (typeof JournalPostScalarFieldEnum)[keyof typeof JournalPostScalarFieldEnum]
 
 
 export const SortOrder = {
