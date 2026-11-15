@@ -130,4 +130,3 @@ export async function toggleJournalFeatured(id: number, featured: boolean): Prom
   return toRow(row);
 }
 
-export { JOURNAL_CATEGORIES };
