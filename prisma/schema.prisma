@@ -291,3 +291,39 @@ model Notification {
   @@index([businessId, publishedAt])
   @@map("notifications")
 }
+// ─── POS Store Items ──────────────────────────────────────────────
+// Items managed by admin, synced down to Flutter POS apps.
+// Linked to a shop by `businessId` (matches the Flutter SQLite DB's business).
+
+model StoreItem {
+  id                     Int      @id @default(autoincrement())
+  businessId             String
+
+  name                   String
+  description            String?
+  sku                    String?
+  barcode                String?
+  categoryName           String?
+
+  // Prices in KES cents (minor units) — matches Flutter's minor-unit model
+  sellingPriceMinor      Int
+  costPriceMinor         Int?
+
+  // Stock in milli-units — 1000 = 1 unit (matches Flutter's quantityMilli)
+  stockMilli             Int      @default(0)
+  lowStockThresholdMilli Int      @default(5000)  // 5 units
+
+  imageUrl               String?
+  isActive               Boolean  @default(true)
+
+  // "admin" = created from the panel, "phone" = created on the Flutter app
+  source                 String   @default("admin")
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([businessId, sku])
+  @@index([businessId])
+  @@index([businessId, isActive])
+  @@index([businessId, updatedAt])  // for delta sync
+}

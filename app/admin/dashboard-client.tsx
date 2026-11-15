@@ -18,7 +18,8 @@ import { TransactionPanel } from "./transactions/transaction-panel";
 import { QuotesPanel } from "./quotes/quotes-panel";
 import { ProjectsPanel } from "./projects/projects-panel";
 import { AccountingPanel } from "./accounting/accounting-panel";
-import { NotificationsPanel } from "./notifications/notifications-panel"; // ⭐ NEW
+import { NotificationsPanel } from "./notifications/notifications-panel";
+import { OfferingsPanel } from "./offerings/offerings-panel"; // ⭐ Storefront
 
 // ─── Types ────────────────────────────────────────────────────────
 type ModuleKey =
@@ -27,7 +28,8 @@ type ModuleKey =
   | "payments"
   | "projects"
   | "accounting"
-  | "notifications"; // ⭐ NEW
+  | "notifications"
+  | "offerings"; // ⭐ Storefront
 
 type ModuleTone = {
   ring: string;
@@ -118,8 +120,6 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillText: "text-violet-800 dark:text-violet-200",
     icon: <CalculatorIcon />,
   },
-  // ⭐ NEW tone for Notifications — violet family to match the
-  //    Flutter screen's type badge for subscription notifications
   notifications: {
     ring: "ring-violet-500/20",
     border: "border-violet-200/60 dark:border-violet-800/60",
@@ -133,6 +133,21 @@ const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
     pillBg: "bg-violet-100 dark:bg-violet-950",
     pillText: "text-violet-800 dark:text-violet-200",
     icon: <BellIcon />,
+  },
+  // ⭐ Storefront tone — uses the brand palette (matches quotes)
+  offerings: {
+    ring: "ring-brand-500/20",
+    border: "border-brand-200/60 dark:border-brand-800/60",
+    borderHover: "hover:border-brand-400 dark:hover:border-brand-600",
+    bgSoft: "bg-brand-50 dark:bg-brand-950/40",
+    bgActive: "bg-brand-100 dark:bg-brand-950/70",
+    text: "text-brand-700 dark:text-brand-300",
+    button: "bg-brand-600",
+    buttonHover: "hover:bg-brand-700",
+    bar: "bg-brand-500",
+    pillBg: "bg-brand-100 dark:bg-brand-950",
+    pillText: "text-brand-800 dark:text-brand-200",
+    icon: <StorefrontIcon />,
   },
 };
 
@@ -149,6 +164,8 @@ const MODULE_GROUPS: ModuleGroup[] = [
     label: "Content",
     modules: [
       { key: "projects", label: "Portfolio", description: "Projects & case studies", icon: TONES.projects.icon, tone: TONES.projects },
+      // ⭐ Storefront lives under Content — manages the /store catalogue
+      { key: "offerings", label: "Storefront", description: "Public catalogue & offerings", icon: TONES.offerings.icon, tone: TONES.offerings },
     ],
   },
   {
@@ -158,7 +175,6 @@ const MODULE_GROUPS: ModuleGroup[] = [
       { key: "quotes", label: "Quotes", description: "Requests → quotes", icon: TONES.quotes.icon, tone: TONES.quotes },
       { key: "payments", label: "Payments", description: "Invoices & M-Pesa", icon: TONES.payments.icon, tone: TONES.payments },
       { key: "accounting", label: "Accounting", description: "Revenue, expenses, reports", icon: TONES.accounting.icon, tone: TONES.accounting },
-      // ⭐ NEW — Communications in Operations
       { key: "notifications", label: "Notifications", description: "Announcements & alerts", icon: TONES.notifications.icon, tone: TONES.notifications },
     ],
   },
@@ -194,6 +210,7 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "projects" && <ProjectsPanel search={search} />}
               {activeModule === "accounting" && <AccountingPanel />}
               {activeModule === "notifications" && <NotificationsPanel search={search} />}
+              {activeModule === "offerings" && <OfferingsPanel search={search} />} {/* ⭐ Storefront */}
             </div>
           </div>
         </main>
@@ -436,16 +453,16 @@ function DashboardHeader({
     payments: "Payments",
     projects: "Portfolio",
     accounting: "Accounting",
-    notifications: "Notifications", // ⭐ NEW
+    notifications: "Notifications",
+    offerings: "Storefront", // ⭐
   };
 
-  // Notifications uses its own in-panel search input (matches the panel's
-  // filter logic on businessId/title/type) — hide the global header search
-  // for that module, same as accounting.
+  // Storefront manages its own filters. Hide global search.
   const searchable =
     activeModule !== "overview" &&
     activeModule !== "accounting" &&
-    activeModule !== "notifications"; // ⭐ NEW
+    activeModule !== "notifications" &&
+    activeModule !== "offerings"; // ⭐
 
   return (
     <header
@@ -690,6 +707,7 @@ function Kpi({
     payments: "from-emerald-50/60 to-white dark:from-emerald-950/20 dark:to-deep-900",
     accounting: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
     notifications: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
+    offerings: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900", // ⭐
   };
 
   return (
@@ -902,12 +920,21 @@ function CalculatorIcon() {
     </svg>
   );
 }
-// ⭐ NEW — Notifications bell icon for the sidebar
 function BellIcon() {
   return (
     <svg {...iconBase}>
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
+  );
+}
+// ⭐ NEW — Storefront icon (package/shop icon)
+function StorefrontIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M3 9h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
+      <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
+      <path d="M8 13h8" />
     </svg>
   );
 }

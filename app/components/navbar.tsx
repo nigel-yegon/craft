@@ -30,6 +30,7 @@ const studioSub = [
   { href: "/studio/process", label: "Process" },
   { href: "/studio/team", label: "Team" },
   { href: "/studio/journal", label: "Journal" },
+  { href: "/store", label: "Our Store" },
 ] as const;
 
 const links = [

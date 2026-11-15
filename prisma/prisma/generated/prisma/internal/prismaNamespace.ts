@@ -409,7 +409,8 @@ export const ModelName = {
   Quote: 'Quote',
   Project: 'Project',
   Expense: 'Expense',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  StoreItem: 'StoreItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction" | "offering" | "quoteRequest" | "quoteRequestItem" | "quote" | "project" | "expense" | "notification"
+    modelProps: "user" | "account" | "session" | "verificationToken" | "invoice" | "mpesaTransaction" | "offering" | "quoteRequest" | "quoteRequestItem" | "quote" | "project" | "expense" | "notification" | "storeItem"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1391,6 +1392,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StoreItem: {
+      payload: Prisma.$StoreItemPayload<ExtArgs>
+      fields: Prisma.StoreItemFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StoreItemFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StoreItemFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        findFirst: {
+          args: Prisma.StoreItemFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StoreItemFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        findMany: {
+          args: Prisma.StoreItemFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>[]
+        }
+        create: {
+          args: Prisma.StoreItemCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        createMany: {
+          args: Prisma.StoreItemCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StoreItemCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>[]
+        }
+        delete: {
+          args: Prisma.StoreItemDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        update: {
+          args: Prisma.StoreItemUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        deleteMany: {
+          args: Prisma.StoreItemDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StoreItemUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StoreItemUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>[]
+        }
+        upsert: {
+          args: Prisma.StoreItemUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StoreItemPayload>
+        }
+        aggregate: {
+          args: Prisma.StoreItemAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStoreItem>
+        }
+        groupBy: {
+          args: Prisma.StoreItemGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StoreItemGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StoreItemCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StoreItemCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1648,6 +1723,28 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const StoreItemScalarFieldEnum = {
+  id: 'id',
+  businessId: 'businessId',
+  name: 'name',
+  description: 'description',
+  sku: 'sku',
+  barcode: 'barcode',
+  categoryName: 'categoryName',
+  sellingPriceMinor: 'sellingPriceMinor',
+  costPriceMinor: 'costPriceMinor',
+  stockMilli: 'stockMilli',
+  lowStockThresholdMilli: 'lowStockThresholdMilli',
+  imageUrl: 'imageUrl',
+  isActive: 'isActive',
+  source: 'source',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StoreItemScalarFieldEnum = (typeof StoreItemScalarFieldEnum)[keyof typeof StoreItemScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1944,6 +2041,7 @@ export type GlobalOmitConfig = {
   project?: Prisma.ProjectOmit
   expense?: Prisma.ExpenseOmit
   notification?: Prisma.NotificationOmit
+  storeItem?: Prisma.StoreItemOmit
 }
 
 /* Types for Logging */
