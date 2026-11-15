@@ -22,12 +22,53 @@ type NotificationRow = {
 };
 
 const TYPES: { value: NotificationType; label: string; tone: string }[] = [
-  { value: "subscription", label: "Subscription", tone: "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200" },
-  { value: "code", label: "Activation code", tone: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200" },
-  { value: "alert", label: "Low stock / alert", tone: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200" },
-  { value: "backup", label: "Backup status", tone: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200" },
-  { value: "system", label: "System", tone: "bg-cream-200 text-deep-700 dark:bg-deep-800 dark:text-cream-300" },
+  {
+    value: "subscription",
+    label: "Subscription",
+    tone:
+      "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200",
+  },
+  {
+    value: "code",
+    label: "Activation code",
+    tone:
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
+  },
+  {
+    value: "alert",
+    label: "Low stock / alert",
+    tone:
+      "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200",
+  },
+  {
+    value: "backup",
+    label: "Backup status",
+    tone: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200",
+  },
+  {
+    value: "system",
+    label: "System",
+    tone:
+      "bg-cream-200 text-deep-700 dark:bg-deep-800 dark:text-cream-300",
+  },
 ];
+
+// ⭐ Shared input styling — used by both input and textarea so any future
+//    field matches without duplicating the (long) class list.
+//    Key fixes for dark mode:
+//      • dark:[color-scheme:dark] — makes the browser render select
+//        dropdowns + autofill in dark palette instead of white.
+//      • dark:placeholder:text-cream-400 — visible placeholders on
+//        the deep-950 input background.
+//      • text-… + dark:text-cream-100 — typed text is white on dark.
+const inputClass =
+  "w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm " +
+  "text-deep-800 outline-none transition " +
+  "placeholder:text-deep-400 " +
+  "focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 " +
+  "dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100 " +
+  "dark:placeholder:text-cream-400 " +
+  "dark:focus:bg-deep-950 dark:[color-scheme:dark]";
 
 export function NotificationsPanel({ search = "" }: { search?: string }) {
   const [items, setItems] = useState<NotificationRow[]>([]);
@@ -159,7 +200,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                 value={businessId}
                 onChange={(e) => setBusinessId(e.target.value)}
                 placeholder="UUID of the shop, or 'default-business-id'"
-                className="w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm text-deep-800 outline-none transition focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100 dark:focus:bg-deep-950"
+                className={inputClass}
               />
             </Field>
 
@@ -167,10 +208,18 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as NotificationType)}
-                className="w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm text-deep-800 outline-none transition focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100"
+                className={inputClass}
               >
                 {TYPES.map((t) => (
-                  <option key={t.value} value={t.value}>
+                  <option
+                    key={t.value}
+                    value={t.value}
+                    // ⭐ Explicit bg/text on <option> — some browsers
+                    //    ignore the parent <select>'s dark styles on the
+                    //    native dropdown list. This makes the popup
+                    //    readable even on OS-default light menus.
+                    className="bg-cream-100 text-deep-800 dark:bg-deep-900 dark:text-cream-100"
+                  >
                     {t.label}
                   </option>
                 ))}
@@ -184,7 +233,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={120}
                 placeholder="e.g. Subscription Expiring Soon"
-                className="w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm text-deep-800 outline-none transition focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100"
+                className={inputClass}
               />
             </Field>
 
@@ -195,7 +244,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                 rows={4}
                 maxLength={2000}
                 placeholder="Message shown in the app"
-                className="w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm text-deep-800 outline-none transition focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100"
+                className={`${inputClass} resize-y`}
               />
             </Field>
 
@@ -204,7 +253,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                 value={actionRoute}
                 onChange={(e) => setActionRoute(e.target.value)}
                 placeholder="/settings/subscription"
-                className="w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm text-deep-800 outline-none transition focus:bg-cream-50 focus:ring-2 focus:ring-violet-500/20 dark:border-deep-700 dark:bg-deep-950 dark:text-cream-100"
+                className={inputClass}
               />
             </Field>
           </div>
@@ -227,7 +276,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
         {/* ── Recent list ────────────────────────────── */}
         <section className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+            <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-400">
               Recent notifications
             </h3>
             <button
@@ -239,11 +288,11 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
           </div>
 
           {loading ? (
-            <p className="text-sm text-deep-500 dark:text-cream-500">
+            <p className="text-sm text-deep-500 dark:text-cream-400">
               Loading…
             </p>
           ) : filtered.length === 0 ? (
-            <p className="text-sm text-deep-500 dark:text-cream-500">
+            <p className="text-sm text-deep-500 dark:text-cream-400">
               {items.length === 0
                 ? "No notifications yet."
                 : "No notifications match your search."}
@@ -262,7 +311,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                           >
                             {n.type}
                           </span>
-                          <span className="truncate text-xs text-deep-500 dark:text-cream-500">
+                          <span className="truncate text-xs text-deep-500 dark:text-cream-400">
                             {n.businessId}
                           </span>
                         </div>
@@ -270,11 +319,11 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                           {n.title}
                         </p>
                         {n.body && (
-                          <p className="mt-0.5 line-clamp-2 text-xs text-deep-600 dark:text-cream-400">
+                          <p className="mt-0.5 line-clamp-2 text-xs text-deep-600 dark:text-cream-300">
                             {n.body}
                           </p>
                         )}
-                        <p className="mt-1 text-[11px] text-deep-400 dark:text-cream-600">
+                        <p className="mt-1 text-[11px] text-deep-400 dark:text-cream-500">
                           {new Date(n.publishedAt).toLocaleString()}
                           {n.actionRoute ? ` · → ${n.actionRoute}` : ""}
                         </p>
@@ -306,7 +355,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
+      {/* ⭐ Bumped label contrast in dark mode from cream-500 → cream-400
+          so it stands off the deep-900 form background. */}
+      <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-400">
         {label}
       </span>
       {children}
