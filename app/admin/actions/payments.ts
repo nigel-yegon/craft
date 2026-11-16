@@ -49,10 +49,23 @@ async function getToken(): Promise<string> {
       : "https://sandbox.safaricom.co.ke";
 
   const auth = Buffer.from(`${key}:${secret}`).toString("base64");
-  const res = await fetch(
-    `${base}/oauth/v1/generate?grant_type=client_credentials`,
-    { headers: { Authorization: `Basic ${auth}` }, cache: "no-store" },
-  );
+
+  let res: Response;
+  try {
+    res = await fetch(
+      `${base}/oauth/v1/generate?grant_type=client_credentials`,
+      {
+        headers: { Authorization: `Basic ${auth}` },
+        cache: "no-store",
+        signal: AbortSignal.timeout(15_000),  // ⭐ 15s timeout
+      },
+    );
+  } catch (err: any) {
+    if (err.name === "TimeoutError" || err.name === "AbortError") {
+      throw new Error("M-Pesa OAuth timed out after 15s — check network/VPS connectivity to Safaricom");
+    }
+    throw new Error(`M-Pesa OAuth network error: ${err.message}`);
+  }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -89,7 +102,6 @@ function isUniqueConstraintError(err: unknown): boolean {
   );
 }
 
-// ⭐ Shared helper — resolves the till number from .env with a clear error
 function getTillNumber(): string {
   const till = process.env.MPESA_TILL_NUMBER;
   if (!till) {
@@ -101,7 +113,6 @@ function getTillNumber(): string {
 }
 
 // ─── STK Push (Buy Goods) ─────────────────────────────────────────
-
 export async function sendPaymentPrompt(invoiceId: number) {
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
@@ -109,43 +120,47 @@ export async function sendPaymentPrompt(invoiceId: number) {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status === "PAID") throw new Error("Invoice already paid");
 
-  const tillNumber = getTillNumber();
+  const storeNumber = process.env.MPESA_STORE_NUMBER;   // ⭐ store, not till
+  const tillNumber = process.env.MPESA_TILL_NUMBER;
   const passkey = process.env.MPESA_PASSKEY;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
+  if (!storeNumber) {
+    throw new Error("MPESA_STORE_NUMBER not configured");
+  }
+  if (!tillNumber) {
+    throw new Error("MPESA_TILL_NUMBER not configured");
+  }
   if (!passkey) {
     throw new Error("MPESA_PASSKEY not configured");
   }
   if (!appUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback",
-    );
+    throw new Error("NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback");
   }
 
-  // Validate & normalize callback URL
   const cleanAppUrl = appUrl.trim().replace(/\/+$/, "");
   if (!cleanAppUrl.startsWith("https://")) {
-    throw new Error(
-      `M-Pesa callback URL must use HTTPS. Got: ${cleanAppUrl}`,
-    );
+    throw new Error(`M-Pesa callback URL must use HTTPS. Got: ${cleanAppUrl}`);
   }
   if (cleanAppUrl.includes("localhost") || cleanAppUrl.includes("127.0.0.1")) {
-    throw new Error(
-      `M-Pesa callback URL cannot be localhost. Got: ${cleanAppUrl}`,
-    );
+    throw new Error(`M-Pesa callback URL cannot be localhost. Got: ${cleanAppUrl}`);
   }
 
   const callbackUrl = `${cleanAppUrl}/api/mpesa/callback`;
-  console.log("M-Pesa STK Push — Till:", tillNumber, "Callback:", callbackUrl);
+  console.log(
+    "M-Pesa STK Push — Store:", storeNumber,
+    "Till:", tillNumber,
+    "Callback:", callbackUrl,
+  );
 
-  // EAT timestamp (Kenya time, UTC+3)
   const timestamp = new Date(Date.now() + 3 * 60 * 60 * 1000)
     .toISOString()
     .replace(/[-:TZ.]/g, "")
     .slice(0, 14);
 
+  // ⭐ Password uses STORE number, not till
   const password = Buffer.from(
-    `${tillNumber}${passkey}${timestamp}`,
+    `${storeNumber}${passkey}${timestamp}`,
   ).toString("base64");
 
   const token = await getToken();
@@ -155,13 +170,13 @@ export async function sendPaymentPrompt(invoiceId: number) {
       : "https://sandbox.safaricom.co.ke";
 
   const payload = {
-    BusinessShortCode: tillNumber,
+    BusinessShortCode: storeNumber,             // ⭐ STORE, not till
     Password: password,
     Timestamp: timestamp,
     TransactionType: "CustomerBuyGoodsOnline",
     Amount: invoice.amount,
     PartyA: invoice.customerPhone,
-    PartyB: tillNumber,
+    PartyB: tillNumber,                         // ⭐ TILL (money destination)
     PhoneNumber: invoice.customerPhone,
     CallBackURL: callbackUrl,
     AccountReference: invoice.invoiceNumber.slice(0, 12),
@@ -170,21 +185,40 @@ export async function sendPaymentPrompt(invoiceId: number) {
 
   console.log("M-Pesa STK Push — payload:", JSON.stringify(payload, null, 2));
 
-  const res = await fetch(`${base}/mpesa/stkpush/v1/processrequest`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${base}/mpesa/stkpush/v1/processrequest`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (err: any) {
+    if (err.name === "TimeoutError" || err.name === "AbortError") {
+      console.error("M-Pesa STK Push — request timed out after 30s");
+      throw new Error(
+        "M-Pesa request timed out — Safaricom API is not responding. Retry or check if the till is active.",
+      );
+    }
+    console.error("M-Pesa STK Push — network error:", err.name, err.message);
+    throw new Error(`M-Pesa network error: ${err.message}`);
+  }
 
-  const data = (await res.json()) as {
+  let data: {
     MerchantRequestID?: string;
     CheckoutRequestID?: string;
     errorMessage?: string;
     errorCode?: string;
   };
+  try {
+    data = await res.json();
+  } catch (err: any) {
+    console.error("M-Pesa STK Push — could not parse JSON response:", err.message);
+    throw new Error(`M-Pesa returned non-JSON response (HTTP ${res.status})`);
+  }
 
   if (!res.ok) {
     console.error(
@@ -216,9 +250,12 @@ export async function sendPaymentPrompt(invoiceId: number) {
 
 export async function queryStkStatus(checkoutRequestId: string) {
   const token = await getToken();
-  const tillNumber = getTillNumber();  // ⭐ was undefined `shortcode`
+  const storeNumber = process.env.MPESA_STORE_NUMBER;   // ⭐ store
   const passkey = process.env.MPESA_PASSKEY;
 
+  if (!storeNumber) {
+    throw new Error("MPESA_STORE_NUMBER not configured");
+  }
   if (!passkey) {
     throw new Error("MPESA_PASSKEY not configured");
   }
@@ -232,23 +269,32 @@ export async function queryStkStatus(checkoutRequestId: string) {
     .toISOString()
     .replace(/[-:TZ.]/g, "")
     .slice(0, 14);
-  const password = Buffer.from(`${tillNumber}${passkey}${timestamp}`).toString(
+  const password = Buffer.from(`${storeNumber}${passkey}${timestamp}`).toString(
     "base64",
   );
 
-  const res = await fetch(`${base}/mpesa/stkpushquery/v1/query`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      BusinessShortCode: tillNumber,    // ⭐ was `tillnumber` (typo)
-      Password: password,
-      Timestamp: timestamp,
-      CheckoutRequestID: checkoutRequestId,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${base}/mpesa/stkpushquery/v1/query`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        BusinessShortCode: storeNumber,          // ⭐ store
+        Password: password,
+        Timestamp: timestamp,
+        CheckoutRequestID: checkoutRequestId,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+  } catch (err: any) {
+    if (err.name === "TimeoutError" || err.name === "AbortError") {
+      return { status: "UNKNOWN" as const, message: "Status query timed out" };
+    }
+    return { status: "UNKNOWN" as const, message: `Network error: ${err.message}` };
+  }
 
   const data = (await res.json()) as {
     ResultCode?: string;
@@ -257,10 +303,7 @@ export async function queryStkStatus(checkoutRequestId: string) {
   };
 
   if (!res.ok) {
-    return {
-      status: "UNKNOWN" as const,
-      message: data.errorMessage ?? "Query failed",
-    };
+    return { status: "UNKNOWN" as const, message: data.errorMessage ?? "Query failed" };
   }
 
   if (data.ResultCode === "0") return { status: "SUCCESS" as const };
@@ -269,7 +312,6 @@ export async function queryStkStatus(checkoutRequestId: string) {
   }
   return { status: "PENDING" as const, message: data.ResultDesc };
 }
-
 export async function reconcileInvoice(invoiceId: number) {
   const invoice = await prisma.invoice.findUnique({
     where: { id: invoiceId },
