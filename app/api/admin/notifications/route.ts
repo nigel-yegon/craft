@@ -12,6 +12,7 @@ const corsHeaders = {
 const querySchema = z.object({
   businessId: z.string().min(1, "businessId is required"),
   since: z.string().datetime().optional(),
+  limit: z.coerce.number().int().min(1).max(200).default(100),
 });
 
 type NotificationRow = {
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
     const params = {
       businessId: req.nextUrl.searchParams.get("businessId") ?? undefined,
       since: req.nextUrl.searchParams.get("since") ?? undefined,
+      limit: req.nextUrl.searchParams.get("limit") ?? undefined,
     };
 
     const parsed = querySchema.safeParse(params);
@@ -43,7 +45,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const { businessId, since } = parsed.data;
+    const { businessId, since, limit } = parsed.data;
 
     const rows = await prisma.notification.findMany({
       where: {
@@ -51,7 +53,7 @@ export async function GET(req: NextRequest) {
         ...(since ? { publishedAt: { gt: new Date(since) } } : {}),
       },
       orderBy: { publishedAt: "desc" },
-      take: 100,
+      take: limit,
       select: {
         id: true,
         type: true,
