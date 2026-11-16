@@ -89,7 +89,18 @@ function isUniqueConstraintError(err: unknown): boolean {
   );
 }
 
-// ─── STK Push (Paybill) ───────────────────────────────────────────
+// ⭐ Shared helper — resolves the till number from .env with a clear error
+function getTillNumber(): string {
+  const till = process.env.MPESA_TILL_NUMBER;
+  if (!till) {
+    throw new Error(
+      "MPESA_TILL_NUMBER not configured. For Buy Goods, set it to your till number (e.g. 9090113).",
+    );
+  }
+  return till;
+}
+
+// ─── STK Push (Buy Goods) ─────────────────────────────────────────
 
 export async function sendPaymentPrompt(invoiceId: number) {
   const invoice = await prisma.invoice.findUnique({
@@ -98,25 +109,30 @@ export async function sendPaymentPrompt(invoiceId: number) {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status === "PAID") throw new Error("Invoice already paid");
 
-  // ⭐ Buy Goods Till number, NOT the store number
-  const tillNumber = process.env.MPESA_SHORTCODE; // 9090113
+  const tillNumber = getTillNumber();
   const passkey = process.env.MPESA_PASSKEY;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  if (!tillNumber || !passkey) {
-    throw new Error("M-Pesa till/passkey not configured");
+  if (!passkey) {
+    throw new Error("MPESA_PASSKEY not configured");
   }
   if (!appUrl) {
-    throw new Error("NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback");
+    throw new Error(
+      "NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback",
+    );
   }
 
-  // ⭐ Validate & normalize callback URL
+  // Validate & normalize callback URL
   const cleanAppUrl = appUrl.trim().replace(/\/+$/, "");
   if (!cleanAppUrl.startsWith("https://")) {
-    throw new Error(`M-Pesa callback URL must use HTTPS. Got: ${cleanAppUrl}`);
+    throw new Error(
+      `M-Pesa callback URL must use HTTPS. Got: ${cleanAppUrl}`,
+    );
   }
   if (cleanAppUrl.includes("localhost") || cleanAppUrl.includes("127.0.0.1")) {
-    throw new Error(`M-Pesa callback URL cannot be localhost. Got: ${cleanAppUrl}`);
+    throw new Error(
+      `M-Pesa callback URL cannot be localhost. Got: ${cleanAppUrl}`,
+    );
   }
 
   const callbackUrl = `${cleanAppUrl}/api/mpesa/callback`;
@@ -139,13 +155,13 @@ export async function sendPaymentPrompt(invoiceId: number) {
       : "https://sandbox.safaricom.co.ke";
 
   const payload = {
-    BusinessShortCode: tillNumber,             // ⭐ the TILL (9090113)
+    BusinessShortCode: tillNumber,
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerBuyGoodsOnline", // ⭐ BUY GOODS, not PayBill
+    TransactionType: "CustomerBuyGoodsOnline",
     Amount: invoice.amount,
     PartyA: invoice.customerPhone,
-    PartyB: tillNumber,                        // ⭐ the TILL, not the store
+    PartyB: tillNumber,
     PhoneNumber: invoice.customerPhone,
     CallBackURL: callbackUrl,
     AccountReference: invoice.invoiceNumber.slice(0, 12),
@@ -200,8 +216,13 @@ export async function sendPaymentPrompt(invoiceId: number) {
 
 export async function queryStkStatus(checkoutRequestId: string) {
   const token = await getToken();
-  const shortcode = process.env.MPESA_SHORTCODE!;
-  const passkey = process.env.MPESA_PASSKEY!;
+  const tillNumber = getTillNumber();  // ⭐ was undefined `shortcode`
+  const passkey = process.env.MPESA_PASSKEY;
+
+  if (!passkey) {
+    throw new Error("MPESA_PASSKEY not configured");
+  }
+
   const base =
     process.env.MPESA_ENVIRONMENT === "production"
       ? "https://api.safaricom.co.ke"
@@ -211,7 +232,7 @@ export async function queryStkStatus(checkoutRequestId: string) {
     .toISOString()
     .replace(/[-:TZ.]/g, "")
     .slice(0, 14);
-  const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString(
+  const password = Buffer.from(`${tillNumber}${passkey}${timestamp}`).toString(
     "base64",
   );
 
@@ -222,7 +243,7 @@ export async function queryStkStatus(checkoutRequestId: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      BusinessShortCode: shortcode,
+      BusinessShortCode: tillNumber,    // ⭐ was `tillnumber` (typo)
       Password: password,
       Timestamp: timestamp,
       CheckoutRequestID: checkoutRequestId,
