@@ -54,7 +54,11 @@ function isConnectionDrop(err: unknown): boolean {
   return false;
 }
 
-async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 2, backoffMs = 250): Promise<T> {
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  maxAttempts = 2,
+  backoffMs = 250
+): Promise<T> {
   let lastErr: unknown;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
@@ -69,7 +73,9 @@ async function withRetry<T>(fn: () => Promise<T>, maxAttempts = 2, backoffMs = 2
 }
 
 /// Lists all registered businesses with summary counts.
-export async function listBusinesses(opts: { search?: string } = {}): Promise<BusinessSummary[]> {
+export async function listBusinesses(
+  opts: { search?: string } = {}
+): Promise<BusinessSummary[]> {
   const q = opts.search?.trim().toLowerCase() ?? "";
 
   const businesses = await withRetry(() =>
@@ -87,20 +93,21 @@ export async function listBusinesses(opts: { search?: string } = {}): Promise<Bu
 
   const results: BusinessSummary[] = await Promise.all(
     businesses.map(async (b) => {
-      const [notifCount, backupCount, lastNotif, lastBackup] = await Promise.all([
-        prisma.notification.count({ where: { businessId: b.id } }),
-        prisma.businessBackup.count({ where: { businessId: b.id } }),
-        prisma.notification.findFirst({
-          where: { businessId: b.id },
-          orderBy: { publishedAt: "desc" },
-          select: { publishedAt: true },
-        }),
-        prisma.businessBackup.findFirst({
-          where: { businessId: b.id },
-          orderBy: { createdAt: "desc" },
-          select: { createdAt: true },
-        }),
-      ]);
+      const [notifCount, backupCount, lastNotif, lastBackup] =
+        await Promise.all([
+          prisma.notification.count({ where: { businessId: b.id } }),
+          prisma.businessBackup.count({ where: { businessId: b.id } }),
+          prisma.notification.findFirst({
+            where: { businessId: b.id },
+            orderBy: { publishedAt: "desc" },
+            select: { publishedAt: true },
+          }),
+          prisma.businessBackup.findFirst({
+            where: { businessId: b.id },
+            orderBy: { createdAt: "desc" },
+            select: { createdAt: true },
+          }),
+        ]);
 
       return {
         id: b.id,
@@ -109,8 +116,9 @@ export async function listBusinesses(opts: { search?: string } = {}): Promise<Bu
         email: b.email,
         createdAt: b.createdAt.toISOString(),
         notificationCount: notifCount,
-        backupCount: backupCount,
-        lastNotificationAt: lastNotif?.publishedAt.toISOString() ?? null,
+        backupCount,
+        lastNotificationAt:
+          lastNotif?.publishedAt.toISOString() ?? null,
         lastBackupAt: lastBackup?.createdAt.toISOString() ?? null,
       };
     })
@@ -127,37 +135,36 @@ export async function listBusinesses(opts: { search?: string } = {}): Promise<Bu
 }
 
 /// Fetches a single business with recent activity.
-export async function getBusinessDetail(id: string): Promise<BusinessDetail | null> {
+///
+/// Counts are fetched separately (not via _count) because Prisma's
+/// generated `_count` type is truncated in some versions (7.10.1 +
+/// Turbopack). Separate `.count()` queries are equivalent and stable.
+export async function getBusinessDetail(
+  id: string
+): Promise<BusinessDetail | null> {
   const business = await withRetry(() =>
-    prisma.business.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: {
-            notifications: true,
-            backups: true,
-          },
-        },
-      },
-    })
+    prisma.business.findUnique({ where: { id } })
   );
 
   if (!business) return null;
 
-  const [recentNotifications, recentBackups] = await Promise.all([
-    prisma.notification.findMany({
-      where: { businessId: id },
-      orderBy: { publishedAt: "desc" },
-      take: 3,
-      select: { id: true, type: true, title: true, publishedAt: true },
-    }),
-    prisma.businessBackup.findMany({
-      where: { businessId: id },
-      orderBy: { createdAt: "desc" },
-      take: 3,
-      select: { id: true, filename: true, sizeBytes: true, createdAt: true },
-    }),
-  ]);
+  const [notifCount, backupCount, recentNotifications, recentBackups] =
+    await Promise.all([
+      prisma.notification.count({ where: { businessId: id } }),
+      prisma.businessBackup.count({ where: { businessId: id } }),
+      prisma.notification.findMany({
+        where: { businessId: id },
+        orderBy: { publishedAt: "desc" },
+        take: 3,
+        select: { id: true, type: true, title: true, publishedAt: true },
+      }),
+      prisma.businessBackup.findMany({
+        where: { businessId: id },
+        orderBy: { createdAt: "desc" },
+        take: 3,
+        select: { id: true, filename: true, sizeBytes: true, createdAt: true },
+      }),
+    ]);
 
   return {
     id: business.id,
@@ -165,9 +172,10 @@ export async function getBusinessDetail(id: string): Promise<BusinessDetail | nu
     phone: business.phone,
     email: business.email,
     createdAt: business.createdAt.toISOString(),
-    notificationCount: business._count.notifications,
-    backupCount: business._count.backups,
-    lastNotificationAt: recentNotifications[0]?.publishedAt.toISOString() ?? null,
+    notificationCount: notifCount,
+    backupCount,
+    lastNotificationAt:
+      recentNotifications[0]?.publishedAt.toISOString() ?? null,
     lastBackupAt: recentBackups[0]?.createdAt.toISOString() ?? null,
     recentNotifications: recentNotifications.map((n) => ({
       id: n.id,
@@ -185,7 +193,9 @@ export async function getBusinessDetail(id: string): Promise<BusinessDetail | nu
 }
 
 /// Lists all cloud backups across all businesses.
-export async function listAllBackups(opts: { search?: string } = {}): Promise<BackupRow[]> {
+export async function listAllBackups(
+  opts: { search?: string } = {}
+): Promise<BackupRow[]> {
   const backups = await withRetry(() =>
     prisma.businessBackup.findMany({
       orderBy: { createdAt: "desc" },
