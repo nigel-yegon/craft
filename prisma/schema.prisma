@@ -416,3 +416,12 @@ model Business {
 
   @@index([createdAt])
 }
+model BusinessBackup {
+  id         String   @id @default(cuid())
+  businessId String
+  filename   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+
+  @@index([businessId, createdAt])
+}
