@@ -53,14 +53,6 @@ const TYPES: { value: NotificationType; label: string; tone: string }[] = [
   },
 ];
 
-// ⭐ Shared input styling — used by both input and textarea so any future
-//    field matches without duplicating the (long) class list.
-//    Key fixes for dark mode:
-//      • dark:[color-scheme:dark] — makes the browser render select
-//        dropdowns + autofill in dark palette instead of white.
-//      • dark:placeholder:text-cream-400 — visible placeholders on
-//        the deep-950 input background.
-//      • text-… + dark:text-cream-100 — typed text is white on dark.
 const inputClass =
   "w-full rounded-xl border border-deep-200 bg-cream-100 px-3 py-2 text-sm " +
   "text-deep-800 outline-none transition " +
@@ -76,6 +68,9 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ⭐ Filter — empty string means "all businesses"
+  const [filterBusinessId, setFilterBusinessId] = useState<string>("");
+
   // Form state
   const [businessId, setBusinessId] = useState("");
   const [type, setType] = useState<NotificationType>("system");
@@ -87,7 +82,13 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/notifications?limit=100", {
+      // ⭐ Conditionally add businessId
+      const qs = new URLSearchParams({ limit: "100" });
+      if (filterBusinessId.trim()) {
+        qs.set("businessId", filterBusinessId.trim());
+      }
+
+      const res = await fetch(`/api/admin/notifications?${qs.toString()}`, {
         cache: "no-store",
       });
       if (!res.ok) {
@@ -102,11 +103,20 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
     }
   };
 
+  // Refresh whenever the filter changes
   useEffect(() => {
     refresh();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterBusinessId]);
 
-  // Filter by the sidebar search — matches businessId, title, or type.
+  // Distinct business IDs seen in the current load — used to populate
+  // the filter dropdown without a separate businesses API.
+  const knownBusinessIds = useMemo(() => {
+    const set = new Set<string>();
+    for (const n of items) set.add(n.businessId);
+    return Array.from(set).sort();
+  }, [items]);
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return items;
@@ -214,10 +224,6 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                   <option
                     key={t.value}
                     value={t.value}
-                    // ⭐ Explicit bg/text on <option> — some browsers
-                    //    ignore the parent <select>'s dark styles on the
-                    //    native dropdown list. This makes the popup
-                    //    readable even on OS-default light menus.
                     className="bg-cream-100 text-deep-800 dark:bg-deep-900 dark:text-cream-100"
                   >
                     {t.label}
@@ -275,16 +281,37 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
 
         {/* ── Recent list ────────────────────────────── */}
         <section className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-400">
               Recent notifications
             </h3>
-            <button
-              onClick={refresh}
-              className="text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400"
-            >
-              Refresh
-            </button>
+            <div className="flex gap-2">
+              {/* ⭐ Business filter — reuses knownBusinessIds from current load */}
+              {knownBusinessIds.length > 0 && (
+                <select
+                  value={filterBusinessId}
+                  onChange={(e) => setFilterBusinessId(e.target.value)}
+                  className={`${inputClass} max-w-xs !w-auto`}
+                >
+                  <option value="">All businesses</option>
+                  {knownBusinessIds.map((id) => (
+                    <option
+                      key={id}
+                      value={id}
+                      className="bg-cream-100 text-deep-800 dark:bg-deep-900 dark:text-cream-100"
+                    >
+                      {id}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={refresh}
+                className="rounded-lg px-2 text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400"
+              >
+                Refresh
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -355,8 +382,6 @@ function Field({
 }) {
   return (
     <label className="block">
-      {/* ⭐ Bumped label contrast in dark mode from cream-500 → cream-400
-          so it stands off the deep-900 form background. */}
       <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-400">
         {label}
       </span>
