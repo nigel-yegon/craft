@@ -131,15 +131,20 @@ export async function getBusinessDetail(id: string): Promise<BusinessDetail | nu
   const business = await withRetry(() =>
     prisma.business.findUnique({
       where: { id },
-     
+      include: {
+        _count: {
+          select: {
+            notifications: true,
+            backups: true,
+          },
+        },
+      },
     })
   );
 
   if (!business) return null;
 
-  const [notifCount, backupCount, recentNotifications, recentBackups] = await Promise.all([
-    prisma.notification.count({ where: { businessId: id } }),
-    prisma.businessBackup.count({ where: { businessId: id } }),
+  const [recentNotifications, recentBackups] = await Promise.all([
     prisma.notification.findMany({
       where: { businessId: id },
       orderBy: { publishedAt: "desc" },
@@ -160,8 +165,8 @@ export async function getBusinessDetail(id: string): Promise<BusinessDetail | nu
     phone: business.phone,
     email: business.email,
     createdAt: business.createdAt.toISOString(),
-    notificationCount: notifCount,
-    backupCount,
+    notificationCount: business._count.notifications,
+    backupCount: business._count.backups,
     lastNotificationAt: recentNotifications[0]?.publishedAt.toISOString() ?? null,
     lastBackupAt: recentBackups[0]?.createdAt.toISOString() ?? null,
     recentNotifications: recentNotifications.map((n) => ({

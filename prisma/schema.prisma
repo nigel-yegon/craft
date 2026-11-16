@@ -100,11 +100,10 @@ model MpesaTransaction {
   rawCallback        Json?
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  source        String    @default("invoice") // "invoice" | "subscription"
-  subscriptionPlan String? // "weekly" | "monthly" | "yearly"
+  source             String    @default("invoice")
+  subscriptionPlan   String?
 
   @@index([source])
-
   @@index([invoiceId])
   @@index([status])
   @@index([checkoutRequestId])
@@ -215,8 +214,6 @@ model Project {
   description     String    @db.Text
 
   status          String    @default("IN_PROGRESS")
-  // PLANNED | IN_PROGRESS | COMPLETED | ON_HOLD | ARCHIVED
-
   category        String
   clientName      String
   clientContact   String?
@@ -239,11 +236,9 @@ model Project {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
-  // Link back to the quote this project was sold through (optional)
   quoteId         Int?      @unique
   quote           Quote?    @relation(fields: [quoteId], references: [id])
 
-  // Costs incurred delivering this project
   expenses        Expense[]
 
   @@index([status])
@@ -256,11 +251,11 @@ model Project {
 
 model Expense {
   id          Int      @id @default(autoincrement())
-  reference   String   @unique   // "EXP-2026-0001"
+  reference   String   @unique
   description String
-  category    String   // "Software" | "Contractor" | "Equipment" | "Travel" | "Office" | "Other"
-  amount      Int      // KES
-  status      String   @default("PENDING") // PENDING | APPROVED | REJECTED
+  category    String
+  amount      Int
+  status      String   @default("PENDING")
   incurredAt  DateTime
   paidAt      DateTime?
   vendorName  String?
@@ -277,9 +272,28 @@ model Expense {
   @@index([incurredAt])
 }
 
+// ─── Business (new — needed as parent for relations) ──────────────
+
+model Business {
+  id        String   @id
+  name      String
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ⭐ NEW relations — enables business._count.notifications and cascade
+  notifications Notification[]
+  backups       BusinessBackup[]
+
+  @@index([createdAt])
+}
+
+// ─── Notifications ────────────────────────────────────────────────
+
 model Notification {
   id          String   @id @default(uuid())
-  businessId  String
+  businessId  String   // ⭐ relation now
   type        String
   title       String
   body        String   @default("")
@@ -287,12 +301,13 @@ model Notification {
   payload     Json?
   publishedAt DateTime @default(now())
 
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)  // ⭐ NEW
+
   @@index([businessId, publishedAt])
   @@map("notifications")
 }
+
 // ─── POS Store Items ──────────────────────────────────────────────
-// Items managed by admin, synced down to Flutter POS apps.
-// Linked to a shop by `businessId` (matches the Flutter SQLite DB's business).
 
 model StoreItem {
   id                     Int      @id @default(autoincrement())
@@ -304,18 +319,15 @@ model StoreItem {
   barcode                String?
   categoryName           String?
 
-  // Prices in KES cents (minor units) — matches Flutter's minor-unit model
   sellingPriceMinor      Int
   costPriceMinor         Int?
 
-  // Stock in milli-units — 1000 = 1 unit (matches Flutter's quantityMilli)
   stockMilli             Int      @default(0)
-  lowStockThresholdMilli Int      @default(5000)  // 5 units
+  lowStockThresholdMilli Int      @default(5000)
 
   imageUrl               String?
   isActive               Boolean  @default(true)
 
-  // "admin" = created from the panel, "phone" = created on the Flutter app
   source                 String   @default("admin")
 
   createdAt              DateTime @default(now())
@@ -324,8 +336,9 @@ model StoreItem {
   @@unique([businessId, sku])
   @@index([businessId])
   @@index([businessId, isActive])
-  @@index([businessId, updatedAt])  // for delta sync
+  @@index([businessId, updatedAt])
 }
+
 // ─── Team ─────────────────────────────────────────────────────────
 
 model TeamMember {
@@ -333,32 +346,26 @@ model TeamMember {
   slug            String   @unique
 
   name            String
-  role            String                     // "Design Lead", "Software Engineer", etc.
-  bio             String   @db.Text          // markdown-capable long bio
-  shortBio        String?                    // 1–2 sentence teaser for cards
+  role            String
+  bio             String   @db.Text
+  shortBio        String?
 
   photoUrl        String?
   email           String?
   phone           String?
 
-  
-
-  // Fields of expertise — stored as PostgreSQL text[] for fast filtering
   expertise       String[] @default([])
-  disciplines     String[] @default([])      // "architecture", "interiors", "software", etc.
+  disciplines     String[] @default([])
 
-  // Social links
   linkedinUrl     String?
   githubUrl       String?
   twitterUrl      String?
   websiteUrl      String?
 
-  // Meta
-  joinedAt        DateTime?                  // when they joined the studio
-  location        String?                    // "Nairobi, Kenya"
+  joinedAt        DateTime?
+  location        String?
   yearsExperience Int?
 
-  // Ordering + visibility
   sortOrder       Int      @default(0)
   featured        Boolean  @default(false)
   published       Boolean  @default(true)
@@ -370,8 +377,7 @@ model TeamMember {
   @@index([featured])
   @@index([sortOrder])
 
-  
- journalPosts JournalPost[]     // ⭐ relation from JournalPost.authorId
+  journalPosts JournalPost[]
 }
 
 // ─── Journal ──────────────────────────────────────────────────────
@@ -381,20 +387,20 @@ model JournalPost {
   slug            String   @unique
 
   title           String
-  subtitle        String?                    // optional dek / subheading
-  excerpt         String   @db.Text          // teaser shown on listing page
-  content         String   @db.Text          // full markdown body
+  subtitle        String?
+  excerpt         String   @db.Text
+  content         String   @db.Text
 
   coverImageUrl   String?
   galleryUrls     String[] @default([])
 
-  category        String   @default("STUDIO") // "STUDIO" | "PROCESS" | "TECH" | "CASE_STUDY" | "CULTURE" | "ANNOUNCEMENT"
+  category        String   @default("STUDIO")
   tags            String[] @default([])
 
   authorId        Int?
   author          TeamMember? @relation(fields: [authorId], references: [id], onDelete: SetNull)
 
-  readTimeMinutes Int?                       // computed or stored
+  readTimeMinutes Int?
   featured        Boolean  @default(false)
   published       Boolean  @default(false)
   publishedAt     DateTime?
@@ -406,22 +412,17 @@ model JournalPost {
   @@index([category])
   @@index([featured])
 }
-model Business {
-  id        String   @id
-  name      String
-  phone     String?
-  email     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@index([createdAt])
-}
+// ─── Business Backups ─────────────────────────────────────────────
+
 model BusinessBackup {
   id         String   @id @default(cuid())
-  businessId String
+  businessId String   // ⭐ relation now
   filename   String
   sizeBytes  Int
   createdAt  DateTime @default(now())
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)  // ⭐ NEW
 
   @@index([businessId, createdAt])
 }
