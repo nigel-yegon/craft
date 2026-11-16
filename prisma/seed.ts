@@ -13,7 +13,7 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "./prisma/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { seedOfferings } from "./seed-offerings";
 import { seedProjects } from "./seed-projects";
 import { seedAccounting } from "./seed-accounting"; 

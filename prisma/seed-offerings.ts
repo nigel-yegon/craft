@@ -1,6 +1,6 @@
 // prisma/seed-offerings.ts
 
-import type { PrismaClient } from "./prisma/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 type SeedOffering = {
   slug: string;

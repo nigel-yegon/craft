@@ -9,7 +9,7 @@
 //
 // Or as part of the master seed (imported and called from prisma/seed.ts).
 
-import type { PrismaClient } from "./prisma/generated/prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 // ─── Helpers ──────────────────────────────────────────────────────
 

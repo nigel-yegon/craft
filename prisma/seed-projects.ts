@@ -4,7 +4,7 @@
 // Cover images are expected at public/images/projects/<slug>.jpg
 // (or .webp). Galleries reference <slug>-1.jpg, <slug>-2.jpg, etc.
 
-import type { PrismaClient } from "./prisma/generated/prisma/client";
+import type { PrismaClient } from "@prisma/client";
 
 type SeedProject = {
   slug: string;
