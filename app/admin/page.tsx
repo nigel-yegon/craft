@@ -1,6 +1,7 @@
 // app/admin/page.tsx
 import { Suspense } from "react";
 import { getServerSession } from "next-auth";
+import { connection } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { DashboardClient } from "./dashboard-client";
 
@@ -15,6 +16,9 @@ export default function AdminPage() {
 }
 
 async function AdminShell() {
+  // ⭐ Opt out of prerendering — this route depends on request state
+  await connection();
+
   const session = await getServerSession(authOptions);
   const userName = session?.user?.name ?? session?.user?.email ?? "Admin";
   return <DashboardClient userName={userName} />;

@@ -98,26 +98,38 @@ export async function sendPaymentPrompt(invoiceId: number) {
   if (!invoice) throw new Error("Invoice not found");
   if (invoice.status === "PAID") throw new Error("Invoice already paid");
 
-  const shortcode = process.env.MPESA_SHORTCODE;
+  // ⭐ Buy Goods Till number, NOT the store number
+  const tillNumber = process.env.MPESA_SHORTCODE; // 9090113
   const passkey = process.env.MPESA_PASSKEY;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL;
 
-  if (!shortcode || !passkey) {
-    throw new Error("M-Pesa shortcode/passkey not configured");
+  if (!tillNumber || !passkey) {
+    throw new Error("M-Pesa till/passkey not configured");
   }
   if (!appUrl) {
-    throw new Error(
-      "NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback",
-    );
+    throw new Error("NEXT_PUBLIC_APP_URL is not set — required for M-Pesa callback");
   }
 
+  // ⭐ Validate & normalize callback URL
+  const cleanAppUrl = appUrl.trim().replace(/\/+$/, "");
+  if (!cleanAppUrl.startsWith("https://")) {
+    throw new Error(`M-Pesa callback URL must use HTTPS. Got: ${cleanAppUrl}`);
+  }
+  if (cleanAppUrl.includes("localhost") || cleanAppUrl.includes("127.0.0.1")) {
+    throw new Error(`M-Pesa callback URL cannot be localhost. Got: ${cleanAppUrl}`);
+  }
+
+  const callbackUrl = `${cleanAppUrl}/api/mpesa/callback`;
+  console.log("M-Pesa STK Push — Till:", tillNumber, "Callback:", callbackUrl);
+
+  // EAT timestamp (Kenya time, UTC+3)
   const timestamp = new Date(Date.now() + 3 * 60 * 60 * 1000)
     .toISOString()
     .replace(/[-:TZ.]/g, "")
     .slice(0, 14);
 
   const password = Buffer.from(
-    `${shortcode}${passkey}${timestamp}`,
+    `${tillNumber}${passkey}${timestamp}`,
   ).toString("base64");
 
   const token = await getToken();
@@ -127,18 +139,20 @@ export async function sendPaymentPrompt(invoiceId: number) {
       : "https://sandbox.safaricom.co.ke";
 
   const payload = {
-    BusinessShortCode: shortcode,
+    BusinessShortCode: tillNumber,             // ⭐ the TILL (9090113)
     Password: password,
     Timestamp: timestamp,
-    TransactionType: "CustomerBuyGoodsOnline",
+    TransactionType: "CustomerBuyGoodsOnline", // ⭐ BUY GOODS, not PayBill
     Amount: invoice.amount,
     PartyA: invoice.customerPhone,
-    PartyB: shortcode,
+    PartyB: tillNumber,                        // ⭐ the TILL, not the store
     PhoneNumber: invoice.customerPhone,
-    CallBackURL: `${appUrl}/api/mpesa/callback`,
+    CallBackURL: callbackUrl,
     AccountReference: invoice.invoiceNumber.slice(0, 12),
     TransactionDesc: "Invoice payment".slice(0, 13),
   };
+
+  console.log("M-Pesa STK Push — payload:", JSON.stringify(payload, null, 2));
 
   const res = await fetch(`${base}/mpesa/stkpush/v1/processrequest`, {
     method: "POST",
@@ -153,10 +167,19 @@ export async function sendPaymentPrompt(invoiceId: number) {
     MerchantRequestID?: string;
     CheckoutRequestID?: string;
     errorMessage?: string;
+    errorCode?: string;
   };
 
   if (!res.ok) {
-    throw new Error(data.errorMessage || `STK failed: ${res.status}`);
+    console.error(
+      "M-Pesa STK Push failed — status:",
+      res.status,
+      "response:",
+      JSON.stringify(data, null, 2),
+    );
+    throw new Error(
+      data.errorMessage || `STK failed: ${res.status} ${JSON.stringify(data)}`,
+    );
   }
 
   await prisma.mpesaTransaction.create({
