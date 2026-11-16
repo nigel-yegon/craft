@@ -41,6 +41,7 @@ export default function NotificationsClient() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [actionRoute, setActionRoute] = useState("");
+  
 
   const refresh = async () => {
     setLoading(true);
