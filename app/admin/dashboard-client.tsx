@@ -22,6 +22,8 @@ import { NotificationsPanel } from "./notifications/notifications-panel";
 import { OfferingsPanel } from "./offerings/offerings-panel";
 import { TeamPanel } from "./team/team-panel";
 import { JournalPanel } from "./journal/journal-panel";
+import { BusinessesPanel } from "./businesses/businesses-panel";
+import { DownloadsPanel } from "./downloads/downloads-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ModuleKey =
@@ -33,7 +35,9 @@ type ModuleKey =
   | "notifications"
   | "offerings"
   | "team"
-  | "journal";
+  | "journal"
+  | "businesses"
+  | "downloads";
 
 type ModuleTone = {
   ring: string;
@@ -68,6 +72,34 @@ const HEADER_HEIGHT = "lg:min-h-24";
 
 // ─── Tones ────────────────────────────────────────────────────────
 const TONES: Record<Exclude<ModuleKey, "overview">, ModuleTone> = {
+  businesses: {
+    ring: "ring-cyan-500/20",
+    border: "border-cyan-200/60 dark:border-cyan-800/60",
+    borderHover: "hover:border-cyan-400 dark:hover:border-cyan-600",
+    bgSoft: "bg-cyan-50 dark:bg-cyan-950/40",
+    bgActive: "bg-cyan-100 dark:bg-cyan-950/70",
+    text: "text-cyan-700 dark:text-cyan-300",
+    button: "bg-cyan-600",
+    buttonHover: "hover:bg-cyan-700",
+    bar: "bg-cyan-500",
+    pillBg: "bg-cyan-100 dark:bg-cyan-950",
+    pillText: "text-cyan-800 dark:text-cyan-200",
+    icon: <StoreIcon />,
+  },
+  downloads: {
+    ring: "ring-teal-500/20",
+    border: "border-teal-200/60 dark:border-teal-800/60",
+    borderHover: "hover:border-teal-400 dark:hover:border-teal-600",
+    bgSoft: "bg-teal-50 dark:bg-teal-950/40",
+    bgActive: "bg-teal-100 dark:bg-teal-950/70",
+    text: "text-teal-700 dark:text-teal-300",
+    button: "bg-teal-600",
+    buttonHover: "hover:bg-teal-700",
+    bar: "bg-teal-500",
+    pillBg: "bg-teal-100 dark:bg-teal-950",
+    pillText: "text-teal-800 dark:text-teal-200",
+    icon: <DownloadIcon />,
+  },
   projects: {
     ring: "ring-rose-500/20",
     border: "border-rose-200/60 dark:border-rose-800/60",
@@ -191,6 +223,14 @@ const MODULE_GROUPS: ModuleGroup[] = [
     ],
   },
   {
+    key: "system",
+    label: "System",
+    modules: [
+      { key: "businesses", label: "Businesses", description: "Registered shops", icon: TONES.businesses.icon, tone: TONES.businesses },
+      { key: "downloads", label: "Downloads", description: "Cloud backups", icon: TONES.downloads.icon, tone: TONES.downloads },
+    ],
+  },
+  {
     key: "content",
     label: "Content",
     modules: [
@@ -245,6 +285,8 @@ export function DashboardClient({ userName }: { userName: string }) {
               {activeModule === "offerings" && <OfferingsPanel search={search} />}
               {activeModule === "team" && <TeamPanel search={search} />}
               {activeModule === "journal" && <JournalPanel search={search} />}
+              {activeModule === "businesses" && <BusinessesPanel search={search} />}
+              {activeModule === "downloads" && <DownloadsPanel search={search} />}
             </div>
           </div>
         </main>
@@ -489,18 +531,21 @@ function DashboardHeader({
     accounting: "Accounting",
     notifications: "Notifications",
     offerings: "Storefront",
-    team: "Team",       // ⭐
-    journal: "Journal", // ⭐
+    team: "Team",
+    journal: "Journal",
+    businesses: "Businesses",
+    downloads: "Downloads",
   };
 
-  // Team & Journal manage their own filters. Hide global search.
   const searchable =
     activeModule !== "overview" &&
     activeModule !== "accounting" &&
     activeModule !== "notifications" &&
     activeModule !== "offerings" &&
-    activeModule !== "team" &&    // ⭐
-    activeModule !== "journal";   // ⭐
+    activeModule !== "team" &&
+    activeModule !== "journal" &&
+    activeModule !== "businesses" &&
+    activeModule !== "downloads";
 
   return (
     <header
@@ -573,7 +618,6 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
 
   return (
     <div className="mx-auto max-w-7xl space-y-8">
-      {/* KPI strip */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Kpi
           label="Projects"
@@ -610,7 +654,6 @@ function Overview({ onNavigate }: { onNavigate: (m: ModuleKey) => void }) {
         />
       </section>
 
-      {/* Financial summary */}
       <section className="grid gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-deep-200 bg-cream-50 p-5 dark:border-deep-800 dark:bg-deep-900">
           <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-deep-500 dark:text-cream-500">
@@ -744,8 +787,10 @@ function Kpi({
     accounting: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
     notifications: "from-violet-50/60 to-white dark:from-violet-950/20 dark:to-deep-900",
     offerings: "from-brand-50/60 to-white dark:from-brand-950/20 dark:to-deep-900",
-    team: "from-rose-50/60 to-white dark:from-rose-950/20 dark:to-deep-900",       // ⭐
-    journal: "from-sky-50/60 to-white dark:from-sky-950/20 dark:to-deep-900",      // ⭐
+    team: "from-rose-50/60 to-white dark:from-rose-950/20 dark:to-deep-900",
+    journal: "from-sky-50/60 to-white dark:from-sky-950/20 dark:to-deep-900",
+    businesses: "from-cyan-50/60 to-white dark:from-cyan-950/20 dark:to-deep-900",
+    downloads: "from-teal-50/60 to-white dark:from-teal-950/20 dark:to-deep-900",
   };
 
   return (
@@ -975,7 +1020,6 @@ function StorefrontIcon() {
     </svg>
   );
 }
-// ⭐ NEW — Team icon
 function UsersIcon() {
   return (
     <svg {...iconBase}>
@@ -986,11 +1030,30 @@ function UsersIcon() {
     </svg>
   );
 }
-// ⭐ NEW — Journal icon
 function BookIcon() {
   return (
     <svg {...iconBase}>
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+    </svg>
+  );
+}
+// ⭐ NEW — Store icon
+function StoreIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M3 9h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z" />
+      <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
+      <path d="M8 13h8" />
+    </svg>
+  );
+}
+// ⭐ NEW — Download icon
+function DownloadIcon() {
+  return (
+    <svg {...iconBase}>
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M12 15V3" />
     </svg>
   );
 }
