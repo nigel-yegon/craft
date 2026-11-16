@@ -121,3 +121,8 @@ export type TeamMember = Prisma.TeamMemberModel
  * 
  */
 export type JournalPost = Prisma.JournalPostModel
+/**
+ * Model Business
+ * 
+ */
+export type Business = Prisma.BusinessModel

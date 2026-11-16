@@ -66,7 +66,8 @@ export const ModelName = {
   Notification: 'Notification',
   StoreItem: 'StoreItem',
   TeamMember: 'TeamMember',
-  JournalPost: 'JournalPost'
+  JournalPost: 'JournalPost',
+  Business: 'Business'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -377,6 +378,18 @@ export const JournalPostScalarFieldEnum = {
 } as const
 
 export type JournalPostScalarFieldEnum = (typeof JournalPostScalarFieldEnum)[keyof typeof JournalPostScalarFieldEnum]
+
+
+export const BusinessScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phone: 'phone',
+  email: 'email',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BusinessScalarFieldEnum = (typeof BusinessScalarFieldEnum)[keyof typeof BusinessScalarFieldEnum]
 
 
 export const SortOrder = {

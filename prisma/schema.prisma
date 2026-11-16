@@ -407,3 +407,13 @@ model JournalPost {
   @@index([category])
   @@index([featured])
 }
+model Business {
+  id        String   @id
+  name      String
+  phone     String?
+  email     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}

@@ -21,6 +21,14 @@ type NotificationRow = {
   publishedAt: string;
 };
 
+type BusinessRow = {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  createdAt: string;
+};
+
 const TYPES: { value: NotificationType; label: string; tone: string }[] = [
   {
     value: "subscription",
@@ -64,11 +72,12 @@ const inputClass =
 
 export function NotificationsPanel({ search = "" }: { search?: string }) {
   const [items, setItems] = useState<NotificationRow[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ⭐ Filter — empty string means "all businesses"
+  // Filter — empty string means "all businesses"
   const [filterBusinessId, setFilterBusinessId] = useState<string>("");
 
   // Form state
@@ -78,11 +87,31 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
   const [body, setBody] = useState("");
   const [actionRoute, setActionRoute] = useState("");
 
+  // ⭐ Fetch registered businesses once on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/businesses", {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const rows: BusinessRow[] = await res.json();
+        setBusinesses(rows);
+        // Auto-select the first shop if none chosen
+        if (rows.length > 0 && !businessId) {
+          setBusinessId(rows[0].id);
+        }
+      } catch {
+        // Silent — the dropdown just stays empty if the endpoint fails
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const refresh = async () => {
     setLoading(true);
     setError(null);
     try {
-      // ⭐ Conditionally add businessId
       const qs = new URLSearchParams({ limit: "100" });
       if (filterBusinessId.trim()) {
         qs.set("businessId", filterBusinessId.trim());
@@ -103,19 +132,10 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
     }
   };
 
-  // Refresh whenever the filter changes
   useEffect(() => {
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterBusinessId]);
-
-  // Distinct business IDs seen in the current load — used to populate
-  // the filter dropdown without a separate businesses API.
-  const knownBusinessIds = useMemo(() => {
-    const set = new Set<string>();
-    for (const n of items) set.add(n.businessId);
-    return Array.from(set).sort();
-  }, [items]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -130,6 +150,10 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!businessId) {
+      setError("Pick a business first");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -173,6 +197,8 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
     }
   };
 
+  const selectedBusiness = businesses.find((b) => b.id === businessId);
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       {/* ── Header ─────────────────────────────────────── */}
@@ -204,14 +230,38 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
           </h3>
 
           <div className="space-y-4">
-            <Field label="Business ID">
-              <input
-                required
-                value={businessId}
-                onChange={(e) => setBusinessId(e.target.value)}
-                placeholder="UUID of the shop, or 'default-business-id'"
-                className={inputClass}
-              />
+            {/* ⭐ Business dropdown — populated from /api/admin/businesses */}
+            <Field label="Business">
+              {businesses.length === 0 ? (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+                  No businesses registered yet. Once a shop completes setup,
+                  it will appear here.
+                </div>
+              ) : (
+                <select
+                  required
+                  value={businessId}
+                  onChange={(e) => setBusinessId(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">Choose a shop…</option>
+                  {businesses.map((b) => (
+                    <option
+                      key={b.id}
+                      value={b.id}
+                      className="bg-cream-100 text-deep-800 dark:bg-deep-900 dark:text-cream-100"
+                    >
+                      {b.name} — {b.id.slice(0, 8)}…
+                    </option>
+                  ))}
+                </select>
+              )}
+              {selectedBusiness && (
+                <p className="mt-1 text-[11px] text-deep-500 dark:text-cream-500">
+                  {selectedBusiness.name}
+                  {selectedBusiness.phone ? ` · ${selectedBusiness.phone}` : ""}
+                </p>
+              )}
             </Field>
 
             <Field label="Type">
@@ -272,7 +322,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
 
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || businesses.length === 0}
             className="mt-5 w-full rounded-xl bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-800 disabled:opacity-50"
           >
             {busy ? "Publishing…" : "Publish notification"}
@@ -286,21 +336,21 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
               Recent notifications
             </h3>
             <div className="flex gap-2">
-              {/* ⭐ Business filter — reuses knownBusinessIds from current load */}
-              {knownBusinessIds.length > 0 && (
+              {/* ⭐ Filter dropdown — same businesses list */}
+              {businesses.length > 0 && (
                 <select
                   value={filterBusinessId}
                   onChange={(e) => setFilterBusinessId(e.target.value)}
-                  className={`${inputClass} max-w-xs !w-auto`}
+                  className={`${inputClass} max-w-xs w-auto!`}
                 >
                   <option value="">All businesses</option>
-                  {knownBusinessIds.map((id) => (
+                  {businesses.map((b) => (
                     <option
-                      key={id}
-                      value={id}
+                      key={b.id}
+                      value={b.id}
                       className="bg-cream-100 text-deep-800 dark:bg-deep-900 dark:text-cream-100"
                     >
-                      {id}
+                      {b.name}
                     </option>
                   ))}
                 </select>
@@ -328,6 +378,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
             <ul className="divide-y divide-deep-100 dark:divide-deep-800">
               {filtered.map((n) => {
                 const tone = TYPES.find((t) => t.value === n.type)?.tone ?? "";
+                const biz = businesses.find((b) => b.id === n.businessId);
                 return (
                   <li key={n.id} className="py-3">
                     <div className="flex items-start justify-between gap-3">
@@ -339,7 +390,7 @@ export function NotificationsPanel({ search = "" }: { search?: string }) {
                             {n.type}
                           </span>
                           <span className="truncate text-xs text-deep-500 dark:text-cream-400">
-                            {n.businessId}
+                            {biz?.name ?? n.businessId}
                           </span>
                         </div>
                         <p className="mt-1 truncate text-sm font-medium text-deep-800 dark:text-cream-100">
