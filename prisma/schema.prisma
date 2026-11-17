@@ -426,3 +426,41 @@ model BusinessBackup {
 
   @@index([businessId, createdAt])
 }
+// Add to prisma/schema.prisma
+model RentInvoice {
+  id            Int       @id @default(autoincrement())
+  businessId    String
+  unitId        String
+  unitNumber    String
+  propertyName  String
+  tenantName    String
+  tenantPhone   String
+  amount        Int
+  forMonth      String    // "YYYY-MM"
+  dueDate       DateTime
+  status        String    @default("PENDING")
+  paidAt        DateTime?
+  paymentId     Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([unitId, forMonth])
+  @@index([businessId, forMonth])
+  @@index([status])
+}
+
+model RegisteredUnit {
+  id            String   @id
+  businessId    String
+  propertyName  String
+  unitNumber    String
+  monthlyRent   Int
+  dueDay        Int      @default(5)
+  tenantName    String?
+  tenantPhone   String?
+  isOccupied    Boolean  @default(false)
+  syncedAt      DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@index([businessId, isOccupied])
+}
