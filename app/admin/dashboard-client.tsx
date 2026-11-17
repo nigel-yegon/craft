@@ -24,6 +24,7 @@ import { TeamPanel } from "./team/team-panel";
 import { JournalPanel } from "./journal/journal-panel";
 import { BusinessesPanel } from "./businesses/businesses-panel";
 import { DownloadsPanel } from "./downloads/downloads-panel";
+import { RentPanel } from "./payments/rent-panel";
 
 // ─── Types ────────────────────────────────────────────────────────
 type ModuleKey =
@@ -296,11 +297,15 @@ export function DashboardClient({ userName }: { userName: string }) {
 }
 
 // ─── Sub-Component: PaymentsModule Tabs ───────────────────────────
+// ─── Sub-Component: PaymentsModule Tabs ───────────────────────────
 function PaymentsModule({ search }: { search: string }) {
-  const [activeTab, setActiveTab] = useState<"invoices" | "transactions" | "subscriptions">("invoices");
+  const [activeTab, setActiveTab] = useState<
+    "invoices" | "rent" | "transactions" | "subscriptions"
+  >("invoices");
 
   const tabs = [
     { key: "invoices", label: "Invoices" },
+    { key: "rent", label: "Rent Invoices" },
     { key: "transactions", label: "All Transactions" },
     { key: "subscriptions", label: "Subscriptions" },
   ] as const;
@@ -318,7 +323,7 @@ function PaymentsModule({ search }: { search: string }) {
             </h2>
           </div>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-deep-600 dark:text-cream-400">
-            Manage invoices, review all M-Pesa transactions, and track active subscriptions.
+            Manage invoices, rent collection, M-Pesa transactions, and subscriptions.
           </p>
         </div>
       </div>
@@ -346,6 +351,7 @@ function PaymentsModule({ search }: { search: string }) {
 
       <div className="mt-4">
         {activeTab === "invoices" && <PaymentsPanel search={search} />}
+        {activeTab === "rent" && <RentPanel search={search} />}
         {activeTab === "transactions" && <TransactionPanel search={search} />}
         {activeTab === "subscriptions" && <SubscriptionsPanel search={search} />}
       </div>
